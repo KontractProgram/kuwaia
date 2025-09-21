@@ -23,7 +23,6 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
     AiDiaryScreen(),
     ToolsScreen(),
     AiJournalScreen(),
-    Text('Settings'),
     ProfileScreen()
   ];
 
