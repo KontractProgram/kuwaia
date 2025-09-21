@@ -69,8 +69,52 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
+  Future<void> addToolToDiary({
+    required String profileId,
+    required Tools tool,
+  }) async {
+    print('aaaaaaaaa');
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      print('qqqqqqqqqq');
+
+      // Insert into Supabase
+      await _client.from('profile_tools_map').insert({
+        'profile_id': profileId,
+        'tool_id': tool.id,
+      });
+
+      print('wwwwwwwww');
+
+      // Update local state
+      _profileToolsMap ??= [];
+      _profileToolsMap!.add({
+        'profile_id': profileId,
+        'tool_id': tool.id,
+      });
+
+      _diary ??= [];
+      _diary!.add(tool);
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
   Future<void> deleteToolFromDiary({required String profileId, required int toolId}) async {
     try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
       await _client
           .from('profile_tools_map')
           .delete()
@@ -81,6 +125,7 @@ class AiDiaryProvider with ChangeNotifier{
       _profileToolsMap?.removeWhere((map) => map['tool_id'] == toolId);
       _diary?.removeWhere((tool) => tool.id == toolId);
 
+      _isLoading = false;
       notifyListeners();
     } catch (e) {
       _error = e.toString();

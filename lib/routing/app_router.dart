@@ -15,7 +15,6 @@ class AppRouter {
       redirect: (context, state) {
         final auth = context.read<AuthProvider>();
         if(auth.isLoading) return '/loading';
-        if(auth.isAuthenticated) return '/landing';
 
         final inAuthFlow = state.matchedLocation.startsWith('/auth_') ||
                            state.matchedLocation.startsWith('/continue_') ||
@@ -23,6 +22,8 @@ class AppRouter {
                            state.matchedLocation.startsWith('/username');
 
         if (!auth.isAuthenticated && !inAuthFlow) return '/auth_options';
+
+        if(auth.isAuthenticated && state.matchedLocation == '/') return '/landing';
 
         return null;
 

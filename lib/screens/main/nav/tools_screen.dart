@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -109,6 +110,21 @@ class _ToolsScreenState extends State<ToolsScreen> {
               itemBuilder: (context, index) {
                 final group = filteredGroups[index];
 
+                return singleTrailCardWidget(
+                  leadingIcon: group.icon,
+                  title: '${group.name} Tools',
+                  subtitle: group.description,
+                  onPressed: () {
+                    final List<Tools> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
+                    context.push(
+                        '/tools_in_group',
+                        extra: {
+                        'group': group,
+                        'tools': toolsInGroup
+                        },
+                    );
+                  }
+                );
                 return Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(15),
@@ -135,7 +151,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
                       final List<Tools> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
 
                       context.push(
-                        '/toolsInGroup',
+                        '/tools_in_group',
                         extra: {
                           'group': group,
                           'tools': toolsInGroup

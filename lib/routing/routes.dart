@@ -87,7 +87,7 @@ final routes = [
     builder: (context, state) => const OnboardingScreen(),
   ),
   GoRoute(
-    path: '/tools_in_group/:group/:tools',
+    path: '/tools_in_group',
     name: AppRoute.toolsInGroup.name,
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>;

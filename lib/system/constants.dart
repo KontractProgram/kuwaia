@@ -7,12 +7,12 @@ class AppColors {
   static final Color primaryBackgroundColor = Color(0xFF121212);
   static final Color secondaryBackgroundColor = Color(0xFF1E1E1E);
   static final Color primaryAccentColor = Color(0xFF00A3FF);
-  static final Color secondaryAccentColor = Color(0xFFFFC700);
+  static final Color secondaryAccentColor = Color(0xFF8087C0);
   static final Color dashaSignatureColor = Color(0xFFFF6B81);
   static final Color bodyTextColor = Color(0xFFEAEAEA);
   static final Color headingTextColor = Color(0xFFFFFFFF);
   static final Color warningColor = Color(0xFFFF1111);
-  static final Color confirmColor = Color(0xFF00FF00);
+  static final Color confirmColor = Color(0xFF00FF11);
 }
 
 //images

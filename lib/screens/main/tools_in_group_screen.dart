@@ -8,6 +8,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../models/Group.dart';
 import '../../models/tools.dart';
+import '../../providers/auth_provider.dart';
 import '../../system/constants.dart';
 import '../../widgets/texts.dart';
 
@@ -58,14 +59,29 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                       final tool = widget.tools[index];
                       final logo = '';
 
-                      final inDiary = context.read<AiDiaryProvider>().isToolAFavorite(tool);
+                      final inDiary = context.read<AiDiaryProvider>().isToolInDiary(tool);
+                      print('tool ${tool.name} in diary $inDiary');
 
                       return toolCardWidget(
                         context: context,
                         tool: tool,
                         group: widget.group,
                         inDiary: inDiary,
-                        logo: logo
+                        logo: logo,
+                        onBookMarkPressed: () async {
+                          print('333333333');
+                          final profileId = context.read<AuthProvider>().profile!.id;
+                          print(profileId);
+                          if(inDiary) {
+                            print('2222222222');
+                            await context.read<AiDiaryProvider>().deleteToolFromDiary(profileId: profileId, toolId: tool.id);
+                          } else {
+                            print('000000000000');
+                            await context.read<AiDiaryProvider>().addToolToDiary(profileId: profileId, tool: tool);
+                          }
+
+                          setState(() {});
+                        }
                       );
                     }
                 )

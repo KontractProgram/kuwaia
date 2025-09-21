@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -27,12 +28,12 @@ Widget toolCardWidget({
       contentPadding: const EdgeInsets.all(0),
       leading: CircleAvatar(
         radius: 25,
-        backgroundColor: AppColors.secondaryAccentColor,
+        backgroundColor: AppColors.secondaryBackgroundColor,
         child: logo.isEmpty ? reusableText(
             text: tool.id.toString(),
             fontSize: 16,
             fontWeight: FontWeight.bold
-        ) : Image.asset(logo, width: 50, fit: BoxFit.cover,),
+        ) : ClipOval(child: Image.asset(logo, width: 50, fit: BoxFit.cover,)),
       ),
 
       title: Row(
@@ -110,7 +111,7 @@ Widget toolCardWidget({
                     );
                   },
                 );
-                if (shouldDelete == true) onBookMarkPressed;
+                if (shouldDelete == true) onBookMarkPressed?.call();
               } else {
                 final addToDiary = await showDialog<bool>(
                   context: context,
@@ -127,13 +128,13 @@ Widget toolCardWidget({
                         ElevatedButton(
                           onPressed: () => context.pop(true),
                           style: ElevatedButton.styleFrom(backgroundColor: AppColors.confirmColor),
-                          child: reusableText(text: "Confirm"),
+                          child: reusableText(text: "Confirm", color: AppColors.secondaryBackgroundColor),
                         )
                       ],
                     );
                   }
                 );
-                if (addToDiary == true) onBookMarkPressed;
+                if (addToDiary == true) onBookMarkPressed?.call();
               }
 
             },
@@ -141,6 +142,39 @@ Widget toolCardWidget({
           SizedBox(width: 10)
         ],
       ),
+    ),
+  );
+}
+
+Widget singleTrailCardWidget({
+  required IconData leadingIcon,
+  required String title,
+  String? subtitle,
+  VoidCallback? onPressed,
+  }){
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(15),
+      color: AppColors.secondaryBackgroundColor,
+    ),
+    padding: EdgeInsets.all(8),
+    margin: EdgeInsets.only(top: 15),
+    child: ListTile(
+        leading: FaIcon(
+            leadingIcon,
+            color: AppColors.primaryAccentColor,
+            size: 25
+        ),
+        title: reusableText(
+            text: title,
+            textAlign: TextAlign.start,
+            fontWeight: FontWeight.w600,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis
+        ),
+        subtitle: reusableText(text: subtitle ?? '', color: AppColors.bodyTextColor.withAlpha(129), fontSize: 12, textAlign: TextAlign.start),
+        trailing: FaIcon(FontAwesomeIcons.chevronRight, color: AppColors.bodyTextColor.withAlpha(150),),
+        onTap: onPressed
     ),
   );
 }

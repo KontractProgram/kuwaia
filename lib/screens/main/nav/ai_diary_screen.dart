@@ -106,7 +106,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                 itemCount: filteredTools.length,
                 itemBuilder: (context, index) {
                   final tool = filteredTools[index];
-                  final logo = '';
+                  final logo = 'assets/tool_logos/1.png';
                   final group = groups.firstWhere((g) => g.id == tool.groupId);
 
                   return toolCardWidget(
@@ -120,111 +120,6 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                       diaryProvider.deleteToolFromDiary(profileId: auth.profile!.id, toolId: tool.id);
                     }
                   );
-
-                  // return Container(
-                  //   decoration: BoxDecoration(
-                  //     borderRadius: BorderRadius.circular(15),
-                  //     color: AppColors.secondaryBackgroundColor,
-                  //   ),
-                  //   padding: EdgeInsets.all(8),
-                  //   margin: EdgeInsets.only(top: 15),
-                  //   child: ListTile(
-                  //     contentPadding: const EdgeInsets.all(0),
-                  //     leading: CircleAvatar(
-                  //       radius: 25,
-                  //       backgroundColor: AppColors.secondaryAccentColor,
-                  //       child: logo.isEmpty ? reusableText(
-                  //           text: tool.id.toString(),
-                  //           fontSize: 16,
-                  //           fontWeight: FontWeight.bold
-                  //       ) : Image.asset(logo, width: 50, fit: BoxFit.cover,),
-                  //     ),
-                  //
-                  //     title: Row(
-                  //       crossAxisAlignment: CrossAxisAlignment.start,
-                  //       mainAxisAlignment: MainAxisAlignment.start,
-                  //       children: [
-                  //         Flexible(
-                  //           child: reusableText(
-                  //             text: tool.name,
-                  //             fontWeight: FontWeight.w600,
-                  //             textAlign: TextAlign.start,
-                  //             maxLines: 2,
-                  //             overflow: TextOverflow.ellipsis, // optional
-                  //           ),
-                  //         ),
-                  //         const SizedBox(width: 5),
-                  //         GestureDetector(
-                  //           onTap: () => launchUrl(Uri.parse(tool.visitLink)),
-                  //           child: FaIcon(
-                  //             FontAwesomeIcons.arrowUpRightFromSquare,
-                  //             color: AppColors.bodyTextColor,
-                  //             size: 16,
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //
-                  //
-                  //     subtitle: reusableText(
-                  //         text: '${group.name} Tools',
-                  //         fontSize: 14,
-                  //         color: AppColors.bodyTextColor.withAlpha(128),
-                  //         textAlign: TextAlign.start
-                  //     ),
-                  //
-                  //     trailing: Row(
-                  //       mainAxisSize: MainAxisSize.min,
-                  //       children: [
-                  //
-                  //         GestureDetector(
-                  //             onTap: () {},
-                  //             child: Image.asset(youtubeLogo, width: 30, fit: BoxFit.cover,),
-                  //         ),
-                  //
-                  //         SizedBox(width: 20,),
-                  //
-                  //         GestureDetector(
-                  //           child: FaIcon(FontAwesomeIcons.solidBookmark, size: 20, color: AppColors.primaryAccentColor),
-                  //           onTap: () async {
-                  //             final shouldDelete = await showDialog<bool>(
-                  //               context: context,
-                  //               builder: (context) {
-                  //                 return AlertDialog(
-                  //                   backgroundColor: AppColors.secondaryBackgroundColor,
-                  //                   title: reusableText(text: "Remove Tool", fontWeight: FontWeight.w600, fontSize: 20),
-                  //                   content: reusableText(text: "Are you sure you want to remove ${tool.name} from your diary?", textAlign: TextAlign.start),
-                  //                   actions: [
-                  //                     TextButton(
-                  //                       child: reusableText(text: "Cancel"),
-                  //                       onPressed: () => context.pop(false),
-                  //                     ),
-                  //                     ElevatedButton(
-                  //                       style: ElevatedButton.styleFrom(
-                  //                         backgroundColor: AppColors.warningColor,
-                  //                       ),
-                  //                       child: reusableText(text: "Remove"),
-                  //                       onPressed: () => context.pop(true),
-                  //                     ),
-                  //                   ],
-                  //                 );
-                  //               },
-                  //             );
-                  //
-                  //             if (shouldDelete == true) {
-                  //               final auth = context.read<AuthProvider>();
-                  //               diaryProvider.deleteToolFromDiary(
-                  //                 profileId: auth.profile!.id,
-                  //                 toolId: tool.id,
-                  //               );
-                  //             }
-                  //           },
-                  //         ),
-                  //         SizedBox(width: 10,)
-                  //       ],
-                  //     ),
-                  //   ),
-                  // );
                 },
               ),
           ],
