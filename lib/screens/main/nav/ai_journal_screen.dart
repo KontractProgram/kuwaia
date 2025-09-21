@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/widgets/texts.dart';
 
 class AiJournalScreen extends StatefulWidget {
   const AiJournalScreen({super.key});
@@ -10,8 +11,11 @@ class AiJournalScreen extends StatefulWidget {
 class _AiJournalScreenState extends State<AiJournalScreen> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    final size = MediaQuery.of(context).size;
+
+    return Container(
+      child: reusableText(text: 'ai journal'),
+    );
   }
   
 }

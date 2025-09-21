@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kuwaia/screens/main/nav/ai_diary_screen.dart';
+import 'package:kuwaia/screens/main/nav/ai_journal_screen.dart';
 import 'package:kuwaia/screens/main/nav/profile_screen.dart';
 import 'package:kuwaia/screens/main/nav/tools_screen.dart';
 import 'package:kuwaia/system/constants.dart';
@@ -21,7 +22,7 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
   static final List<Widget> _widgetOptions = <Widget>[
     AiDiaryScreen(),
     ToolsScreen(),
-    Text('AI Journal'),
+    AiJournalScreen(),
     Text('Settings'),
     ProfileScreen()
   ];
