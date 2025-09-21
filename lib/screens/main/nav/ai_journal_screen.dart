@@ -1,0 +1,17 @@
+import 'package:flutter/material.dart';
+
+class AiJournalScreen extends StatefulWidget {
+  const AiJournalScreen({super.key});
+
+  @override
+  State<AiJournalScreen> createState() => _AiJournalScreenState();
+}
+
+class _AiJournalScreenState extends State<AiJournalScreen> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+  
+}
