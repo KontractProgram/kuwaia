@@ -193,6 +193,8 @@ Widget savedPromptWidget({
     margin: EdgeInsets.only(top: 16),
     child: Column(
       mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         reusableText(
           text: description,
@@ -239,7 +241,10 @@ Widget savedPromptWidget({
                 icon: FaIcon(FontAwesomeIcons.trashCan, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
             ),
           ],
-        )
+        ),
+
+        SizedBox(height: 5),
+        Divider(),
       ],
     ),
   );

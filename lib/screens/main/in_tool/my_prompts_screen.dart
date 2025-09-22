@@ -1,12 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-
-import '../../../models/prompt.dart';
 import '../../../models/tool.dart';
 import '../../../system/constants.dart';
 import '../../../widgets/buttons.dart';
@@ -31,16 +28,22 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
     });
   }
 
-  void _showAddPromptModal(BuildContext context) {
+  void _showAddPromptModal(BuildContext context, Size size) {
     final descriptionController = TextEditingController();
     final promptController = TextEditingController();
     final profileId = context.read<AuthProvider>().profile!.id;
 
     showModalBottomSheet(
+      backgroundColor: Colors.transparent,
       context: context,
       isScrollControlled: true,
       builder: (_) {
-        return Padding(
+        return Container(
+          height: size.height * 0.9, // 90% of screen height
+          decoration: BoxDecoration(
+            color: AppColors.primaryBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
             left: 16,
@@ -59,16 +62,43 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
               TextField(
                 controller: descriptionController,
                 maxLength: 150,
-                decoration: const InputDecoration(labelText: "Description"),
+                decoration: InputDecoration(
+                  labelText: "Description",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                  ),
+                ),
+                style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
               ),
+              SizedBox(height: 20),
               TextField(
                 controller: promptController,
                 maxLength: 1000,
                 maxLines: 5,
-                decoration: const InputDecoration(labelText: "Prompt"),
+                decoration: InputDecoration(
+                  labelText: "Prompt",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                  ),
+                ),
+                style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+              longActionButton(
+                text: "Save Prompt",
+                size: size,
+                buttonColor: AppColors.primaryAccentColor,
+                textColor: AppColors.bodyTextColor,
                 onPressed: () {
                   if (descriptionController.text.isNotEmpty &&
                       promptController.text.isNotEmpty) {
@@ -82,9 +112,7 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text("Save Prompt"),
               ),
-              const SizedBox(height: 16),
             ],
           ),
         );
@@ -139,29 +167,31 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                         shortActionButton(
                           text: "+ Add Prompt",
                           size: size,
-                          onPressed: () => _showAddPromptModal(context),
+                          onPressed: () => _showAddPromptModal(context, size),
                         ),
-
-                        SizedBox(height: size.height*0.02,),
-
-                        // list of prompts in saved prompt widgets
-
-                        if (prompts.isEmpty)
-                          Center(
-                            child: Lottie.asset(emptyBox, width: size.width*0.6,
-                            ),
-                          )
-                        else
-                          Column(
-                            children: prompts.map((prompt) {
-                              return savedPromptWidget(
-                                description: prompt.description,
-                                prompt: prompt.prompt,
-                              );
-                            }).toList(),
-                          )
                       ],
-                    )
+                    ),
+
+                    SizedBox(height: size.height*0.02,),
+
+                    if (prompts.isEmpty)
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children:
+                        [
+                          SizedBox(height: size.height*0.2),
+                          Lottie.asset(emptyBox, width: size.width*0.6),
+                        ]
+                      )
+                    else
+                      Column(
+                        children: prompts.map((prompt) {
+                          return savedPromptWidget(
+                            description: prompt.description,
+                            prompt: prompt.prompt,
+                          );
+                        }).toList(),
+                      )
                   ],
                 ),
               );
