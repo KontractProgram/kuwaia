@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/prompt.dart';
 import '../models/tool.dart';
 
 class AiDiaryProvider with ChangeNotifier{
@@ -7,11 +8,13 @@ class AiDiaryProvider with ChangeNotifier{
 
   List<Tool>? _diary;
   List<Map<String, dynamic>>? _profileToolsMap;
+  List<Prompt>? _myPrompts;
   bool _isLoading = true;
   String? _error;
 
   List<Tool>? get diary => _diary;
   List<Map<String, dynamic>>? get profileToolsMap => _profileToolsMap;
+  List<Prompt>? get myPrompts => _myPrompts;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -29,7 +32,6 @@ class AiDiaryProvider with ChangeNotifier{
     if (match.isEmpty) return false;
     return match['is_favorite'] == true;
   }
-
 
   Future<void> fetchDiary(String profileId) async {
     try{
@@ -69,25 +71,17 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addToolToDiary({
-    required String profileId,
-    required Tool tool,
-  }) async {
-    print('aaaaaaaaa');
+  Future<void> addToolToDiary({required String profileId, required Tool tool,}) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
-
-      print('qqqqqqqqqq');
 
       // Insert into Supabase
       await _client.from('profile_tools_map').insert({
         'profile_id': profileId,
         'tool_id': tool.id,
       });
-
-      print('wwwwwwwww');
 
       // Update local state
       _profileToolsMap ??= [];
@@ -107,7 +101,6 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
     }
   }
-
 
   Future<void> deleteToolFromDiary({required String profileId, required int toolId}) async {
     try {
@@ -129,12 +122,17 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
     } catch (e) {
       _error = e.toString();
+      _isLoading = false;
       notifyListeners();
     }
   }
 
   Future<void> updateFavoriteStatus({required String profileId, required int toolId, required bool isFavorite}) async {
     try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
       await _client
           .from('profile_tools_map')
           .update({'is_favorite': isFavorite})
@@ -151,9 +149,119 @@ class AiDiaryProvider with ChangeNotifier{
         map['is_favorite'] = isFavorite;
       }
 
+      _isLoading = false;
       notifyListeners();
     } catch (e) {
       _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchPrompts({required int toolId, required String profileId}) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the prompts data
+      final promptsResponse = await _client.from('profile_tool_prompt').select().match(query);
+
+      final promptList = List<Map<String, dynamic>>.from(promptsResponse);
+
+      _myPrompts = promptList.map((map) => Prompt.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchPromptWithId({required int id, required int toolId, required String profileId}) async{
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the prompts data
+      final promptResponse = await _client.from('profile_tool_prompt').select().match(query);
+
+      final promptMap = promptResponse[0];
+      final prompt = Prompt.fromMap(promptMap);
+      _myPrompts?.add(prompt);
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addPrompt({required String description, required String prompt, required int toolId, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client.from('profile_tool_prompt').insert({
+        'description': description,
+        'prompt': prompt,
+        'tool_id': toolId,
+        'profile_id': profileId
+      });
+
+      _myPrompts ??= [];
+      fetchPrompts(toolId: toolId, profileId: profileId);
+
+      _isLoading = false;
+      notifyListeners();
+    }  catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updatePrompt({required Prompt prompt, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_prompt')
+          .update({'description': prompt.description, 'prompt': prompt.prompt})
+          .eq('id', prompt.id)
+          .eq('tool_id', prompt.toolId)
+          .eq('profile_id', profileId);
+
+      // Update local cache
+      if (_myPrompts != null) {
+        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
+        if (index != -1) {
+          _myPrompts![index] = prompt;
+        } else {
+          // optional: insert if not found
+          _myPrompts!.add(prompt);
+        }
+      } else {
+        _myPrompts = [prompt];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
       notifyListeners();
     }
   }

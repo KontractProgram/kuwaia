@@ -4,7 +4,7 @@ import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import '../../../models/Group.dart';
+import '../../../models/group.dart';
 import '../../../models/tool.dart';
 import '../../../providers/tools_provider.dart';
 import '../../../system/constants.dart';

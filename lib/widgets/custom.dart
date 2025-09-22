@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kuwaia/models/Group.dart';
+import 'package:kuwaia/models/group.dart';
 import 'package:kuwaia/models/tool.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -14,6 +14,7 @@ Widget toolCardWidget({
   required Group group,
   required bool inDiary,
   required String logo,
+  VoidCallback? onPressed,
   VoidCallback? onBookMarkPressed,
 }){
   return Container(
@@ -24,6 +25,7 @@ Widget toolCardWidget({
     padding: EdgeInsets.all(8),
     margin: EdgeInsets.only(top: 15),
     child: ListTile(
+      onTap: onPressed,
       contentPadding: const EdgeInsets.all(0),
       leading: CircleAvatar(
         radius: 25,
@@ -59,7 +61,6 @@ Widget toolCardWidget({
           ),
         ],
       ),
-
 
       subtitle: reusableText(
           text: '${group.name} Tools',
@@ -171,7 +172,9 @@ Widget singleTrailCardWidget({
             maxLines: 1,
             overflow: TextOverflow.ellipsis
         ),
-        subtitle: reusableText(text: subtitle ?? '', color: AppColors.bodyTextColor.withAlpha(129), fontSize: 12, textAlign: TextAlign.start),
+        subtitle: subtitle != null
+          ? reusableText(text: subtitle ?? '', color: AppColors.bodyTextColor.withAlpha(129), fontSize: 12, textAlign: TextAlign.start)
+          : null,
         trailing: FaIcon(FontAwesomeIcons.chevronRight, color: AppColors.bodyTextColor.withAlpha(150),),
         onTap: onPressed
     ),

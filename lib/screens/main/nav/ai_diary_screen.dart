@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kuwaia/models/Group.dart';
+import 'package:go_router/go_router.dart';
+import 'package:kuwaia/models/group.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/texts.dart';
@@ -112,6 +113,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                     group: group,
                     logo: logo,
                     inDiary: true,
+                    onPressed: () => context.push('/tool_view_screen', extra: {'tool': tool}),
                     onBookMarkPressed: () {
                       final auth = context.read<AuthProvider>();
                       diaryProvider.deleteToolFromDiary(profileId: auth.profile!.id, toolId: tool.id);

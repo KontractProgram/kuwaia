@@ -6,7 +6,7 @@ import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-import '../../models/Group.dart';
+import '../../models/group.dart';
 import '../../models/tool.dart';
 import '../../providers/auth_provider.dart';
 import '../../system/constants.dart';
@@ -29,13 +29,12 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryBackgroundColor,
         leading: leadingButton(context),
-        title: Center(child: reusableText(
+        title: reusableText(
             text: '${widget.group.name} Tools',
             color: AppColors.headingTextColor,
             fontSize: 16,
             maxLines: 1,
             fontWeight: FontWeight.w700
-        ),
         ),
       ),
       body: SafeArea(

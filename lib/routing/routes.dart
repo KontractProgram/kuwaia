@@ -1,9 +1,14 @@
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/screens/main/in_tool/log_details_screen.dart';
+import 'package:kuwaia/screens/main/in_tool/my_prompts_screen.dart';
+import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
+import 'package:kuwaia/screens/main/in_tool/official_use_case_screen.dart';
+import 'package:kuwaia/screens/main/in_tool/tool_view_screen.dart';
 import 'package:kuwaia/screens/main/landing_nav_screen.dart';
 import 'package:kuwaia/screens/main/tools_in_group_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
 
-import '../models/Group.dart';
+import '../models/group.dart';
 import '../models/tool.dart';
 import '../screens/auth/auth_options_screen.dart';
 import 'package:kuwaia/screens/auth/continue_with_email_screen.dart';
@@ -12,6 +17,8 @@ import 'package:kuwaia/screens/auth/password_to_register_screen.dart';
 import 'package:kuwaia/screens/auth/username_screen.dart';
 import 'package:kuwaia/screens/main/landing_screen.dart';
 import 'package:kuwaia/screens/others/loading_screen.dart';
+
+import '../screens/main/in_tool/my_notes_screen.dart';
 
 
 enum AppRoute {
@@ -25,6 +32,12 @@ enum AppRoute {
   loading,
   onboarding,
   toolsInGroup,
+  toolView,
+  myPrompts,
+  myNotes,
+  myVideos,
+  officialUseCase,
+  logDetails
 }
 
 final routes = [
@@ -97,4 +110,62 @@ final routes = [
       return ToolsInGroupScreen(group: group, tools: tools);
     },
   ),
+
+  GoRoute(
+    path: '/tool_view_screen',
+    name: AppRoute.toolView.name,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>;
+      final tool = extra['tool'] as Tool;
+      return ToolViewScreen(tool: tool);
+    }
+  ),
+  GoRoute(
+    path: '/my_prompts',
+    name: AppRoute.myPrompts.name,
+    builder: (context, state) {
+      final extra = state.extra as Map<String, dynamic>;
+      final tool = extra['tool'] as Tool;
+      return MyPromptsScreen(tool: tool);
+    }
+  ),
+  GoRoute(
+      path: '/my_notes',
+      name: AppRoute.myNotes.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final tool = extra['tool'] as Tool;
+        return MyNotesScreen(tool: tool);
+      }
+  ),
+  GoRoute(
+      path: '/my_videos',
+      name: AppRoute.myVideos.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final tool = extra['tool'] as Tool;
+        return MyVideosScreen(tool: tool);
+      }
+  ),
+  GoRoute(
+      path: '/official_use_case',
+      name: AppRoute.officialUseCase.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final tool = extra['tool'] as Tool;
+        return OfficialUseCaseScreen(tool: tool);
+      }
+  ),
+  GoRoute(
+      path: '/log_details',
+      name: AppRoute.logDetails.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final tool = extra['tool'] as Tool;
+        return LogDetailsScreen(tool: tool);
+      }
+  ),
+
+
+
 ];

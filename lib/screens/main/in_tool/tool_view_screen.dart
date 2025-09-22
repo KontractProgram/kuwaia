@@ -24,13 +24,12 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
       appBar: AppBar(
         backgroundColor: AppColors.primaryBackgroundColor,
         leading: leadingButton(context),
-        title: Center(child: reusableText(
-            text: widget.tool.name,
-            color: AppColors.headingTextColor,
-            fontSize: 16,
-            maxLines: 1,
-            fontWeight: FontWeight.w700
-        ),
+        title: reusableText(
+          text: widget.tool.name,
+          color: AppColors.headingTextColor,
+          fontSize: 16,
+          maxLines: 1,
+          fontWeight: FontWeight.w700
         ),
       ),
       body: SafeArea(
@@ -58,12 +57,14 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
                     leadingIcon: FontAwesomeIcons.video,
                     title: 'My Videos',
                     onPressed: () => context.push('/my_videos', extra: {'tool': widget.tool})
-                  ),//my prompts
+                  ),
+                  //Official Use Case
                   singleTrailCardWidget(
                     leadingIcon: FontAwesomeIcons.signature,
                     title: 'Official Use Case',
                     onPressed: () => context.push('/official_use_case', extra: {'tool': widget.tool})
-                  ),//my prompts
+                  ),
+                  //Log Details
                   singleTrailCardWidget(
                     leadingIcon: FontAwesomeIcons.clockRotateLeft,
                     title: 'Log Details',

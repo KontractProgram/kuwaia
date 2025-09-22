@@ -28,6 +28,7 @@ const montserratRegular = "assets/fonts/Montserrat-Regular.ttf";
 //animations
 const threeDotsLoading = "assets/anim/loading.json";
 const emptyDiary = "assets/anim/empty_diary.json";
+const emptyBox = "assets/anim/empty_box.json";
 
 
 
