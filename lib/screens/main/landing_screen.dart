@@ -33,7 +33,6 @@ class _LandingScreenState extends State<LandingScreen> {
   @override
   Widget build(BuildContext context) {
 
-
     return Scaffold(
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {

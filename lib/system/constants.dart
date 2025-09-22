@@ -1,7 +1,5 @@
 import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class AppColors {
   static final Color primaryBackgroundColor = Color(0xFF121212);
@@ -51,7 +49,6 @@ String? validateEmail(String? value) {
 
     return null;
   }
-
 
 String? validateUsername(String? value) {
   if (value == null || value.isEmpty) {

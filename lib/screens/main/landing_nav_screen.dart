@@ -99,17 +99,6 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
           ),
           BottomNavigationBarItem(
               icon: glowingIcon(
-                icon: FontAwesomeIcons.gear,
-                isActive: false,
-              ),
-              activeIcon: glowingIcon(
-                icon: FontAwesomeIcons.gear,
-                isActive: true,
-              ),
-              label: 'Settings'
-          ),
-          BottomNavigationBarItem(
-              icon: glowingIcon(
                 icon: FontAwesomeIcons.user,
                 isActive: false,
               ),

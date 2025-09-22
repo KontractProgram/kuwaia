@@ -59,11 +59,7 @@ class AuthProvider with ChangeNotifier {
 
 
   /// Sign up
-  Future<AuthResponse> signUpWithEmailPassword({
-    required String email,
-    required String password,
-    required String username,
-  }) async {
+  Future<AuthResponse> signUpWithEmailPassword({required String email, required String password, required String username,}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -172,7 +168,6 @@ class AuthProvider with ChangeNotifier {
 
   /// Onboard user
   Future<void> onboard(List<Map<String, dynamic>> professions) async {
-    print('profossions $professions');
 
     try {
       _isLoading = true;
@@ -187,30 +182,21 @@ class AuthProvider with ChangeNotifier {
         };
       }).toList();
 
-      print('cccccccccccccccccc');
-      print(batchProfileProfessions);
-
       await _client.from('profile_professions_map').insert(batchProfileProfessions);
 
-      print('dddddddddddddddddddddd');
 
       // 2 Fetch all relevant group_ids via group_profession_map
       final professionIds = professions.map((p) => p['id']).toList();
 
-      print('eeeeeeeeeeeeeee');
-      print(professionIds);
 
       final groupMap = await _client
           .from('group_profession_map')
           .select('group_id, profession_id')
           .inFilter('profession_id', professionIds);
 
-      print('ffffffffffffff');
-      print(groupMap);
 
       final groupIds = groupMap.map((e) => e['group_id'] as int).toSet().toList();
 
-      print(groupIds);
 
       // 3 Fetch all tools in these groups
       final tools = await _client
@@ -218,7 +204,6 @@ class AuthProvider with ChangeNotifier {
           .select('id, name, group_id')
           .inFilter('group_id', groupIds);
 
-      print(tools);
 
       // 4 Insert into profile_tools
       final batchProfileTools = tools.map((tool) {
@@ -229,8 +214,6 @@ class AuthProvider with ChangeNotifier {
         };
       }).toList();
 
-      print('ggggggggggggggg');
-      print(batchProfileTools);
 
       await _client.from('profile_tools_map').insert(batchProfileTools);
 
@@ -239,8 +222,6 @@ class AuthProvider with ChangeNotifier {
                               .eq('id', _user!.id)
                               .select();
 
-      print('hhhhhhhhhhhhh');
-      print(res);
 
       Map<String, dynamic> data = res[0];
       print(data);

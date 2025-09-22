@@ -56,7 +56,7 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                     itemCount: widget.tools.length,
                     itemBuilder: (context, index) {
                       final tool = widget.tools[index];
-                      final logo = '';
+                      final logo = 'assets/tool_logos/1.png';
 
                       final inDiary = context.read<AiDiaryProvider>().isToolInDiary(tool);
                       print('tool ${tool.name} in diary $inDiary');
@@ -67,15 +67,16 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                         group: widget.group,
                         inDiary: inDiary,
                         logo: logo,
-                        onBookMarkPressed: () async {
-                          print('333333333');
-                          final profileId = context.read<AuthProvider>().profile!.id;
-                          print(profileId);
+                        onPressed: () {
                           if(inDiary) {
-                            print('2222222222');
+                            context.push('/tool_view_screen', extra: {'tool': tool});
+                          }
+                        },
+                        onBookMarkPressed: () async {
+                          final profileId = context.read<AuthProvider>().profile!.id;
+                          if(inDiary) {
                             await context.read<AiDiaryProvider>().deleteToolFromDiary(profileId: profileId, toolId: tool.id);
                           } else {
-                            print('000000000000');
                             await context.read<AiDiaryProvider>().addToolToDiary(profileId: profileId, tool: tool);
                           }
 

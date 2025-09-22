@@ -19,16 +19,23 @@ Widget toolCardWidget({
 }){
   return Container(
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(20),
       color: AppColors.secondaryBackgroundColor,
+      boxShadow: [
+        BoxShadow(
+          color: AppColors.bodyTextColor.withAlpha(150),
+          blurRadius: 5,
+          spreadRadius: 2,
+        ),
+      ],
     ),
-    padding: EdgeInsets.all(8),
-    margin: EdgeInsets.only(top: 15),
+    padding: EdgeInsets.all(4),
+    margin: EdgeInsets.only(top: 10, left: 7, right: 7),
     child: ListTile(
       onTap: onPressed,
       contentPadding: const EdgeInsets.all(0),
       leading: CircleAvatar(
-        radius: 25,
+        radius: 20,
         backgroundColor: AppColors.secondaryBackgroundColor,
         child: logo.isEmpty ? reusableText(
             text: tool.id.toString(),
@@ -154,16 +161,17 @@ Widget singleTrailCardWidget({
   }){
   return Container(
     decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(15),
+      borderRadius: BorderRadius.circular(20),
       color: AppColors.secondaryBackgroundColor,
     ),
-    padding: EdgeInsets.all(8),
-    margin: EdgeInsets.only(top: 15),
+    margin: EdgeInsets.only(top: 10),
+    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
     child: ListTile(
+      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
         leading: FaIcon(
             leadingIcon,
             color: AppColors.primaryAccentColor,
-            size: 25
+            size: 20
         ),
         title: reusableText(
             text: title,
