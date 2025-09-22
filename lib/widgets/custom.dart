@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/Group.dart';
-import 'package:kuwaia/models/tools.dart';
+import 'package:kuwaia/models/tool.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../system/constants.dart';
 
 Widget toolCardWidget({
   required BuildContext context,
-  required Tools tool,
+  required Tool tool,
   required Group group,
   required bool inDiary,
   required String logo,
@@ -178,3 +177,68 @@ Widget singleTrailCardWidget({
     ),
   );
 }
+
+Widget savedPromptWidget({
+  required String description,
+  required String prompt,
+  VoidCallback? onShare,
+  VoidCallback? onCopy,
+  VoidCallback? onEdit,
+  VoidCallback? onDelete,
+}) {
+  return Container(
+    margin: EdgeInsets.only(top: 16),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        reusableText(
+          text: description,
+          fontWeight: FontWeight.w600,
+          maxLines: 1,
+          textAlign: TextAlign.start
+        ),
+
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: AppColors.secondaryBackgroundColor,
+          ),
+          child: reusableText(
+            text: prompt,
+            textAlign: TextAlign.start,
+            fontSize: 12,
+            maxLines: 4
+          ),
+        ),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+              onPressed: (){},
+              icon: FaIcon(FontAwesomeIcons.shareNodes, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.copy, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.penToSquare, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.trashCan, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+          ],
+        )
+      ],
+    ),
+  );
+}
+

@@ -1,14 +1,14 @@
-class Tools {
+class Tool {
   final int id;
   final String name;
   final String visitLink;
   final String learningLink;
   final int groupId;
 
-  Tools({required this.id, required this.name, required this.visitLink, required this.learningLink, required this.groupId});
+  Tool({required this.id, required this.name, required this.visitLink, required this.learningLink, required this.groupId});
 
-  factory Tools.fromMap(Map<String, dynamic> map) {
-    return Tools(
+  factory Tool.fromMap(Map<String, dynamic> map) {
+    return Tool(
         id: map['id'] as int,
         name: map['name'] as String,
         visitLink: map['visit_link'] as String,

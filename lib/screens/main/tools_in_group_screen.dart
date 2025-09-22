@@ -7,14 +7,14 @@ import 'package:kuwaia/widgets/custom.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../models/Group.dart';
-import '../../models/tools.dart';
+import '../../models/tool.dart';
 import '../../providers/auth_provider.dart';
 import '../../system/constants.dart';
 import '../../widgets/texts.dart';
 
 class ToolsInGroupScreen extends StatefulWidget {
   final Group group;
-  final List<Tools> tools;
+  final List<Tool> tools;
   const ToolsInGroupScreen({super.key, required this.group, required this.tools});
 
   @override

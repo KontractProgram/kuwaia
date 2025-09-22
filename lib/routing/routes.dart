@@ -4,7 +4,7 @@ import 'package:kuwaia/screens/main/tools_in_group_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
 
 import '../models/Group.dart';
-import '../models/tools.dart';
+import '../models/tool.dart';
 import '../screens/auth/auth_options_screen.dart';
 import 'package:kuwaia/screens/auth/continue_with_email_screen.dart';
 import 'package:kuwaia/screens/auth/password_to_login_screen.dart';
@@ -92,7 +92,7 @@ final routes = [
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>;
       final group = extra['group'] as Group;
-      final tools = extra['tools'] as List<Tools>;
+      final tools = extra['tools'] as List<Tool>;
 
       return ToolsInGroupScreen(group: group, tools: tools);
     },

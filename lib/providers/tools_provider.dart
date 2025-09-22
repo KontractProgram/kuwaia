@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/tools.dart';
+import '../models/tool.dart';
 
 class ToolsProvider with ChangeNotifier {
   final SupabaseClient _client = Supabase.instance.client;
 
-  List<Tools>? _allTools;
+  List<Tool>? _allTools;
   bool _isLoading = true;
   String? _error;
 
-  List<Tools>? get allTools => _allTools;
+  List<Tool>? get allTools => _allTools;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -23,7 +23,7 @@ class ToolsProvider with ChangeNotifier {
 
       final toolsList = List<Map<String, dynamic>>.from(toolsResponse);
 
-      _allTools = toolsList.map((map) => Tools.fromMap(map)).toList();
+      _allTools = toolsList.map((map) => Tool.fromMap(map)).toList();
 
       _isLoading = false;
       notifyListeners();
@@ -35,7 +35,7 @@ class ToolsProvider with ChangeNotifier {
   }
 
   /// 🔍 Get all tools belonging to a specific group
-  List<Tools> getToolsByGroup(int groupId) {
+  List<Tool> getToolsByGroup(int groupId) {
     if (_allTools == null) return [];
     return _allTools!.where((tool) => tool.groupId == groupId).toList();
   }

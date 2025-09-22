@@ -1,26 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/tools.dart';
+import '../models/tool.dart';
 
 class AiDiaryProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
 
-  List<Tools>? _diary;
+  List<Tool>? _diary;
   List<Map<String, dynamic>>? _profileToolsMap;
   bool _isLoading = true;
   String? _error;
 
-  List<Tools>? get diary => _diary;
+  List<Tool>? get diary => _diary;
   List<Map<String, dynamic>>? get profileToolsMap => _profileToolsMap;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  bool isToolInDiary(Tools tool) {
+  bool isToolInDiary(Tool tool) {
     if (_diary == null) return false;
     return _diary!.any((t) => t.id == tool.id);
   }
 
-  bool isToolAFavorite(Tools tool) {
+  bool isToolAFavorite(Tool tool) {
     if (_profileToolsMap == null) return false;
     final match = _profileToolsMap!.firstWhere(
           (map) => map['tool_id'] == tool.id,
@@ -58,7 +58,7 @@ class AiDiaryProvider with ChangeNotifier{
 
       final toolsList = List<Map<String, dynamic>>.from(toolsResponse);
 
-      _diary = toolsList.map((map) => Tools.fromMap(map)).toList();
+      _diary = toolsList.map((map) => Tool.fromMap(map)).toList();
 
       _isLoading = false;
       notifyListeners();
@@ -71,7 +71,7 @@ class AiDiaryProvider with ChangeNotifier{
 
   Future<void> addToolToDiary({
     required String profileId,
-    required Tools tool,
+    required Tool tool,
   }) async {
     print('aaaaaaaaa');
     try {

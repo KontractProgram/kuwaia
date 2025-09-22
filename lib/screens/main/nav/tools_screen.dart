@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../../models/Group.dart';
-import '../../../models/tools.dart';
+import '../../../models/tool.dart';
 import '../../../providers/tools_provider.dart';
 import '../../../system/constants.dart';
 
@@ -115,7 +114,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
                   title: '${group.name} Tools',
                   subtitle: group.description,
                   onPressed: () {
-                    final List<Tools> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
+                    final List<Tool> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
                     context.push(
                         '/tools_in_group',
                         extra: {
@@ -124,41 +123,6 @@ class _ToolsScreenState extends State<ToolsScreen> {
                         },
                     );
                   }
-                );
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15),
-                    color: AppColors.secondaryBackgroundColor,
-                  ),
-                  padding: EdgeInsets.all(8),
-                  margin: EdgeInsets.only(top: 15),
-                  child: ListTile(
-                    leading: FaIcon(
-                        group.icon,
-                        color: AppColors.primaryAccentColor,
-                        size: 25
-                    ),
-                    title: reusableText(
-                      text: '${group.name} Tools',
-                      textAlign: TextAlign.start,
-                      fontWeight: FontWeight.w600,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis
-                    ),
-                    subtitle: reusableText(text: group.description, color: AppColors.bodyTextColor.withAlpha(129), fontSize: 12, textAlign: TextAlign.start),
-                    trailing: FaIcon(FontAwesomeIcons.chevronRight, color: AppColors.bodyTextColor.withAlpha(150),),
-                    onTap: () {
-                      final List<Tools> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
-
-                      context.push(
-                        '/tools_in_group',
-                        extra: {
-                          'group': group,
-                          'tools': toolsInGroup
-                        },
-                      );
-                    }
-                  ),
                 );
               },
             ),
