@@ -25,7 +25,7 @@ class Prompt {
       'id': id,
       'description': description,
       'prompt': prompt,
-      'toolId': toolId,
+      'tool_id': toolId,
     };
   }
 }

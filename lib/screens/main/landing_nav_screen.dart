@@ -26,13 +26,7 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
     ProfileScreen()
   ];
 
-  static final List<String> _appBarTitles = [
-    'AI Diary',
-    'Tools',
-    'AI Journal',
-    'Settings',
-    'Profile'
-  ];
+  static final List<String> _appBarTitles = ['AI Diary', 'Tools', 'AI Journal', 'Profile'];
 
   @override
   Widget build(BuildContext context) {

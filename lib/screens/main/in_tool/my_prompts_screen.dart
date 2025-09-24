@@ -123,83 +123,66 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primaryBackgroundColor,
-        leading: leadingButton(context),
-        title: reusableText(
-            text: 'My Saved Prompts',
-            color: AppColors.headingTextColor,
-            fontSize: 16,
-            maxLines: 1,
-            fontWeight: FontWeight.w700
-        ),
-      ),
+    return Container(
+        width: size.width*0.9,
+        padding: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.01),
+        child: Consumer<AiDiaryProvider>(
+          builder: (context, aiDiaryProvider, _) {
+            if (aiDiaryProvider.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-      body: SafeArea(
-        child: Container(
-          width: size.width,
-          height: size.height,
-          padding: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.02),
-          child: Consumer<AiDiaryProvider>(
-            builder: (context, aiDiaryProvider, _) {
-              if (aiDiaryProvider.isLoading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-
-              if (aiDiaryProvider.error != null) {
-                return Center(
-                  child: Text(
-                    aiDiaryProvider.error!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                );
-              }
-
-              final prompts = aiDiaryProvider.myPrompts ?? [];
-
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        shortActionButton(
-                          text: "+ Add Prompt",
-                          size: size,
-                          onPressed: () => _showAddPromptModal(context, size),
-                        ),
-                      ],
-                    ),
-
-                    SizedBox(height: size.height*0.02,),
-
-                    if (prompts.isEmpty)
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children:
-                        [
-                          SizedBox(height: size.height*0.2),
-                          Lottie.asset(emptyBox, width: size.width*0.6),
-                        ]
-                      )
-                    else
-                      Column(
-                        children: prompts.map((prompt) {
-                          return savedPromptWidget(
-                            description: prompt.description,
-                            prompt: prompt.prompt,
-                          );
-                        }).toList(),
-                      )
-                  ],
+            if (aiDiaryProvider.error != null) {
+              return Center(
+                child: Text(
+                  aiDiaryProvider.error!,
+                  style: const TextStyle(color: Colors.red),
                 ),
               );
             }
-          )
-        ),
-      ),
-    );
+
+            final prompts = aiDiaryProvider.myPrompts ?? [];
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      shortActionButton(
+                        text: "+ Add Prompt",
+                        size: size,
+                        onPressed: () => _showAddPromptModal(context, size),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: size.height*0.02,),
+
+                  if (prompts.isEmpty)
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children:
+                      [
+                        SizedBox(height: size.height*0.2),
+                        Lottie.asset(emptyBox, width: size.width*0.6),
+                      ]
+                    )
+                  else
+                    Column(
+                      children: prompts.map((prompt) {
+                        return savedPromptWidget(
+                          description: prompt.description,
+                          prompt: prompt.prompt,
+                        );
+                      }).toList(),
+                    )
+                ],
+              ),
+            );
+          }
+        )
+      );
   }
 
 }

@@ -258,3 +258,61 @@ Widget savedPromptWidget({
   );
 }
 
+Widget savedNoteWidget({
+  required String note,
+  VoidCallback? onShare,
+  VoidCallback? onCopy,
+  VoidCallback? onEdit,
+  VoidCallback? onDelete,
+}) {
+  return Container(
+    margin: EdgeInsets.only(top: 16),
+    child: Column(
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: AppColors.secondaryBackgroundColor,
+          ),
+          child: reusableText(
+              text: note,
+              textAlign: TextAlign.start,
+              fontSize: 12,
+              maxLines: 4
+          ),
+        ),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.shareNodes, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.copy, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.penToSquare, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: (){},
+                icon: FaIcon(FontAwesomeIcons.trashCan, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+          ],
+        ),
+
+        SizedBox(height: 5),
+        Divider(),
+      ],
+    ),
+  );
+}
+

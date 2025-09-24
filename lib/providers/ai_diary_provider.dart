@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/Note.dart';
 import '../models/prompt.dart';
 import '../models/tool.dart';
 
@@ -9,12 +10,14 @@ class AiDiaryProvider with ChangeNotifier{
   List<Tool>? _diary;
   List<Map<String, dynamic>>? _profileToolsMap;
   List<Prompt>? _myPrompts;
+  List<Note>? _myNotes;
   bool _isLoading = true;
   String? _error;
 
   List<Tool>? get diary => _diary;
   List<Map<String, dynamic>>? get profileToolsMap => _profileToolsMap;
   List<Prompt>? get myPrompts => _myPrompts;
+  List<Note>? get myNotes => _myNotes;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -158,6 +161,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
+  //PROMPTS METHODS
   Future<void> fetchPrompts({required int toolId, required String profileId}) async {
     try{
       _isLoading = true;
@@ -265,4 +269,113 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
     }
   }
+
+  //NOTES METHODS
+  Future<void> fetchNotes({required int toolId, required String profileId}) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the notes data
+      final notesResponse = await _client.from('profile_tool_notes').select().match(query);
+
+      final notesList = List<Map<String, dynamic>>.from(notesResponse);
+
+      _myNotes = notesList.map((map) => Note.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchNoteWithId({required int id, required int toolId, required String profileId}) async{
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the prompts data
+      final notesResponse = await _client.from('profile_tool_notes').select().match(query);
+
+      final notesMap = notesResponse[0];
+      final note = Note.fromMap(notesMap);
+      _myNotes?.add(note);
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addNote({required String note, required int toolId, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client.from('profile_tool_notes').insert({
+        'note': note,
+        'tool_id': toolId,
+        'profile_id': profileId
+      });
+
+      _myNotes ??= [];
+      fetchNotes(toolId: toolId, profileId: profileId);
+
+      _isLoading = false;
+      notifyListeners();
+    }  catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateNote({required Note note, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_notes')
+          .update({'note': note.note})
+          .eq('id', note.id)
+          .eq('tool_id', note.toolId)
+          .eq('profile_id', profileId);
+
+      // Update local cache
+      if (_myNotes != null) {
+        final index = _myNotes!.indexWhere((p) => p.id == note.id);
+        if (index != -1) {
+          _myNotes![index] = note;
+        } else {
+          // optional: insert if not found
+          _myNotes!.add(note);
+        }
+      } else {
+        _myNotes = [note];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
 }
