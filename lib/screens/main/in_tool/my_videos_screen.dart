@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:kuwaia/widgets/toast.dart';
+import 'package:kuwaia/widgets/youtube_video.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../../../models/tool.dart';
@@ -37,7 +41,7 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
       isScrollControlled: true,
       builder: (_) {
         return Container(
-          height: size.height * 0.4, // 90% of screen height
+          height: size.height * 0.9, // 90% of screen height
           decoration: BoxDecoration(
             color: AppColors.primaryBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -103,6 +107,69 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
     final size = MediaQuery.of(context).size;
     return Container(
       width: size.width*0.9,
+      padding: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.01),
+      child: Consumer<AiDiaryProvider>(
+        builder: (context, aiDiaryProvider, _) {
+          if (aiDiaryProvider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (aiDiaryProvider.error != null) {
+            return Center(
+              child: Text(
+                aiDiaryProvider.error!,
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          }
+
+          final videos = aiDiaryProvider.myVideos ?? [];
+
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    shortActionButton(
+                      text: "+ Add Video",
+                      size: size,
+                      onPressed: () => _showAddVideoLinkModal(context, size),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: size.height*0.02,),
+
+                if (videos.isEmpty)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children:
+                    [
+                      SizedBox(height: size.height*0.2),
+                      Lottie.asset(emptyBox, width: size.width*0.6),
+                    ]
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: videos.map((video) {return YoutubeVideoWidget(
+                      video: video,
+                      onCopy: () async {
+                        await Clipboard.setData(ClipboardData(text: video.videoLink));
+                        showToast('Youtube link copied to clipboard');
+                      },
+                      onDelete: () async {
+                        final profileId = context.read<AuthProvider>().profile!.id;
+                        await aiDiaryProvider.deleteVideo(video: video, profileId: profileId);
+                      },
+                    );}).toList(),
+                  )
+              ],
+            ),
+          );
+        }
+      ),
 
     );
   }

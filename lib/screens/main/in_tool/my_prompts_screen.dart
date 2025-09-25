@@ -311,13 +311,16 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                     )
                   else
                     Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: prompts.map((prompt) {
                         return savedPromptWidget(
                           description: prompt.description,
                           prompt: prompt.prompt,
                           onShare: () {},
                           onCopy: () async {
+                            print('11111');
                             await Clipboard.setData(ClipboardData(text: prompt.prompt));
+                            print('22222');
                             showToast('Prompt copied to clipboard');
                           },
                           onEdit: () => _showEditPromptModal(context: context, size: size, prompt: prompt),

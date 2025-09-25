@@ -230,22 +230,22 @@ Widget savedPromptWidget({
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-              onPressed: () => onShare,
+              onPressed: () => onShare?.call(),
               icon: FaIcon(FontAwesomeIcons.shareNodes, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: () => onCopy,
+                onPressed: () => onCopy?.call(),
                 icon: FaIcon(FontAwesomeIcons.copy, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: () => onEdit,
+                onPressed: () => onEdit?.call(),
                 icon: FaIcon(FontAwesomeIcons.penToSquare, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: () => onDelete,
+                onPressed: () => onDelete?.call(),
                 icon: FaIcon(FontAwesomeIcons.trashCan, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
           ],
@@ -287,31 +287,31 @@ Widget savedNoteWidget({
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.shareNodes, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onShare?.call(),
+                icon: FaIcon(FontAwesomeIcons.shareNodes, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.copy, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onCopy?.call(),
+                icon: FaIcon(FontAwesomeIcons.copy, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.penToSquare, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onEdit?.call(),
+                icon: FaIcon(FontAwesomeIcons.penToSquare, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.trashCan, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onDelete?.call(),
+                icon: FaIcon(FontAwesomeIcons.trashCan, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
           ],
         ),
 
-        SizedBox(height: 5),
         Divider(),
       ],
     ),
   );
 }
+
 

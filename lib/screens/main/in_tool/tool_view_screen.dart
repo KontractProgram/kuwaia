@@ -107,7 +107,7 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
           children: [
             // Menu (Wrap of chips) right under AppBar
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: size.width * 0.01, vertical: size.height * 0.01),
+              padding: EdgeInsets.zero,
               child: Wrap(
                 spacing: 8,
                 runSpacing: 6,

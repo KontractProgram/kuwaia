@@ -150,6 +150,7 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
                   )
                 else
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: notes.map((note) {
                       return savedNoteWidget(
                         note: note.note,

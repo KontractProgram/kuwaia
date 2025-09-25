@@ -336,7 +336,7 @@ class AiDiaryProvider with ChangeNotifier{
 
       final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
 
-      //fetch the prompts data
+      //fetch the notes data
       final notesResponse = await _client.from('profile_tool_notes').select().match(query);
 
       final notesMap = notesResponse[0];
@@ -405,6 +405,36 @@ class AiDiaryProvider with ChangeNotifier{
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteNote({required Note note, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_notes')
+          .delete()
+          .eq('id', note.id)
+          .eq('profile_id', profileId)
+          .eq('tool_id', note.toolId);
+
+      // ✅ Remove from local state
+      if (_myNotes != null) {
+        _myNotes = _myNotes!
+            .where((n) => n.id != note.id)
+            .toList();
+      }
+
+      _isLoading = false;
+      notifyListeners();
+
+    } catch(e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -513,6 +543,36 @@ class AiDiaryProvider with ChangeNotifier{
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteVideo({required Video video, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_videos')
+          .delete()
+          .eq('id', video.id)
+          .eq('profile_id', profileId)
+          .eq('tool_id', video.toolId);
+
+      // ✅ Remove from local state
+      if (_myVideos != null) {
+        _myVideos = _myVideos!
+            .where((v) => v.id != video.id)
+            .toList();
+      }
+
+      _isLoading = false;
+      notifyListeners();
+
+    } catch(e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
