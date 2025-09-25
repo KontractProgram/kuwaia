@@ -7,7 +7,6 @@ import 'package:kuwaia/screens/main/in_tool/tool_view_screen.dart';
 import 'package:kuwaia/screens/main/landing_nav_screen.dart';
 import 'package:kuwaia/screens/main/tools_in_group_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
-
 import '../models/group.dart';
 import '../models/tool.dart';
 import '../screens/auth/auth_options_screen.dart';

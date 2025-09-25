@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/Note.dart';
-import '../models/prompt.dart';
+import '../models/in_tool/Note.dart';
+import '../models/in_tool/Video.dart';
+import '../models/in_tool/prompt.dart';
 import '../models/tool.dart';
 
 class AiDiaryProvider with ChangeNotifier{
@@ -11,6 +12,7 @@ class AiDiaryProvider with ChangeNotifier{
   List<Map<String, dynamic>>? _profileToolsMap;
   List<Prompt>? _myPrompts;
   List<Note>? _myNotes;
+  List<Video>? _myVideos;
   bool _isLoading = true;
   String? _error;
 
@@ -18,6 +20,7 @@ class AiDiaryProvider with ChangeNotifier{
   List<Map<String, dynamic>>? get profileToolsMap => _profileToolsMap;
   List<Prompt>? get myPrompts => _myPrompts;
   List<Note>? get myNotes => _myNotes;
+  List<Video>? get myVideos => _myVideos;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -171,7 +174,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'profile_id': profileId, 'tool_id': toolId};
 
       //fetch the prompts data
-      final promptsResponse = await _client.from('profile_tool_prompt').select().match(query);
+      final promptsResponse = await _client.from('profile_tool_prompts').select().match(query);
 
       final promptList = List<Map<String, dynamic>>.from(promptsResponse);
 
@@ -195,7 +198,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
 
       //fetch the prompts data
-      final promptResponse = await _client.from('profile_tool_prompt').select().match(query);
+      final promptResponse = await _client.from('profile_tool_prompts').select().match(query);
 
       final promptMap = promptResponse[0];
       final prompt = Prompt.fromMap(promptMap);
@@ -216,7 +219,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('profile_tool_prompt').insert({
+      await _client.from('profile_tool_prompts').insert({
         'description': description,
         'prompt': prompt,
         'tool_id': toolId,
@@ -242,7 +245,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_prompt')
+          .from('profile_tool_prompts')
           .update({'description': prompt.description, 'prompt': prompt.prompt})
           .eq('id', prompt.id)
           .eq('tool_id', prompt.toolId)
@@ -367,6 +370,114 @@ class AiDiaryProvider with ChangeNotifier{
         }
       } else {
         _myNotes = [note];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  //VIDEOS METHODS
+  Future<void> fetchVideos({required int toolId, required String profileId}) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the videos data
+      final videosResponse = await _client.from('profile_tool_videos').select().match(query);
+
+      final videosList = List<Map<String, dynamic>>.from(videosResponse);
+
+      _myVideos = videosList.map((map) => Video.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchVideoWithId({required int id, required int toolId, required String profileId}) async{
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the video data
+      final videosResponse = await _client.from('profile_tool_videos').select().match(query);
+
+      final videosMap = videosResponse[0];
+      final video = Video.fromMap(videosMap);
+      _myVideos?.add(video);
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addVideo({required String videoLink, required int toolId, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client.from('profile_tool_videos').insert({
+        'video_link': videoLink,
+        'tool_id': toolId,
+        'profile_id': profileId
+      });
+
+      _myVideos ??= [];
+      fetchVideos(toolId: toolId, profileId: profileId);
+
+      _isLoading = false;
+      notifyListeners();
+    }  catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateVideo({required Video video, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_videos')
+          .update({'video_link': video.videoLink})
+          .eq('id', video.id)
+          .eq('tool_id', video.toolId)
+          .eq('profile_id', profileId);
+
+      // Update local cache
+      if (_myVideos != null) {
+        final index = _myVideos!.indexWhere((p) => p.id == video.id);
+        if (index != -1) {
+          _myVideos![index] = video;
+        } else {
+          // optional: insert if not found
+          _myVideos!.add(video);
+        }
+      } else {
+        _myVideos = [video];
       }
 
       _isLoading = false;

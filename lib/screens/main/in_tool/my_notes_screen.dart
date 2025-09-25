@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-
 import '../../../models/tool.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../system/constants.dart';
@@ -109,7 +108,7 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
       width: size.width*0.9,
       padding: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.01),
       child: Consumer<AiDiaryProvider>(
-        builder: (context, aiDiaryProvider, _){
+        builder: (context, aiDiaryProvider, _) {
           if (aiDiaryProvider.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }

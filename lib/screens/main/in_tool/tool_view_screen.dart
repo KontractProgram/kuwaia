@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kuwaia/screens/main/in_tool/tool_updates_screen.dart';
 import 'package:kuwaia/widgets/buttons.dart';
-import 'package:kuwaia/widgets/custom.dart';
 import '../../../models/tool.dart';
 import '../../../system/constants.dart';
 import '../../../widgets/texts.dart';

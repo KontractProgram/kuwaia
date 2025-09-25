@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/group.dart';
-import 'package:kuwaia/models/tool.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../models/tool.dart';
 import '../system/constants.dart';
 
 Widget toolCardWidget({

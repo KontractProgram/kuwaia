@@ -184,5 +184,4 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
         )
       );
   }
-
 }
