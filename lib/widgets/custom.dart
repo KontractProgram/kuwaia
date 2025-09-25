@@ -230,29 +230,28 @@ Widget savedPromptWidget({
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-              onPressed: (){},
-              icon: FaIcon(FontAwesomeIcons.shareNodes, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+              onPressed: () => onShare,
+              icon: FaIcon(FontAwesomeIcons.shareNodes, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.copy, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onCopy,
+                icon: FaIcon(FontAwesomeIcons.copy, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.penToSquare, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onEdit,
+                icon: FaIcon(FontAwesomeIcons.penToSquare, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
-                onPressed: (){},
-                icon: FaIcon(FontAwesomeIcons.trashCan, size: 20, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onDelete,
+                icon: FaIcon(FontAwesomeIcons.trashCan, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
           ],
         ),
 
-        SizedBox(height: 5),
-        Divider(),
+        Divider(color: AppColors.bodyTextColor.withAlpha(53), thickness: 1,),
       ],
     ),
   );

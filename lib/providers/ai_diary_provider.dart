@@ -273,6 +273,36 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
+  Future<void> deletePrompt({required Prompt prompt, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_prompts')
+          .delete()
+          .eq('id', prompt.id)
+          .eq('profile_id', profileId)
+          .eq('tool_id', prompt.toolId);
+
+      // ✅ Remove from local state
+      if (_myPrompts != null) {
+        _myPrompts = _myPrompts!
+            .where((p) => p.id != prompt.id)
+            .toList();
+      }
+
+      _isLoading = false;
+      notifyListeners();
+
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   //NOTES METHODS
   Future<void> fetchNotes({required int toolId, required String profileId}) async {
     try{

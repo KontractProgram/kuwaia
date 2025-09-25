@@ -113,7 +113,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                     group: group,
                     logo: logo,
                     inDiary: true,
-                    onPressed: () => context.push('/tool_view_screen', extra: {'tool': tool}),
+                    onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
                     onBookMarkPressed: () {
                       final auth = context.read<AuthProvider>();
                       diaryProvider.deleteToolFromDiary(profileId: auth.profile!.id, toolId: tool.id);

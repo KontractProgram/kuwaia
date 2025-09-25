@@ -68,7 +68,7 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                         logo: logo,
                         onPressed: () {
                           if(inDiary) {
-                            context.push('/tool_view_screen', extra: {'tool': tool});
+                            context.push('/tool_view', extra: {'tool': tool});
                           }
                         },
                         onBookMarkPressed: () async {

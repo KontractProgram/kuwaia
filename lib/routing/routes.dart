@@ -111,7 +111,7 @@ final routes = [
   ),
 
   GoRoute(
-    path: '/tool_view_screen',
+    path: '/tool_view',
     name: AppRoute.toolView.name,
     builder: (context, state) {
       final extra = state.extra as Map<String, dynamic>;

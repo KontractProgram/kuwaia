@@ -56,22 +56,24 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
 
   Widget _buildChip(String label, int index) {
     final bool selected = _currentIndex == index;
-
-    return ChoiceChip(
-      label: Text(
-        label,
-        style: TextStyle(
-          fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-          color: selected ? AppColors.headingTextColor : Colors.black87,
+    
+    return GestureDetector(
+      onTap: () => _onChipTap(index),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: selected ? AppColors.primaryAccentColor.withAlpha(53) : AppColors.bodyTextColor.withAlpha(53),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: reusableText(
+          text: label,
+          color: selected ? AppColors.primaryAccentColor : AppColors.bodyTextColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w600
         ),
       ),
-      selected: selected,
-      onSelected: (_) => _onChipTap(index),
-      elevation: selected ? 2 : 0,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      selectedColor: AppColors.primaryBackgroundColor.withOpacity(0.12),
-      backgroundColor: Colors.transparent,
     );
+
   }
 
   @override
@@ -105,7 +107,7 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
           children: [
             // Menu (Wrap of chips) right under AppBar
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: size.width * 0.04, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: size.width * 0.01, vertical: size.height * 0.01),
               child: Wrap(
                 spacing: 8,
                 runSpacing: 6,
@@ -115,9 +117,6 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
                 ),
               ),
             ),
-
-            // Divider (optional)
-            const Divider(height: 1),
 
             // PageView that shows the selected screen
             Expanded(

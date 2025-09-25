@@ -1,16 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
 import 'package:kuwaia/providers/tools_provider.dart';
-import 'package:kuwaia/screens/auth/auth_options_screen.dart';
-import 'package:kuwaia/screens/auth/continue_with_email_screen.dart';
-import 'package:kuwaia/screens/auth/password_to_login_screen.dart';
-import 'package:kuwaia/screens/auth/password_to_register_screen.dart';
-import 'package:kuwaia/screens/auth/username_screen.dart';
-import 'package:kuwaia/screens/main/landing_screen.dart';
-import 'package:kuwaia/screens/others/loading_screen.dart';
 import 'package:kuwaia/system/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
