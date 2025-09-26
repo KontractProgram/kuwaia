@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
@@ -112,7 +113,7 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                       toolId: widget.tool.id,
                       profileId: profileId,
                     );
-                    Navigator.pop(context);
+                    context.pop();
                   }
                 },
               ),
@@ -211,7 +212,7 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                       prompt: newPrompt,
                       profileId: profileId,
                     );
-                    Navigator.pop(context);
+                    context.pop();
                   }
                 },
               ),
@@ -240,14 +241,14 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
           actions: [
             TextButton(
               child: reusableText(text: "Cancel"),
-              onPressed: () => Navigator.of(context).pop(false),
+              onPressed: () => context.pop(false),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.warningColor,
               ),
               child: reusableText(text: "Delete"),
-              onPressed: () => Navigator.of(context).pop(true),
+              onPressed: () => context.pop(true),
             ),
           ],
         );

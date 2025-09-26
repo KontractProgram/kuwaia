@@ -259,6 +259,7 @@ Widget savedPromptWidget({
 
 Widget savedNoteWidget({
   required String note,
+  required Size size,
   VoidCallback? onShare,
   VoidCallback? onCopy,
   VoidCallback? onEdit,
@@ -267,10 +268,12 @@ Widget savedNoteWidget({
   return Container(
     margin: EdgeInsets.only(top: 16),
     child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          width: size.width*0.9,
+          margin: EdgeInsets.symmetric(vertical: 4),
+          padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: AppColors.secondaryBackgroundColor,

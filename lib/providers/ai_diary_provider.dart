@@ -684,5 +684,4 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-
 }

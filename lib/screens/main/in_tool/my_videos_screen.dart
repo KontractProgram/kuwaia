@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kuwaia/widgets/toast.dart';
 import 'package:kuwaia/widgets/youtube_video.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
-
+import '../../../models/in_tool/Video.dart';
 import '../../../models/tool.dart';
 import '../../../providers/ai_diary_provider.dart';
 import '../../../providers/auth_provider.dart';
@@ -91,7 +92,7 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
                       toolId: widget.tool.id,
                       profileId: profileId,
                     );
-                    Navigator.pop(context);
+                    context.pop();
                   }
                 },
               ),
@@ -100,6 +101,44 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
         );
       },
     );
+  }
+
+  Future<void> _showDeleteVideoDialog({ required BuildContext context, required Video video}) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.secondaryBackgroundColor,
+          title: reusableText(
+            text: "Delete Video",
+            fontWeight: FontWeight.w600,
+            fontSize: 20,
+          ),
+          content: reusableText(
+            text: "Are you sure you want to delete this video?",
+            textAlign: TextAlign.start,
+          ),
+          actions: [
+            TextButton(
+              child: reusableText(text: "Cancel"),
+              onPressed: () => context.pop(false),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.warningColor,
+              ),
+              child: reusableText(text: "Delete"),
+              onPressed: () => context.pop(true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      final profileId = context.read<AuthProvider>().profile!.id;
+      Provider.of<AiDiaryProvider>(context, listen: false).deleteVideo(video: video, profileId: profileId);
+    }
   }
 
   @override
@@ -159,10 +198,7 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
                         await Clipboard.setData(ClipboardData(text: video.videoLink));
                         showToast('Youtube link copied to clipboard');
                       },
-                      onDelete: () async {
-                        final profileId = context.read<AuthProvider>().profile!.id;
-                        await aiDiaryProvider.deleteVideo(video: video, profileId: profileId);
-                      },
+                      onDelete: () => _showDeleteVideoDialog(context: context, video: video),
                     );}).toList(),
                   )
               ],
