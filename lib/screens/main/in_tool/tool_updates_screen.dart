@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/widgets/texts.dart';
 
 import '../../../models/tool.dart';
 
@@ -13,8 +14,8 @@ class ToolUpdatesScreen extends StatefulWidget {
 class _ToolUpdatesScreenState extends State<ToolUpdatesScreen> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return SizedBox(
+      child: Center(child: reusableText(text: 'Updates page'),),
+    );
   }
-
 }

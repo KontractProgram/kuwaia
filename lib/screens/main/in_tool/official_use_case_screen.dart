@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/widgets/texts.dart';
 
 import '../../../models/tool.dart';
 
@@ -13,8 +14,9 @@ class OfficialUseCaseScreen extends StatefulWidget {
 class _OfficialUseCaseScreenState extends State<OfficialUseCaseScreen> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return SizedBox(
+      child: Center(child: reusableText(text: 'Use case'),),
+    );
   }
 
 }

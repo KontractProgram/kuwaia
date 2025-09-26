@@ -27,7 +27,7 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
     'Prompts',
     'Notes',
     'Videos',
-    'Info',
+    'Use Case',
     'Log Details',
     'Updates',
   ];
@@ -106,15 +106,12 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
         child: Column(
           children: [
             // Menu (Wrap of chips) right under AppBar
-            Padding(
-              padding: EdgeInsets.zero,
-              child: Wrap(
-                spacing: 8,
-                runSpacing: 6,
-                children: List.generate(
-                  _labels.length,
-                      (i) => _buildChip(_labels[i], i),
-                ),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: List.generate(
+                _labels.length,
+                    (i) => _buildChip(_labels[i], i),
               ),
             ),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kuwaia/models/in_tool/log_details.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/in_tool/Note.dart';
 import '../models/in_tool/Video.dart';
@@ -13,6 +14,7 @@ class AiDiaryProvider with ChangeNotifier{
   List<Prompt>? _myPrompts;
   List<Note>? _myNotes;
   List<Video>? _myVideos;
+  LogDetails? _logDetails;
   bool _isLoading = true;
   String? _error;
 
@@ -21,6 +23,7 @@ class AiDiaryProvider with ChangeNotifier{
   List<Prompt>? get myPrompts => _myPrompts;
   List<Note>? get myNotes => _myNotes;
   List<Video>? get myVideos => _myVideos;
+  LogDetails? get logDetails => _logDetails;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
@@ -578,5 +581,108 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
     }
   }
+
+  //LOG DETAILS METHODS
+  Future<void> fetchLogDetails({required int toolId, required String profileId}) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'profile_id': profileId, 'tool_id': toolId};
+
+      //fetch the log details data
+      final logDetailsResponse = await _client.from('profile_tool_log_details').select().match(query);
+
+      if(logDetailsResponse.isNotEmpty){
+        final logDetailsMap = logDetailsResponse[0];
+        _logDetails = LogDetails.fromMap(logDetailsMap);
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addLogDetails({required String email, required String logPasswordHint, required int toolId, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client.from('profile_tool_log_details').insert({
+        'log_email': email,
+        'log_password_hint': logPasswordHint,
+        'tool_id': toolId,
+        'profile_id': profileId
+      });
+
+      fetchLogDetails(toolId: toolId, profileId: profileId);
+
+      _isLoading = false;
+      notifyListeners();
+    }  catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> updateLogDetails({required LogDetails ld, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_log_details')
+          .update({'log_email': ld.logEmail, 'log_password_hint': ld.logPasswordHint})
+          .eq('id', ld.id)
+          .eq('tool_id', ld.toolId)
+          .eq('profile_id', profileId);
+
+      // Update local cache
+      if(_logDetails != null) {
+        _logDetails = LogDetails(id: ld.id, logEmail: ld.logEmail, logPasswordHint: ld.logPasswordHint, toolId: ld.toolId);
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> deleteLogDetails({required LogDetails ld, required String profileId}) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+          .from('profile_tool_log_details')
+          .delete()
+          .eq('id', ld.id)
+          .eq('profile_id', profileId)
+          .eq('tool_id', ld.toolId);
+
+      _logDetails = null;
+
+      _isLoading = false;
+      notifyListeners();
+
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
 
 }
