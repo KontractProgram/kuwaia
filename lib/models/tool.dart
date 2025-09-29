@@ -26,6 +26,4 @@ class Tool {
       'group_id': groupId
     };
   }
-
-
 }

@@ -65,14 +65,12 @@ class AuthProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      print('aaaaaaaaa');
 
       final response = await _client.auth.signUp(
         email: email,
         password: password,
         emailRedirectTo: "myapp://login-callback/",
       );
-      print('aaaaaaaaaaaa');
 
       print('📩 AuthResponse: $response');
       print('👤 response.user: ${response.user}');
@@ -168,70 +166,123 @@ class AuthProvider with ChangeNotifier {
 
   /// Onboard user
   Future<void> onboard(List<Map<String, dynamic>> professions) async {
-
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      // 1. Insert into profile_professions
+      // 1. Insert into profile_professions_map
       final batchProfileProfessions = professions.map((prof) {
         return {
           'profile_id': _user!.id,
-          'profession_id': prof['id'], // Make sure this is the profession id
+          'profession_id': prof['id'],
         };
       }).toList();
 
       await _client.from('profile_professions_map').insert(batchProfileProfessions);
 
-
-      // 2 Fetch all relevant group_ids via group_profession_map
+      // 2. Fetch all relevant group_ids via group_profession_map
       final professionIds = professions.map((p) => p['id']).toList();
-
 
       final groupMap = await _client
           .from('group_profession_map')
           .select('group_id, profession_id')
           .inFilter('profession_id', professionIds);
 
-
       final groupIds = groupMap.map((e) => e['group_id'] as int).toSet().toList();
 
-
-      // 3 Fetch all tools in these groups
+      // 3. Fetch all tools in these groups
       final tools = await _client
           .from('tools')
           .select('id, name, group_id')
           .inFilter('group_id', groupIds);
 
+      // --- CURATION LOGIC ---
+      // Step A: Organize tools by group
+      final Map<int, List<Map<String, dynamic>>> toolsByGroup = {};
+      for (var tool in tools) {
+        final gid = tool['group_id'] as int;
+        toolsByGroup.putIfAbsent(gid, () => []).add(tool);
+      }
 
-      // 4 Insert into profile_tools
-      final batchProfileTools = tools.map((tool) {
+      // Step B: Decide cap based on profession count
+      final int professionCount = professions.length;
+      final int toolCap = professionCount == 1
+          ? 5
+          : professionCount == 2
+          ? 8
+          : 12;
+
+      // Step C: Pick tools with group safeguard
+      final List<Map<String, dynamic>> curatedTools = [];
+      final groupList = toolsByGroup.entries.toList();
+
+      if (groupList.length <= toolCap) {
+        // Case 1: groups fit into cap → at least 1 per group
+        for (var entry in groupList) {
+          if (entry.value.isNotEmpty) {
+            curatedTools.add(entry.value.first);
+          }
+        }
+
+        // Fill remaining slots if space left
+        int remaining = toolCap - curatedTools.length;
+        while (remaining > 0) {
+          bool addedAny = false;
+          for (var entry in groupList) {
+            if (remaining <= 0) break;
+
+            final groupTools = entry.value;
+            final alreadyPickedIds = curatedTools.map((t) => t['id']).toSet();
+
+            final nextTool = groupTools.firstWhere(
+                  (t) => !alreadyPickedIds.contains(t['id']),
+              orElse: () => {},
+            );
+
+            if (nextTool.isNotEmpty) {
+              curatedTools.add(nextTool);
+              remaining--;
+              addedAny = true;
+            }
+          }
+          if (!addedAny) break; // nothing left to add
+        }
+      } else {
+        // Case 2: too many groups → pick cap number of groups only
+        groupList.shuffle(); // random for now (could be ranked later)
+        for (var i = 0; i < toolCap; i++) {
+          final groupTools = groupList[i].value;
+          if (groupTools.isNotEmpty) {
+            curatedTools.add(groupTools.first);
+          }
+        }
+      }
+
+      // --- Insert curated tools ---
+      final batchProfileTools = curatedTools.map((tool) {
         return {
           'profile_id': _user!.id,
           'tool_id': tool['id'],
-          'is_favorite': false, // default value
+          'is_favorite': false,
         };
       }).toList();
 
-
       await _client.from('profile_tools_map').insert(batchProfileTools);
 
-      final res = await _client.from('profiles')
-                              .update({'onboarded': true})
-                              .eq('id', _user!.id)
-                              .select();
-
+      // 4. Mark profile as onboarded
+      final res = await _client
+          .from('profiles')
+          .update({'onboarded': true})
+          .eq('id', _user!.id)
+          .select();
 
       Map<String, dynamic> data = res[0];
-      print(data);
       final newProfile = Profile.fromMap(data);
-      print(newProfile);
       _profile = newProfile;
       notifyListeners();
 
       print('✅ Onboarding complete with curated tools');
-
     } catch (e) {
       print('❌ Error during onboarding: $e');
       throw Exception('Error updating professions: $e');
@@ -240,4 +291,5 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
 }
