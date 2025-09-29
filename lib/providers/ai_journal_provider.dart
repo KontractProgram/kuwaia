@@ -1,29 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/models/community/journal_video.dart';
+import 'package:kuwaia/models/community/journal_video_group.dart';
+import 'package:kuwaia/models/community/latest.dart';
+import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../models/community/news.dart';
 import '../models/tool.dart';
 
 class AiJournalProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
 
   List<Tool>? _trendingTools;
-
+  List<Latest>? _latestList;
+  List<News>? _newsList;
+  List<JournalVideo>? _journalVideos;
+  List<Prompt>? _journalPrompts;
 
   bool _isLoading = true;
   String? _error;
 
   List<Tool>? get trendingTools => _trendingTools;
+  List<Latest>? get latestList => _latestList;
+  List<News>? get newsList => _newsList;
+  List<JournalVideo>? get journalVideos => _journalVideos;
+  List<Prompt>? get journalPrompts => _journalPrompts;
 
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<void> fetchTrendingTools({required String profileId}) async {
+  Future<void> fetchTrendingTools() async {
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final trendingResponse = await _client.from('trending_tools').select();
+      final trendingResponse = await _client.from('trending_list').select();
 
       final trendingList = List<Map<String, dynamic>>.from(trendingResponse);
 
@@ -37,4 +49,90 @@ class AiJournalProvider with ChangeNotifier{
       notifyListeners();
     }
   }
+
+  Future<void> fetchLatestList() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final latestResponse = await _client.from('latest_list').select();
+
+      final latestResponseList = List<Map<String, dynamic>>.from(latestResponse);
+
+      _latestList = latestResponseList.map((map) => Latest.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchNewsList() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final newsResponse = await _client.from('news_list').select();
+
+      final newsResponseList = List<Map<String, dynamic>>.from(newsResponse);
+
+      _newsList = newsResponseList.map((map) => News.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchVideosList() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final videosResponse = await _client.from('videos').select();
+
+      final videosResponseList = List<Map<String, dynamic>>.from(videosResponse);
+
+      _journalVideos = videosResponseList.map((map) => JournalVideo.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> fetchJournalPrompts() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final journalPromptsResponse = await _client.from('videos').select();
+
+      final journalPromptsResponseList = List<Map<String, dynamic>>.from(journalPromptsResponse);
+
+      _journalPrompts = journalPromptsResponseList.map((map) => Prompt.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
 }
