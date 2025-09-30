@@ -27,6 +27,33 @@ class AiJournalProvider with ChangeNotifier{
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  Future<Tool?> fetchToolById(int toolId) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final toolsResponse = await _client.from('tools').select().eq('id', toolId).maybeSingle();
+
+      if(toolsResponse != null) {
+        final tool = Tool.fromMap(toolsResponse);
+        _isLoading = false;
+        notifyListeners();
+        return tool;
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return null;
+
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
   Future<void> fetchTrendingTools() async {
     try{
       _isLoading = true;

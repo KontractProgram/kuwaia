@@ -32,6 +32,11 @@ class AiDiaryProvider with ChangeNotifier{
     return _diary!.any((t) => t.id == tool.id);
   }
 
+  bool isToolInDiaryById(int toolId) {
+    if (_diary == null) return false;
+    return _diary!.any((t) => t.id == toolId);
+  }
+
   bool isToolAFavorite(Tool tool) {
     if (_profileToolsMap == null) return false;
     final match = _profileToolsMap!.firstWhere(
