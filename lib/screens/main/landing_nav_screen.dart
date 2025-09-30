@@ -48,7 +48,7 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
           width: size.width,
           height: size.height,
           padding: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.02),
-          child: SingleChildScrollView(child: _widgetOptions.elementAt(_selectedIndex)),
+          child: _widgetOptions.elementAt(_selectedIndex),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

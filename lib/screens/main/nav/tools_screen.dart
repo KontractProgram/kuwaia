@@ -73,60 +73,61 @@ class _ToolsScreenState extends State<ToolsScreen> {
         }).toList();
 
 
-
-        return Column(
-          children: [
-            // 🔍 Search bar
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search categories or tools...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              // 🔍 Search bar
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search categories or tools...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                  ),
                 ),
-                focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
-                ),
+                style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
+                onChanged: (value) => setState(() => _searchQuery = value),
               ),
-              style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
-              onChanged: (value) => setState(() => _searchQuery = value),
-            ),
 
-            const SizedBox(height: 10),
+              const SizedBox(height: 10),
 
-            // 🛠 Tools list
-            filteredGroups.isEmpty
-            ? Container(
-              padding: EdgeInsets.only(top: size.height*0.2),
-              child: Lottie.asset(emptyDiary, width: size.width*0.6),
-            )
-            : ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: filteredGroups.length,
-              itemBuilder: (context, index) {
-                final group = filteredGroups[index];
+              // 🛠 Tools list
+              filteredGroups.isEmpty
+              ? Container(
+                padding: EdgeInsets.only(top: size.height*0.2),
+                child: Lottie.asset(emptyDiary, width: size.width*0.6),
+              )
+              : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filteredGroups.length,
+                itemBuilder: (context, index) {
+                  final group = filteredGroups[index];
 
-                return singleTrailCardWidget(
-                  leadingIcon: group.icon,
-                  title: '${group.name} Tools',
-                  subtitle: group.description,
-                  onPressed: () {
-                    final List<Tool> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
-                    context.push(
-                        '/tools_in_group',
-                        extra: {
-                        'group': group,
-                        'tools': toolsInGroup
-                        },
-                    );
-                  }
-                );
-              },
-            ),
-          ],
+                  return singleTrailCardWidget(
+                    leadingIcon: group.icon,
+                    title: '${group.name} Tools',
+                    subtitle: group.description,
+                    onPressed: () {
+                      final List<Tool> toolsInGroup = toolsProvider.getToolsByGroup(group.id);
+                      context.push(
+                          '/tools_in_group',
+                          extra: {
+                          'group': group,
+                          'tools': toolsInGroup
+                          },
+                      );
+                    }
+                  );
+                },
+              ),
+            ],
+          ),
         );
       },
     );

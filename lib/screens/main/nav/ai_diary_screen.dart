@@ -66,65 +66,66 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
         
         print('number of filtered tools ${filteredTools.length}');
 
-        return Column(
-          children: [
-            // 🔍 Search box
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search tools...',
-                prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
-                ),
-                focusedBorder: OutlineInputBorder(
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              // 🔍 Search box
+              TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search tools...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                    borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                  ),
                 ),
-              ),
-              style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 10),
-
-            // 🛠 Tools List
-            filteredTools.isEmpty
-              ? Container(
-              padding: EdgeInsets.only(top: size.height*0.2),
-              child: Lottie.asset(emptyDiary, width: size.width*0.6),
-              )
-              : ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: filteredTools.length,
-                itemBuilder: (context, index) {
-                  final tool = filteredTools[index];
-                  final logo = 'assets/tool_logos/1.png';
-                  final group = groups.firstWhere((g) => g.id == tool.groupId);
-
-                  return toolCardWidget(
-                    context: context,
-                    tool: tool,
-                    group: group,
-                    logo: logo,
-                    inDiary: true,
-                    onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
-                    onBookMarkPressed: () {
-                      final auth = context.read<AuthProvider>();
-                      diaryProvider.deleteToolFromDiary(profileId: auth.profile!.id, toolId: tool.id);
-                    }
-                  );
+                style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
+                onChanged: (value) {
+                  setState(() {
+                    _searchQuery = value;
+                  });
                 },
               ),
-          ],
+
+              const SizedBox(height: 10),
+
+              // 🛠 Tools List
+              filteredTools.isEmpty
+                ? Container(
+                padding: EdgeInsets.only(top: size.height*0.2),
+                child: Lottie.asset(emptyDiary, width: size.width*0.6),
+                )
+                : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: filteredTools.length,
+                  itemBuilder: (context, index) {
+                    final tool = filteredTools[index];
+                    final logo = 'assets/tool_logos/1.png';
+                    final group = groups.firstWhere((g) => g.id == tool.groupId);
+
+                    return toolCardWidget(
+                      context: context,
+                      tool: tool,
+                      group: group,
+                      logo: logo,
+                      inDiary: true,
+                      onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
+                      onBookMarkPressed: () {
+                        final auth = context.read<AuthProvider>();
+                        diaryProvider.deleteToolFromDiary(profileId: auth.profile!.id, toolId: tool.id);
+                      }
+                    );
+                  },
+                ),
+            ],
+          ),
         );
       },
     );
   }
-
 }

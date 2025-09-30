@@ -35,106 +35,114 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         }
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            SizedBox(height: size.height*0.1,),
+        return SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 30),
 
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.secondaryBackgroundColor,
-                shape: BoxShape.circle,
-                border: BoxBorder.all(color: AppColors.dashaSignatureColor, width: 3),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.dashaSignatureColor.withAlpha(150),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                  ),
-                  BoxShadow(
-                    color: AppColors.secondaryAccentColor.withAlpha(150),
-                    blurRadius: 12,
-                    spreadRadius: 2,
-                  ),
-                ]
+              Container(
+                width: size.width*0.5,
+                height: size.width*0.5,
+                decoration: BoxDecoration(
+                  color: AppColors.secondaryBackgroundColor,
+                  shape: BoxShape.circle,
+                  border: BoxBorder.all(color: AppColors.dashaSignatureColor, width: 3),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.dashaSignatureColor.withAlpha(255),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                    BoxShadow(
+                      color: AppColors.secondaryAccentColor.withAlpha(255),
+                      blurRadius: 12,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                ),
+                child: Center(child: FaIcon(FontAwesomeIcons.user, color: AppColors.headingTextColor, size: 50)),
               ),
-              child: FaIcon(FontAwesomeIcons.user, color: AppColors.headingTextColor, size: 50),
-            ),
 
-            SizedBox(height: 20,),
-            
-            reusableText(
-              text: authProvider.profile!.username,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
+              SizedBox(height: 20,),
 
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: AppColors.secondaryAccentColor
+              reusableText(
+                text: authProvider.profile!.username,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
-              child: reusableText(text: '$subscription plan'),
-            ),
 
-            SizedBox(height: 20,),
+              Container(
+                margin: EdgeInsets.symmetric(vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: AppColors.secondaryAccentColor.withAlpha(120)
+                ),
+                child: reusableText(text: '$subscription plan'),
+              ),
 
-            Card(
-              color: AppColors.secondaryBackgroundColor,
-              surfaceTintColor: AppColors.secondaryBackgroundColor,
-              child: Column(
+              SizedBox(height: size.height*0.02),
+
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: AppColors.secondaryBackgroundColor
+                ),
+                child: Column(
+                  children: [
+                    reusableText(text: 'Upgrade to KUWAIA Pro unlimited tools, advanced AI features, and more'),
+                    SizedBox(height: 20),
+                    shortActionButton(
+                      text: 'Go Pro',
+                      size: size
+                    )
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 20,),
+
+              ListView(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
                 children: [
-                  reusableText(text: 'Upgrade to KUWAIA Pro unlimited tools, advanced AI features, and more'),
-                  SizedBox(height: 20),
-                  shortActionButton(
-                    text: 'Go Pro',
-                    size: size
-                  )
+                  singleTrailCardWidget(
+                    leadingIcon: FontAwesomeIcons.chartPie,
+                    title: 'Cost Dashboard',
+                    onPressed: () {}
+                  ),
+                  singleTrailCardWidget(
+                    leadingIcon: FontAwesomeIcons.creditCard,
+                    title: 'Manage Subscription',
+                    onPressed: () {}
+                  ),
+                  singleTrailCardWidget(
+                    leadingIcon: FontAwesomeIcons.download,
+                    title: 'Export My Data',
+                    onPressed: () {}
+                  ),
+                  singleTrailCardWidget(
+                    leadingIcon: FontAwesomeIcons.gear,
+                    title: 'Settings',
+                    onPressed: () {}
+                  ),
+
                 ],
               ),
-            ),
 
-            SizedBox(height: 20,),
+              SizedBox(height: 20,),
 
-            ListView(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              children: [
-                singleTrailCardWidget(
-                  leadingIcon: FontAwesomeIcons.chartPie,
-                  title: 'Cost Dashboard',
-                  onPressed: () {}
-                ),
-                singleTrailCardWidget(
-                  leadingIcon: FontAwesomeIcons.creditCard,
-                  title: 'Manage Subscription',
-                  onPressed: () {}
-                ),
-                singleTrailCardWidget(
-                  leadingIcon: FontAwesomeIcons.download,
-                  title: 'Export My Data',
-                  onPressed: () {}
-                ),
-                singleTrailCardWidget(
-                  leadingIcon: FontAwesomeIcons.gear,
-                  title: 'Settings',
-                  onPressed: () {}
-                ),
-
-              ],
-            ),
-
-            longActionButton(
-              text: 'Log Out',
-              size: size,
-              textColor: AppColors.warningColor,
-              buttonColor: AppColors.warningColor.withAlpha(100),
-              onPressed: () => authProvider.signOut()
-            )
-          ],
+              longActionButton(
+                text: 'Log Out',
+                size: size,
+                textColor: AppColors.warningColor,
+                buttonColor: AppColors.warningColor.withAlpha(50),
+                onPressed: () => authProvider.signOut()
+              )
+            ],
+          ),
         );
       },
     );
