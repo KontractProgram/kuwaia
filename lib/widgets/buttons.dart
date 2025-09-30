@@ -129,3 +129,23 @@ Widget longLoadingButton({
     child: Center(child: Lottie.asset(threeDotsLoading, height: height-8)),
   );
 }
+
+Widget shortLoadingButton({
+  required Size size,
+  Color? buttonColor,
+  Color? iconColor,
+}) {
+  double width = size.width * 0.33;
+  double height = size.height * 0.06;
+
+  return Container(
+    alignment: Alignment.center,
+    width: width,
+    height: height,
+    decoration: BoxDecoration(
+        color: buttonColor ?? AppColors.primaryAccentColor.withAlpha(179),
+        borderRadius: BorderRadius.circular(15)
+    ),
+    child: Center(child: Lottie.asset(threeDotsLoading, height: height-8)),
+  );
+}

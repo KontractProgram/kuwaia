@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:kuwaia/models/community/journal_video.dart';
 import 'package:kuwaia/models/community/latest.dart';
-import 'package:kuwaia/models/community/trending.dart';
 import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/community/news.dart';
+import '../models/tool.dart';
 
 class AiJournalProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
 
-  List<Trending>? _trendingTools;
+  List<Tool>? _trendingTools;
   List<Latest>? _latestList;
   List<News>? _newsList;
   List<JournalVideo>? _journalVideos;
@@ -18,7 +18,7 @@ class AiJournalProvider with ChangeNotifier{
   bool _isLoading = true;
   String? _error;
 
-  List<Trending>? get trendingTools => _trendingTools;
+  List<Tool>? get trendingTools => _trendingTools;
   List<Latest>? get latestList => _latestList;
   List<News>? get newsList => _newsList;
   List<JournalVideo>? get journalVideos => _journalVideos;
@@ -37,10 +37,27 @@ class AiJournalProvider with ChangeNotifier{
 
       final trendingList = List<Map<String, dynamic>>.from(trendingResponse);
 
-      _trendingTools = trendingList.map((map) => Trending.fromMap(map)).toList();
+      final toolIds = trendingList.map((map) => map['tool_id'] as int).toList();
 
+      if (toolIds.isEmpty) {
+        _isLoading = false;
+        notifyListeners();
+        return;
+      }
+
+      final toolsResponse = await _client
+          .from('tools')
+          .select()
+          .inFilter('id', toolIds);
+
+      final toolsList = List<Map<String, dynamic>>.from(toolsResponse);
+
+      final tools = toolsList.map((map) => Tool.fromMap(map)).toList();
+
+      _trendingTools = tools;
       _isLoading = false;
       notifyListeners();
+
     } catch (e) {
       _error = e.toString();
       _isLoading = false;

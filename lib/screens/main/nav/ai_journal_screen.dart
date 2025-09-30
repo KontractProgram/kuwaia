@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/screens/main/in_journal/latest_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/news_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/trending_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/video_screen.dart';
 import 'package:kuwaia/widgets/texts.dart';
-import 'package:provider/provider.dart';
-
 import '../../../system/constants.dart';
 
 class AiJournalScreen extends StatefulWidget {
@@ -75,11 +72,8 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
 
   }
 
-
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-
     final pages = <Widget>[
       TrendingScreen(),
       LatestScreen(),
