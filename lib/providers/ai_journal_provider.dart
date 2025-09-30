@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:kuwaia/models/community/journal_video.dart';
-import 'package:kuwaia/models/community/journal_video_group.dart';
 import 'package:kuwaia/models/community/latest.dart';
+import 'package:kuwaia/models/community/trending.dart';
 import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 import '../models/community/news.dart';
-import '../models/tool.dart';
 
 class AiJournalProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
 
-  List<Tool>? _trendingTools;
+  List<Trending>? _trendingTools;
   List<Latest>? _latestList;
   List<News>? _newsList;
   List<JournalVideo>? _journalVideos;
@@ -20,7 +18,7 @@ class AiJournalProvider with ChangeNotifier{
   bool _isLoading = true;
   String? _error;
 
-  List<Tool>? get trendingTools => _trendingTools;
+  List<Trending>? get trendingTools => _trendingTools;
   List<Latest>? get latestList => _latestList;
   List<News>? get newsList => _newsList;
   List<JournalVideo>? get journalVideos => _journalVideos;
@@ -35,11 +33,11 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final trendingResponse = await _client.from('trending_list').select();
+      final trendingResponse = await _client.from('trending').select();
 
       final trendingList = List<Map<String, dynamic>>.from(trendingResponse);
 
-      _trendingTools = trendingList.map((map) => Tool.fromMap(map)).toList();
+      _trendingTools = trendingList.map((map) => Trending.fromMap(map)).toList();
 
       _isLoading = false;
       notifyListeners();
@@ -56,7 +54,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final latestResponse = await _client.from('latest_list').select();
+      final latestResponse = await _client.from('latest').select();
 
       final latestResponseList = List<Map<String, dynamic>>.from(latestResponse);
 
@@ -77,7 +75,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final newsResponse = await _client.from('news_list').select();
+      final newsResponse = await _client.from('news').select();
 
       final newsResponseList = List<Map<String, dynamic>>.from(newsResponse);
 

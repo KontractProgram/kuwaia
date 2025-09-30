@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
+import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
 import 'package:kuwaia/providers/tools_provider.dart';
 import 'package:kuwaia/system/constants.dart';
@@ -25,6 +26,8 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => AiDiaryProvider()),
         ChangeNotifierProvider(create: (_) => ToolsProvider()),
+        ChangeNotifierProvider(create: (_) => AiJournalProvider()),
+
       ],
       child: const KuwaiaApp(),
     ),
