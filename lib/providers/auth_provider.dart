@@ -293,7 +293,6 @@ class AuthProvider with ChangeNotifier {
   }
 
 
-
   Future<void> changeUsername({required String newUsername, required String password}) async {
     if (_user == null) return;
 

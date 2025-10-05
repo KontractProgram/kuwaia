@@ -94,6 +94,7 @@ class _LatestCardState extends State<_LatestCard> {
       color: AppColors.secondaryBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           // Image preview from Supabase bucket
           if (widget.latest.imageUrl != null && widget.latest.imageUrl!.isNotEmpty)
@@ -110,6 +111,7 @@ class _LatestCardState extends State<_LatestCard> {
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 // Release time
                 reusableText(
@@ -124,15 +126,18 @@ class _LatestCardState extends State<_LatestCard> {
                 reusableText(
                   text: widget.latest.title,
                   fontWeight: FontWeight.bold,
+                  maxLines: 2,
+                  textAlign: TextAlign.start
                 ),
                 const SizedBox(height: 8),
 
                 // Description
                 reusableText(
                   text: widget.latest.description,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   fontSize: 12,
+                  textAlign: TextAlign.start
                 ),
                 const SizedBox(height: 8),
 
@@ -216,7 +221,8 @@ class _LatestCardState extends State<_LatestCard> {
                       ),
                     ),
                   ],
-                )
+                ),
+                const SizedBox(height: 20,)
               ],
             ),
           ),

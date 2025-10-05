@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kuwaia/models/community/journal_video.dart';
 import 'package:kuwaia/models/community/latest.dart';
 import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,7 +11,6 @@ class AiJournalProvider with ChangeNotifier{
   List<Tool>? _trendingTools;
   List<Latest>? _latestList;
   List<News>? _newsList;
-  List<JournalVideo>? _journalVideos;
   List<Prompt>? _journalPrompts;
 
   bool _isLoading = true;
@@ -21,7 +19,6 @@ class AiJournalProvider with ChangeNotifier{
   List<Tool>? get trendingTools => _trendingTools;
   List<Latest>? get latestList => _latestList;
   List<News>? get newsList => _newsList;
-  List<JournalVideo>? get journalVideos => _journalVideos;
   List<Prompt>? get journalPrompts => _journalPrompts;
 
   bool get isLoading => _isLoading;
@@ -102,8 +99,6 @@ class AiJournalProvider with ChangeNotifier{
 
       final latestResponseList = List<Map<String, dynamic>>.from(latestResponse);
 
-      print(latestResponseList);
-
       _latestList = latestResponseList.map((map) => Latest.fromMap(map)).toList();
 
       _isLoading = false;
@@ -136,34 +131,13 @@ class AiJournalProvider with ChangeNotifier{
     }
   }
 
-  Future<void> fetchVideosList() async {
-    try {
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      final videosResponse = await _client.from('videos').select();
-
-      final videosResponseList = List<Map<String, dynamic>>.from(videosResponse);
-
-      _journalVideos = videosResponseList.map((map) => JournalVideo.fromMap(map)).toList();
-
-      _isLoading = false;
-      notifyListeners();
-    } catch(e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
   Future<void> fetchJournalPrompts() async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final journalPromptsResponse = await _client.from('videos').select();
+      final journalPromptsResponse = await _client.from('profile_tool_prompts').select().isFilter('in_journal', true);
 
       final journalPromptsResponseList = List<Map<String, dynamic>>.from(journalPromptsResponse);
 
@@ -177,6 +151,5 @@ class AiJournalProvider with ChangeNotifier{
       notifyListeners();
     }
   }
-
 
 }

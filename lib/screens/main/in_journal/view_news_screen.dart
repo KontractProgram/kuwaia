@@ -45,7 +45,20 @@ class ViewNewsScreen extends StatelessWidget {
                   color: AppColors.headingTextColor,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
+                  textAlign: TextAlign.start,
+                  maxLines: 4
                 ),
+                const SizedBox(height: 20),
+
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    news.imageUrl!,
+                    width: size.width * 0.85,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
                 const SizedBox(height: 20),
 
                 // Render each paragraph separately
@@ -59,6 +72,8 @@ class ViewNewsScreen extends StatelessWidget {
                       text: formatted,
                       color: AppColors.headingTextColor,
                       fontSize: 12,
+                      textAlign: TextAlign.start,
+                      maxLines: 1000
                     ),
                   );
                 }),

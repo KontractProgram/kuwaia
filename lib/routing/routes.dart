@@ -1,5 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:kuwaia/screens/main/in_journal/view_news_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/log_details_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
@@ -18,6 +17,7 @@ import 'package:kuwaia/screens/auth/password_to_register_screen.dart';
 import 'package:kuwaia/screens/auth/username_screen.dart';
 import 'package:kuwaia/screens/main/landing_screen.dart';
 import 'package:kuwaia/screens/others/loading_screen.dart';
+import '../screens/main/in_journal/view_news_screen.dart';
 import '../screens/main/in_tool/my_notes_screen.dart';
 
 

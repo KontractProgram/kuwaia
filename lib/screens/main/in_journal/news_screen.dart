@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:provider/provider.dart';
 import '../../../models/community/news.dart';
@@ -78,6 +79,7 @@ Widget _newsCard({required BuildContext context, required News news, required Si
     color: AppColors.secondaryBackgroundColor,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // Image preview from Supabase bucket
         if (news.imageUrl != null && news.imageUrl!.isNotEmpty)
@@ -94,6 +96,7 @@ Widget _newsCard({required BuildContext context, required News news, required Si
           padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               // Release time
               reusableText(
@@ -109,6 +112,7 @@ Widget _newsCard({required BuildContext context, required News news, required Si
                 fontSize: 12,
                 color: AppColors.primaryAccentColor,
                 fontWeight: FontWeight.bold,
+                maxLines: 1
               ),
 
               const SizedBox(height: 8),
@@ -117,31 +121,33 @@ Widget _newsCard({required BuildContext context, required News news, required Si
               reusableText(
                 text: news.title,
                 fontWeight: FontWeight.bold,
+                maxLines: 2,
+                textAlign: TextAlign.start
               ),
               const SizedBox(height: 8),
 
               // Description
               reusableText(
                 text: news.description,
-                maxLines: 2,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
                 fontSize: 12,
+                textAlign: TextAlign.start
               ),
 
               const SizedBox(height: 12),
 
-              // Action buttons
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => context.go('/view_news', extra: {'news': news}),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.secondaryAccentColor,
-                      foregroundColor: AppColors.bodyTextColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))
-                  ),
-                  child: reusableText(text: "Read More", fontSize: 12, fontWeight: FontWeight.w600),
-                ),
-              )
+              Center(
+                child: shortActionButton(
+                  text: 'Read More',
+                  size: size,
+                  buttonColor: Colors.transparent,
+                  onPressed: () => context.push('/view_news', extra: {'news': news}),
+                )
+              ),
+
+              const SizedBox(height: 20,)
+
             ],
           ),
         ),

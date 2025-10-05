@@ -231,7 +231,9 @@ class AiDiaryProvider with ChangeNotifier{
         'description': description,
         'prompt': prompt,
         'tool_id': toolId,
-        'profile_id': profileId
+        'profile_id': profileId,
+        'owner_id': profileId,
+        'in_journal': false,
       });
 
       _myPrompts ??= [];
@@ -253,11 +255,11 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_prompts')
-          .update({'description': prompt.description, 'prompt': prompt.prompt})
-          .eq('id', prompt.id)
-          .eq('tool_id', prompt.toolId)
-          .eq('profile_id', profileId);
+        .from('profile_tool_prompts')
+        .update({'description': prompt.description, 'prompt': prompt.prompt})
+        .eq('id', prompt.id)
+        .eq('tool_id', prompt.toolId)
+        .eq('profile_id', profileId);
 
       // Update local cache
       if (_myPrompts != null) {
@@ -275,6 +277,78 @@ class AiDiaryProvider with ChangeNotifier{
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addPromptToJournal({required String profileId, required Prompt prompt}) async{
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client
+        .from('profile_tool_prompts')
+        .update({'in_journal': true})
+        .eq('id', prompt.id)
+        .eq('tool_id', prompt.toolId)
+        .eq('profile_id', profileId);
+
+      // Update local cache
+      if (_myPrompts != null) {
+        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
+        if (index != -1) {
+          _myPrompts![index] = prompt;
+        } else {
+          // optional: insert if not found
+          _myPrompts!.add(prompt);
+        }
+      } else {
+        _myPrompts = [prompt];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addJournalPromptToDiary({required String profileId, required Prompt prompt}) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client.from('profile_tool_prompts').insert({
+        'description': prompt.description,
+        'prompt': prompt.prompt,
+        'tool_id': prompt.toolId,
+        'profile_id': profileId,
+        'owner_id': profileId,
+        'in_journal': true,
+      });
+
+      // Update local cache
+      if (_myPrompts != null) {
+        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
+        if (index != -1) {
+          _myPrompts![index] = prompt;
+        } else {
+          // optional: insert if not found
+          _myPrompts!.add(prompt);
+        }
+      } else {
+        _myPrompts = [prompt];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();

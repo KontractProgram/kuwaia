@@ -3,7 +3,6 @@ import 'package:kuwaia/screens/main/in_journal/latest_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/news_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/trending_screen.dart';
-import 'package:kuwaia/screens/main/in_journal/video_screen.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import '../../../system/constants.dart';
 
@@ -22,7 +21,6 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
     'Trending',
     'Latest',
     'News',
-    'Videos',
     'Prompts'
   ];
 
@@ -78,7 +76,6 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
       TrendingScreen(),
       LatestScreen(),
       NewsScreen(),
-      VideoScreen(),
       PromptsScreen()
     ];
 

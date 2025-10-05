@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kuwaia/screens/main/nav/ai_diary_screen.dart';
 import 'package:kuwaia/screens/main/nav/ai_journal_screen.dart';
 import 'package:kuwaia/screens/main/nav/profile_screen.dart';
+import 'package:kuwaia/screens/main/nav/shorts_screen.dart';
 import 'package:kuwaia/screens/main/nav/tools_screen.dart';
 import 'package:kuwaia/system/constants.dart';
 import 'package:kuwaia/widgets/others.dart';
@@ -22,18 +23,20 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
     AiDiaryScreen(),
     ToolsScreen(),
     AiJournalScreen(),
+    ShortsScreen(),
     ProfileScreen()
   ];
 
-  static final List<String> _appBarTitles = ['AI Diary', 'Tools', 'AI Journal', 'Profile'];
+  static final List<String> _appBarTitles = ['AI Diary', 'Tools', 'AI Journal', 'Shorts', 'Profile'];
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      extendBodyBehindAppBar: _selectedIndex == 3 ? true : false,
       appBar: AppBar(
-        backgroundColor: AppColors.primaryBackgroundColor,
+        backgroundColor: _selectedIndex == 3 ? Colors.transparent : AppColors.primaryBackgroundColor,
         title: Center(child: reusableText(
           text: _appBarTitles.elementAt(_selectedIndex),
           color: AppColors.headingTextColor,
@@ -46,7 +49,10 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
         child: Container(
           width: size.width,
           height: size.height,
-          padding: EdgeInsets.symmetric(horizontal: size.width*0.05, vertical: size.height*0.02),
+          padding: EdgeInsets.symmetric(
+            horizontal: _selectedIndex == 3 ? 0 : size.width*0.05,
+            vertical: _selectedIndex == 3 ? 0 : size.height*0.02
+          ),
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
       ),
@@ -89,6 +95,17 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
                 isActive: true,
               ),
               label: 'AI Journal'
+          ),
+          BottomNavigationBarItem(
+            icon: glowingIcon(
+              icon: FontAwesomeIcons.circlePlay,
+              isActive: false,
+            ),
+            activeIcon: glowingIcon(
+              icon: FontAwesomeIcons.circlePlay,
+              isActive: true,
+            ),
+            label: 'Shorts'
           ),
           BottomNavigationBarItem(
               icon: glowingIcon(
