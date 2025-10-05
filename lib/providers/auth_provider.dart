@@ -292,4 +292,110 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+
+
+  Future<void> changeUsername({required String newUsername, required String password}) async {
+    if (_user == null) return;
+
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      // Step 1: Verify password correctness
+      final loginResponse = await _client.auth.signInWithPassword(
+        email: _user!.email!,
+        password: password,
+      );
+
+      // If no user returned, credentials are wrong
+      if (loginResponse.user == null) {
+        throw Exception('wrong-password');
+      }
+
+      // Step 2: Check if the username already exists
+      final existing = await _client
+          .from('profiles')
+          .select('id')
+          .eq('username', newUsername)
+          .maybeSingle();
+
+      if (existing != null) {
+        throw Exception('username-exists');
+      }
+
+      // Step 3: Proceed with username update
+      await _client
+          .from('profiles')
+          .update({'username': newUsername})
+          .eq('id', _user!.id);
+
+      // Step 4: Refresh user profile
+      await refreshProfile();
+
+    } catch (e) {
+      if (e.toString().contains('Invalid login credentials') ||
+          e.toString().contains('wrong-password')) {
+        _error = 'wrong-password';
+        throw Exception('wrong-password');
+      } else if (e.toString().contains('username-exists')) {
+        _error = 'username-exists';
+        throw Exception('username-exists');
+      } else {
+        _error = 'unknown-error';
+        throw Exception('unknown-error');
+      }
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
+  Future<void> changePassword({required String currentPassword, required String newPassword}) async {
+    if (_user == null) return;
+
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      // Step 1: Verify current password
+      final loginResponse = await _client.auth.signInWithPassword(
+        email: _user!.email!,
+        password: currentPassword,
+      );
+
+      if (loginResponse.user == null) {
+        throw Exception('wrong-password');
+      }
+
+      // Step 2: Update password securely via Supabase Auth API
+      final response = await _client.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+
+      if (response.user == null) {
+        throw Exception('password-update-failed');
+      }
+
+      // Step 3: Log out user (must re-login with new password)
+      await _client.auth.signOut();
+
+    } catch (e) {
+      if (e.toString().contains('Invalid login credentials') ||
+          e.toString().contains('wrong-password')) {
+        _error = 'wrong-password';
+        throw Exception('wrong-password');
+      } else {
+        _error = 'unknown-error';
+        throw Exception('unknown-error');
+      }
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
 }

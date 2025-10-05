@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/widgets/buttons.dart';
 import '../../../models/community/news.dart';
 import '../../../system/constants.dart';
 import '../../../widgets/texts.dart';
@@ -18,6 +19,7 @@ class ViewNewsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors.primaryBackgroundColor,
+        leading: leadingButton(context),
         title: reusableText(
           text: 'News',
           color: AppColors.headingTextColor,

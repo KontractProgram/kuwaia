@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kuwaia/widgets/texts.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../models/community/latest.dart';
@@ -28,7 +27,6 @@ class _LatestScreenState extends State<LatestScreen> {
       Provider.of<AiJournalProvider>(context, listen: false).fetchLatestList();
     });
   }
-
 
   @override
   Widget build(BuildContext context) {

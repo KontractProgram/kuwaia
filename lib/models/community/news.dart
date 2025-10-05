@@ -24,7 +24,7 @@ class News{
         description: map['description'] as String,
         owner: map['owner'] as String,
         content: map['content'] as String,
-        releaseTime: map['release_time'] as DateTime,
+      releaseTime: DateTime.parse(map['release_time'] as String),
         imageUrl: map['image_url'] as String? ?? '',
     );
   }
