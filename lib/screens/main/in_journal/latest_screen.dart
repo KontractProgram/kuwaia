@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kuwaia/widgets/texts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../models/community/latest.dart';
 import '../../../models/tool.dart';
 import '../../../providers/ai_diary_provider.dart';
@@ -59,7 +60,7 @@ class _LatestScreenState extends State<LatestScreen> {
           itemBuilder: (context, index) {
             final latest = latestList[index];
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: _LatestCard(latest: latest, size: size),
             );
           },
@@ -70,94 +71,105 @@ class _LatestScreenState extends State<LatestScreen> {
 }
 
 
-class _LatestCard extends StatelessWidget {
+class _LatestCard extends StatefulWidget {
   final Latest latest;
   final Size size;
 
   const _LatestCard({required this.latest, required this.size});
 
   @override
+  State<_LatestCard> createState() => _LatestCardState();
+}
+
+class _LatestCardState extends State<_LatestCard> {
+  bool _isLoading = false;
+
+  @override
   Widget build(BuildContext context) {
-    final inDiary = context.read<AiDiaryProvider>().isToolInDiaryById(latest.toolId!);
+    final inDiary = context.watch<AiDiaryProvider>().isToolInDiaryById(widget.latest.toolId!);
 
     return Card(
-      margin: EdgeInsets.symmetric(horizontal: size.width * 0.05),
+      margin: EdgeInsets.symmetric(horizontal: widget.size.width * 0.05),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       elevation: 6,
       clipBehavior: Clip.hardEdge,
+      color: AppColors.secondaryBackgroundColor,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image preview from Supabase bucket
-          if (latest.imageId != null && latest.imageId!.isNotEmpty)
+          if (widget.latest.imageUrl != null && widget.latest.imageUrl!.isNotEmpty)
             SizedBox(
-              height: size.height * 0.25,
+              height: widget.size.height * 0.25,
               width: double.infinity,
               child: Image.network(
-                "${AppConstants.supabaseBucketUrl}/${latest.imageId!}",
+                widget.latest.imageUrl!,
                 fit: BoxFit.cover,
               ),
             ),
 
           Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Release time
                 reusableText(
-                  text: latest.releaseTime.toLocal().toString(),
+                  text: 'Release Date: ${DateFormat.yMMMMd().format(widget.latest.releaseTime.toLocal())}',
                   fontSize: 12,
                   color: AppColors.bodyTextColor.withAlpha(200),
                 ),
+
                 const SizedBox(height: 6),
 
                 // Title
                 reusableText(
-                  text: latest.title,
+                  text: widget.latest.title,
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
                 ),
                 const SizedBox(height: 8),
 
                 // Description
                 reusableText(
-                  text: latest.description,
-                  maxLines: 4,
+                  text: widget.latest.description,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 8),
 
                 // Tags
-                if (latest.tags != null && latest.tags!.isNotEmpty)
+                if (widget.latest.tags != null && widget.latest.tags!.isNotEmpty)
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
-                    children: latest.tags!
-                        .map((tag) => Chip(
-                      label: Text(tag,
-                          style: const TextStyle(fontSize: 12)),
-                      backgroundColor: AppColors.dashaSignatureColor.withAlpha(25),
+                    children: widget.latest.tags!
+                        .map((tag) => Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.dashaSignatureColor.withAlpha(25),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: reusableText(text: tag, color: AppColors.dashaSignatureColor, fontSize: 12),
                     ))
                         .toList(),
                   ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Action buttons
                 Row(
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () =>  launchUrl(Uri.parse(latest.visitLink)),
+                        onPressed: () =>  launchUrl(Uri.parse(widget.latest.visitLink)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.secondaryAccentColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.bodyTextColor,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text("Visit Site"),
+                        child: reusableText(text: "Visit Site", fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -177,21 +189,32 @@ class _LatestCard extends StatelessWidget {
                         ),
                       )
                           : ElevatedButton(
-                        onPressed: () async {
+                        onPressed: _isLoading ? null : () async {
+                          setState(() => _isLoading = true);
+
                           final profileId = context.read<AuthProvider>().profile!.id;
-                          final Tool tool = context.read<AiJournalProvider>().fetchToolById(latest.toolId!) as Tool;
-                          print('TOOL: ${tool.id}, name ${tool.name}');
+                          final aiJournalProvider = context.read<AiJournalProvider>();
+                          final aiDiaryProvider = context.read<AiDiaryProvider>();
 
-                          await context.read<AiDiaryProvider>().addToolToDiary(profileId: profileId, tool: tool);
+                          try {
+                            Tool? tool = await aiJournalProvider.fetchToolById(widget.latest.toolId!);
+                            await aiDiaryProvider.addToolToDiary(profileId: profileId, tool: tool!);
+                          } catch (e) {
+                            print("Error adding tool: $e");
+                          } finally {
+                            if (!mounted) return;
+                            setState(() => _isLoading = false);
+                          }
                         },
-
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primaryAccentColor,
-                          foregroundColor: Colors.white,
+                          foregroundColor: AppColors.bodyTextColor,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text("Add to Diary"),
+                        child: _isLoading
+                            ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.bodyTextColor, strokeWidth: 2))
+                            : reusableText(text: "Add to Diary", fontSize: 12, fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],

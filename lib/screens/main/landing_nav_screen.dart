@@ -8,7 +8,6 @@ import 'package:kuwaia/system/constants.dart';
 import 'package:kuwaia/widgets/others.dart';
 import 'package:kuwaia/widgets/texts.dart';
 
-
 class LandingNavScreen extends StatefulWidget {
   const LandingNavScreen({super.key});
 

@@ -5,7 +5,7 @@ class News{
   final String owner;
   final String content;
   final DateTime releaseTime;
-  String? imageId;
+  String? imageUrl;
 
   News({
     required this.id,
@@ -14,7 +14,7 @@ class News{
     required this.owner,
     required this.content,
     required this.releaseTime,
-    this.imageId,
+    this.imageUrl,
   });
 
   factory News.fromMap(Map<String, dynamic> map) {
@@ -25,7 +25,7 @@ class News{
         owner: map['owner'] as String,
         content: map['content'] as String,
         releaseTime: map['release_time'] as DateTime,
-        imageId: map['image_id'] as String? ?? '',
+        imageUrl: map['image_url'] as String? ?? '',
     );
   }
 
@@ -37,7 +37,7 @@ class News{
       'owner': owner,
       'content': content,
       'release_time': releaseTime,
-      'image_id': imageId,
+      'image_url': imageUrl,
     };
   }
 }

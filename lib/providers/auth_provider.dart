@@ -208,10 +208,10 @@ class AuthProvider with ChangeNotifier {
       // Step B: Decide cap based on profession count
       final int professionCount = professions.length;
       final int toolCap = professionCount == 1
-          ? 5
+          ? 4
           : professionCount == 2
-          ? 8
-          : 12;
+          ? 7
+          : 10;
 
       // Step C: Pick tools with group safeguard
       final List<Map<String, dynamic>> curatedTools = [];

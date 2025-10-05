@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/screens/main/in_journal/view_news_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/log_details_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
@@ -7,6 +8,7 @@ import 'package:kuwaia/screens/main/in_tool/tool_view_screen.dart';
 import 'package:kuwaia/screens/main/landing_nav_screen.dart';
 import 'package:kuwaia/screens/main/tools_in_group_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
+import '../models/community/news.dart';
 import '../models/group.dart';
 import '../models/tool.dart';
 import '../screens/auth/auth_options_screen.dart';
@@ -16,7 +18,6 @@ import 'package:kuwaia/screens/auth/password_to_register_screen.dart';
 import 'package:kuwaia/screens/auth/username_screen.dart';
 import 'package:kuwaia/screens/main/landing_screen.dart';
 import 'package:kuwaia/screens/others/loading_screen.dart';
-
 import '../screens/main/in_tool/my_notes_screen.dart';
 
 
@@ -36,7 +37,8 @@ enum AppRoute {
   myNotes,
   myVideos,
   officialUseCase,
-  logDetails
+  logDetails,
+  viewNews
 }
 
 final routes = [
@@ -165,6 +167,13 @@ final routes = [
       }
   ),
 
-
-
+  GoRoute(
+    path: '/view_news',
+    name: AppRoute.viewNews.name,
+    builder: (context, state){
+      final extra = state.extra as Map<String, dynamic>;
+      final news = extra['news'] as News;
+      return ViewNewsScreen(news: news);
+    }
+  )
 ];

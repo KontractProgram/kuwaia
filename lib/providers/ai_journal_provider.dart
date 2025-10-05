@@ -102,6 +102,8 @@ class AiJournalProvider with ChangeNotifier{
 
       final latestResponseList = List<Map<String, dynamic>>.from(latestResponse);
 
+      print(latestResponseList);
+
       _latestList = latestResponseList.map((map) => Latest.fromMap(map)).toList();
 
       _isLoading = false;

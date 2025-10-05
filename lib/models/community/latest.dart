@@ -5,7 +5,7 @@ class Latest{
   final String visitLink;
   final DateTime releaseTime;
   List<String>? tags;
-  String? imageId;
+  String? imageUrl;
   int? toolId;
 
   Latest({
@@ -15,7 +15,7 @@ class Latest{
     required this.visitLink,
     required this.releaseTime,
     this.tags,
-    this.imageId,
+    this.imageUrl,
     this.toolId
   });
 
@@ -25,9 +25,11 @@ class Latest{
       title: map['title'] as String,
       description: map['description'] as String,
       visitLink: map['visit_link'] as String,
-      releaseTime: map['release_time'] as DateTime,
-      tags: map['tags'] as List<String>? ?? [],
-      imageId: map['image_id'] as String? ?? '',
+      releaseTime: DateTime.parse(map['release_time'] as String),
+      tags: (map['tags'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList() ?? [],
+      imageUrl: map['image_url'] as String? ?? '',
       toolId: map['tool_id'] as int? ?? -1
     );
   }
@@ -40,7 +42,7 @@ class Latest{
       'visit_link': visitLink,
       'release_time': releaseTime,
       'tags': tags,
-      'image_id': imageId,
+      'image_url': imageUrl,
       'tool_id': toolId
     };
   }

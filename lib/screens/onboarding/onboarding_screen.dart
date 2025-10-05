@@ -67,10 +67,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     setState(() {
       if (_selectedProfessions.contains(profession)) {
         _selectedProfessions.remove(profession);
-      } else if (_selectedProfessions.length < 5) {
+      } else if (_selectedProfessions.length < 3) {
         _selectedProfessions.add(profession);
       } else {
-        showToast('You can select up to 5 roles only');
+        showToast('You can select up to 3 roles only');
       }
     });
   }
@@ -102,7 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     runSpacing: 8,
                     children: _allProfessions!.map((profession) {
                       final isSelected = _selectedProfessions.contains(profession);
-                      final isDisabled = !isSelected && _selectedProfessions.length >= 5;
+                      final isDisabled = !isSelected && _selectedProfessions.length >= 3;
                       final name = profession['name'] as String;
 
                       return ChoiceChip(
