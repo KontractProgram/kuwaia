@@ -3,9 +3,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
+import 'package:kuwaia/providers/connectivity_provider.dart';
 import 'package:kuwaia/providers/notification_provider.dart';
 import 'package:kuwaia/providers/shorts_provider.dart';
 import 'package:kuwaia/providers/tools_provider.dart';
+import 'package:kuwaia/screens/others/no_internet_screen.dart';
 import 'package:kuwaia/system/constants.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
@@ -27,6 +29,7 @@ void main() async {
     OverlaySupport.global(
       child: MultiProvider(
         providers: [
+          ChangeNotifierProvider(create: (_) => ConnectivityProvider()),
           ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => AiDiaryProvider()),
           ChangeNotifierProvider(create: (_) => ToolsProvider()),
@@ -49,7 +52,15 @@ class KuwaiaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final router = AppRouter(auth).router;
-    print('building KuwaiaApp, auth.isLoading=${auth.isLoading}, isAuth=${auth.isAuthenticated}');
+
+    final connectivity = context.watch<ConnectivityProvider>();
+
+    if (!connectivity.hasInternet) {
+      return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: const NoInternetScreen(),
+      );
+    }
 
     return MaterialApp.router(
       title: 'KUWAIA',
