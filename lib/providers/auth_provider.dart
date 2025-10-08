@@ -409,6 +409,8 @@ class AuthProvider with ChangeNotifier {
       _otpCode = _generateOtp();
       _emailForReset = email;
 
+      print('otp code: $_otpCode');
+
       await _client.functions.invoke('send_reset_otp', body: {'email': email, 'otp': _otpCode});
       return true;
     } catch(e) {
@@ -416,7 +418,6 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
-
 
   Future<bool> resetPassword(String newPassword) async {
     try {
