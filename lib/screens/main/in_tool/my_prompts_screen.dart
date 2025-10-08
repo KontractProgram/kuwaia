@@ -27,15 +27,13 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).fetchPrompts(toolId: widget.tool.id, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).fetchPrompts(toolId: widget.tool.id);
     });
   }
 
-  void _showAddPromptModal({required BuildContext context, required Size size}) {
+  void _showCreatePromptModal({required BuildContext context, required Size size}) {
     final descriptionController = TextEditingController();
     final promptController = TextEditingController();
-    final profileId = context.read<AuthProvider>().profile!.id;
 
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
@@ -107,14 +105,71 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                   if (descriptionController.text.isNotEmpty &&
                       promptController.text.isNotEmpty) {
                     Provider.of<AiDiaryProvider>(context, listen: false)
-                        .addPrompt(
+                        .createPrompt(
                       description: descriptionController.text,
                       prompt: promptController.text,
                       toolId: widget.tool.id,
-                      profileId: profileId,
                     );
                     context.pop();
                   }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSharePromptModal({required BuildContext context, required Size size, required AiDiaryProvider aiDiaryProvider, required Prompt prompt}) {
+
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Container(
+          decoration: BoxDecoration(
+            color: AppColors.primaryBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              reusableText(
+                text: "Share Prompt",
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+              const SizedBox(height: 16),
+              longActionButton(
+                text: "To a Friend",
+                size: size,
+                buttonColor: AppColors.secondaryAccentColor,
+                textColor: AppColors.bodyTextColor,
+                onPressed: () async {
+                  context.pop();
+                  final profileId = Provider.of<AuthProvider>(context, listen: false).profile!.id;
+                  final promptSent = await aiDiaryProvider.sharePromptToAFriend(senderId: profileId, receiverId: profileId, promptId: 4);
+                  showToast(promptSent ? "Prompt sent successfully ": "Prompt sending failed");
+                },
+              ),
+              const SizedBox(height: 8),
+              longActionButton(
+                text: "To Journal",
+                size: size,
+                buttonColor: AppColors.primaryAccentColor,
+                textColor: AppColors.bodyTextColor,
+                onPressed: () async {
+                  context.pop();
+                  final promptInJournal = await aiDiaryProvider.sharePromptToJournal(prompt: prompt);
+                  showToast(promptInJournal ? 'Your prompt has been made public' : 'Something went wrong try again later');
                 },
               ),
             ],
@@ -201,17 +256,16 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                       promptController.text.isNotEmpty) {
 
                     final newPrompt = Prompt(
-                        id: prompt.id,
-                        description: descriptionController.text,
-                        prompt: promptController.text,
-                        toolId: prompt.toolId
+                      id: prompt.id,
+                      description: descriptionController.text,
+                      prompt: promptController.text,
+                      toolId: prompt.toolId,
+                      ownerId: prompt.ownerId,
+                      inJournal: prompt.inJournal ?? false
                     );
 
                     Provider.of<AiDiaryProvider>(context, listen: false)
-                        .updatePrompt(
-                      prompt: newPrompt,
-                      profileId: profileId,
-                    );
+                        .updatePrompt(prompt: newPrompt);
                     context.pop();
                   }
                 },
@@ -257,9 +311,8 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
 
     if (confirmed == true) {
       final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).deletePrompt(prompt: prompt, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).deletePrompt(prompt: prompt);
     }
-
   }
 
   @override
@@ -294,7 +347,7 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                       shortActionButton(
                         text: "+ Add Prompt",
                         size: size,
-                        onPressed: () => _showAddPromptModal(context: context, size: size),
+                        onPressed: () => _showCreatePromptModal(context: context, size: size),
                       ),
                     ],
                   ),
@@ -317,7 +370,7 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                         return savedPromptWidget(
                           description: prompt.description,
                           prompt: prompt.prompt,
-                          onShare: () {},
+                          onShare: () => _showSharePromptModal(context: context, size: size, aiDiaryProvider: aiDiaryProvider, prompt: prompt),
                           onCopy: () async {
                             await Clipboard.setData(ClipboardData(text: prompt.prompt));
                             showToast('Prompt copied to clipboard');

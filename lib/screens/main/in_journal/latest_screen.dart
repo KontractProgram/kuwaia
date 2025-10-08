@@ -195,13 +195,12 @@ class _LatestCardState extends State<_LatestCard> {
                         onPressed: _isLoading ? null : () async {
                           setState(() => _isLoading = true);
 
-                          final profileId = context.read<AuthProvider>().profile!.id;
                           final aiJournalProvider = context.read<AiJournalProvider>();
                           final aiDiaryProvider = context.read<AiDiaryProvider>();
 
                           try {
                             Tool? tool = await aiJournalProvider.fetchToolById(widget.latest.toolId!);
-                            await aiDiaryProvider.addToolToDiary(profileId: profileId, tool: tool!);
+                            await aiDiaryProvider.addToolToDiary(tool: tool!);
                           } catch (e) {
                             print("Error adding tool: $e");
                           } finally {

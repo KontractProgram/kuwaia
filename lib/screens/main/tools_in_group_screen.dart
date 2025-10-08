@@ -74,9 +74,9 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                         onBookMarkPressed: () async {
                           final profileId = context.read<AuthProvider>().profile!.id;
                           if(inDiary) {
-                            await context.read<AiDiaryProvider>().deleteToolFromDiary(profileId: profileId, toolId: tool.id);
+                            await context.read<AiDiaryProvider>().deleteToolFromDiary(toolId: tool.id);
                           } else {
-                            await context.read<AiDiaryProvider>().addToolToDiary(profileId: profileId, tool: tool);
+                            await context.read<AiDiaryProvider>().addToolToDiary(tool: tool);
                           }
 
                           setState(() {});

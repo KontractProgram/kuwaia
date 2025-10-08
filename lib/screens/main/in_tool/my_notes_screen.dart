@@ -27,14 +27,12 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).fetchNotes(toolId: widget.tool.id, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).fetchNotes(toolId: widget.tool.id);
     });
   }
 
   void _showAddNoteModal(BuildContext context, Size size) {
     final noteController = TextEditingController();
-    final profileId = context.read<AuthProvider>().profile!.id;
 
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
@@ -91,7 +89,6 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
                         .addNote(
                       note: noteController.text,
                       toolId: widget.tool.id,
-                      profileId: profileId,
                     );
                     context.pop();
                   }
@@ -106,7 +103,6 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
 
   void _showEditNoteModal({required BuildContext context, required Size size, required Note note}) {
     final noteController = TextEditingController(text: note.note);
-    final profileId = context.read<AuthProvider>().profile!.id;
 
     showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -170,7 +166,6 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
                       Provider.of<AiDiaryProvider>(context, listen: false)
                           .updateNote(
                         note: newNote,
-                        profileId: profileId,
                       );
                       context.pop();
                     }
@@ -216,8 +211,7 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
     );
 
     if (confirmed == true) {
-      final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).deleteNote(note: note, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).deleteNote(note: note);
     }
   }
 

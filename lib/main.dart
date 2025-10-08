@@ -3,9 +3,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
+import 'package:kuwaia/providers/notification_provider.dart';
 import 'package:kuwaia/providers/shorts_provider.dart';
 import 'package:kuwaia/providers/tools_provider.dart';
 import 'package:kuwaia/system/constants.dart';
+import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -22,16 +24,19 @@ void main() async {
   );
 
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => AiDiaryProvider()),
-        ChangeNotifierProvider(create: (_) => ToolsProvider()),
-        ChangeNotifierProvider(create: (_) => ShortsProvider()),
-        ChangeNotifierProvider(create: (_) => AiJournalProvider()),
+    OverlaySupport.global(
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
+          ChangeNotifierProvider(create: (_) => AiDiaryProvider()),
+          ChangeNotifierProvider(create: (_) => ToolsProvider()),
+          ChangeNotifierProvider(create: (_) => ShortsProvider()),
+          ChangeNotifierProvider(create: (_) => PromptNotificationProvider()),
+          ChangeNotifierProvider(create: (_) => AiJournalProvider()),
 
-      ],
-      child: const KuwaiaApp(),
+        ],
+        child: const KuwaiaApp(),
+      ),
     ),
   );
 }

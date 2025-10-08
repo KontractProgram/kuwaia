@@ -24,13 +24,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-
-      aiDiaryProvider.fetchDiary(authProvider.profile!.id);
-
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {Provider.of<AiDiaryProvider>(context, listen: false).fetchDiary();});
   }
 
   @override
@@ -116,8 +110,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                       inDiary: true,
                       onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
                       onBookMarkPressed: () {
-                        final auth = context.read<AuthProvider>();
-                        diaryProvider.deleteToolFromDiary(profileId: auth.profile!.id, toolId: tool.id);
+                        diaryProvider.deleteToolFromDiary(toolId: tool.id);
                       }
                     );
                   },

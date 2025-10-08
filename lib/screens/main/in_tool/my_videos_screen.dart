@@ -28,7 +28,7 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).fetchVideos(toolId: widget.tool.id, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).fetchVideos(toolId: widget.tool.id);
     });
   }
 
@@ -90,7 +90,6 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
                         .addVideo(
                       videoLink: videoLinkController.text,
                       toolId: widget.tool.id,
-                      profileId: profileId,
                     );
                     context.pop();
                   }
@@ -135,9 +134,10 @@ class _MyVideosScreenState extends State<MyVideosScreen> {
       },
     );
 
+
     if (confirmed == true) {
       final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).deleteVideo(video: video, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).deleteVideo(video: video);
     }
   }
 

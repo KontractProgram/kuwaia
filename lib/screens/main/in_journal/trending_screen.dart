@@ -116,13 +116,10 @@ class _TrendingScreenState extends State<TrendingScreen> {
                           size: size,
                           onPressed: () async {
                             setState(() => _loadingToolId = tool.id);
-                            final profileId =
-                                context.read<AuthProvider>().profile!.id;
 
                             await context
                                 .read<AiDiaryProvider>()
-                                .addToolToDiary(
-                                profileId: profileId, tool: tool);
+                                .addToolToDiary(tool: tool);
 
                             setState(() => _loadingToolId = null);
                           },

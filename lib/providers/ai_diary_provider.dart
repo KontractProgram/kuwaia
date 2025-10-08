@@ -8,6 +8,7 @@ import '../models/tool.dart';
 
 class AiDiaryProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
+  final _profileId = Supabase.instance.client.auth.currentUser!.id;
 
   List<Tool>? _diary;
   List<Map<String, dynamic>>? _profileToolsMap;
@@ -47,7 +48,7 @@ class AiDiaryProvider with ChangeNotifier{
     return match['is_favorite'] == true;
   }
 
-  Future<void> fetchDiary(String profileId) async {
+  Future<void> fetchDiary() async {
     try{
       _isLoading = true;
       _error = null;
@@ -57,7 +58,7 @@ class AiDiaryProvider with ChangeNotifier{
       final toolsMap = await _client
           .from('profile_tools_map')
           .select('tool_id, is_favorite')
-          .eq('profile_id', profileId);
+          .eq('profile_id', _profileId);
 
       _profileToolsMap = List<Map<String, dynamic>>.from(toolsMap);
       final toolIds = _profileToolsMap!.map((e) => e['tool_id'] as int).toSet().toList();
@@ -85,7 +86,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addToolToDiary({required String profileId, required Tool tool,}) async {
+  Future<void> addToolToDiary({ required Tool tool,}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -93,14 +94,14 @@ class AiDiaryProvider with ChangeNotifier{
 
       // Insert into Supabase
       await _client.from('profile_tools_map').insert({
-        'profile_id': profileId,
+        'profile_id': _profileId,
         'tool_id': tool.id,
       });
 
       // Update local state
       _profileToolsMap ??= [];
       _profileToolsMap!.add({
-        'profile_id': profileId,
+        'profile_id': _profileId,
         'tool_id': tool.id,
       });
 
@@ -116,7 +117,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> deleteToolFromDiary({required String profileId, required int toolId}) async {
+  Future<void> deleteToolFromDiary({ required int toolId}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -125,7 +126,7 @@ class AiDiaryProvider with ChangeNotifier{
       await _client
           .from('profile_tools_map')
           .delete()
-          .eq('profile_id', profileId)
+          .eq('profile_id', _profileId)
           .eq('tool_id', toolId);
 
       // Remove from local state
@@ -141,7 +142,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> updateFavoriteStatus({required String profileId, required int toolId, required bool isFavorite}) async {
+  Future<void> updateFavoriteStatus({ required int toolId, required bool isFavorite}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -150,7 +151,7 @@ class AiDiaryProvider with ChangeNotifier{
       await _client
           .from('profile_tools_map')
           .update({'is_favorite': isFavorite})
-          .eq('profile_id', profileId)
+          .eq('profile_id', _profileId)
           .eq('tool_id', toolId);
 
       // Update local cache
@@ -173,13 +174,13 @@ class AiDiaryProvider with ChangeNotifier{
   }
 
   //PROMPTS METHODS
-  Future<void> fetchPrompts({required int toolId, required String profileId}) async {
+  Future<void> fetchPrompts({required int toolId}) async {
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'profile_id': profileId, 'tool_id': toolId};
+      final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the prompts data
       final promptsResponse = await _client.from('profile_tool_prompts').select().match(query);
@@ -197,13 +198,13 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> fetchPromptWithId({required int id, required int toolId, required String profileId}) async{
+  Future<void> fetchPromptWithId({required int id, required int toolId}) async{
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
+      final query = {'id': id, 'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the prompts data
       final promptResponse = await _client.from('profile_tool_prompts').select().match(query);
@@ -221,7 +222,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addPrompt({required String description, required String prompt, required int toolId, required String profileId}) async {
+  Future<void> createPrompt({required String description, required String prompt, required int toolId}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -231,13 +232,13 @@ class AiDiaryProvider with ChangeNotifier{
         'description': description,
         'prompt': prompt,
         'tool_id': toolId,
-        'profile_id': profileId,
-        'owner_id': profileId,
+        'profile_id': _profileId,
+        'owner_id': _profileId,
         'in_journal': false,
       });
 
       _myPrompts ??= [];
-      fetchPrompts(toolId: toolId, profileId: profileId);
+      fetchPrompts(toolId: toolId);
 
       _isLoading = false;
       notifyListeners();
@@ -248,18 +249,52 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> updatePrompt({required Prompt prompt, required String profileId}) async {
+  Future<bool> clonePrompt({required Prompt prompt}) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
 
+      await _client.from('profile_tool_prompts').insert({
+        'description': prompt.description,
+        'prompt': prompt.prompt,
+        'tool_id': prompt.toolId,
+        'profile_id': _client.auth.currentUser!.id,
+        'owner_id': prompt.ownerId,
+        'in_journal': false,
+      });
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }  catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> updatePrompt({required Prompt prompt, }) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      Map<String, dynamic> query = {};
+
+      if(prompt.ownerId != _profileId) { // not the owner
+        query = {'description': prompt.description, 'prompt': prompt.prompt, 'owner_id': prompt.ownerId};
+      } else {
+        query = {'description': prompt.description, 'prompt': prompt.prompt};
+      }
+
       await _client
         .from('profile_tool_prompts')
-        .update({'description': prompt.description, 'prompt': prompt.prompt})
+        .update(query)
         .eq('id', prompt.id)
         .eq('tool_id', prompt.toolId)
-        .eq('profile_id', profileId);
+        .eq('profile_id', _profileId);
 
       // Update local cache
       if (_myPrompts != null) {
@@ -283,79 +318,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addPromptToJournal({required String profileId, required Prompt prompt}) async{
-    try{
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      await _client
-        .from('profile_tool_prompts')
-        .update({'in_journal': true})
-        .eq('id', prompt.id)
-        .eq('tool_id', prompt.toolId)
-        .eq('profile_id', profileId);
-
-      // Update local cache
-      if (_myPrompts != null) {
-        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
-        if (index != -1) {
-          _myPrompts![index] = prompt;
-        } else {
-          // optional: insert if not found
-          _myPrompts!.add(prompt);
-        }
-      } else {
-        _myPrompts = [prompt];
-      }
-
-      _isLoading = false;
-      notifyListeners();
-    } catch(e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> addJournalPromptToDiary({required String profileId, required Prompt prompt}) async {
-    try{
-      _isLoading = true;
-      _error = null;
-      notifyListeners();
-
-      await _client.from('profile_tool_prompts').insert({
-        'description': prompt.description,
-        'prompt': prompt.prompt,
-        'tool_id': prompt.toolId,
-        'profile_id': profileId,
-        'owner_id': profileId,
-        'in_journal': true,
-      });
-
-      // Update local cache
-      if (_myPrompts != null) {
-        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
-        if (index != -1) {
-          _myPrompts![index] = prompt;
-        } else {
-          // optional: insert if not found
-          _myPrompts!.add(prompt);
-        }
-      } else {
-        _myPrompts = [prompt];
-      }
-
-      _isLoading = false;
-      notifyListeners();
-    } catch(e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  Future<void> deletePrompt({required Prompt prompt, required String profileId}) async {
+  Future<void> deletePrompt({required Prompt prompt, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -365,7 +328,7 @@ class AiDiaryProvider with ChangeNotifier{
           .from('profile_tool_prompts')
           .delete()
           .eq('id', prompt.id)
-          .eq('profile_id', profileId)
+          .eq('profile_id', _profileId)
           .eq('tool_id', prompt.toolId);
 
       // ✅ Remove from local state
@@ -385,14 +348,125 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  //NOTES METHODS
-  Future<void> fetchNotes({required int toolId, required String profileId}) async {
+  Future<bool> sharePromptToJournal({ required Prompt prompt}) async{
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'profile_id': profileId, 'tool_id': toolId};
+      await _client
+          .from('profile_tool_prompts')
+          .update({'in_journal': true})
+          .eq('id', prompt.id)
+          .eq('tool_id', prompt.toolId)
+          .eq('profile_id', _profileId);
+
+      final updatedPrompt = Prompt(id: prompt.id, description: prompt.description, prompt: prompt.prompt, toolId: prompt.toolId, ownerId: prompt.ownerId, inJournal: true);
+
+      // Update local cache
+      if (_myPrompts != null) {
+        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
+        if (index != -1) {
+          _myPrompts![index] = updatedPrompt;
+        } else {
+          // optional: insert if not found
+          _myPrompts!.add(updatedPrompt);
+        }
+      } else {
+        _myPrompts = [updatedPrompt];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> sharePromptToAFriend({required String senderId, required String receiverId, required int promptId }) async{
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      await _client.from('notifications').insert({
+        'sender_id': senderId,
+        'receiver_id': receiverId,
+        'type': 'prompt_share',
+        'message': 'A new prompt was shared with you',
+        'data': {'prompt_id': promptId},
+      });
+
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    }  catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<void> getJournalPromptToDiary({ required Prompt prompt}) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      //check if user has the tool
+      bool hasTool = false;
+      final toolRecordResponse = await _client.from('profile_tools_map').select().match({'profile_id': _profileId, 'tool_id': prompt.toolId}).maybeSingle();
+
+      hasTool = toolRecordResponse!['profile_id'] == _profileId && toolRecordResponse['tool_id'] == prompt.toolId;
+
+      if(!hasTool) {
+        await _client.from('profile_tools_map').insert({'profile_id': _profileId, 'tool_id': prompt.toolId, 'is_favorite': false});
+      }
+
+      await _client.from('profile_tool_prompts').insert({
+        'description': prompt.description,
+        'prompt': prompt.prompt,
+        'tool_id': prompt.toolId,
+        'profile_id': _profileId,
+        'owner_id': prompt.ownerId,
+        'in_journal': false,
+      });
+
+      // Update local cache
+      if (_myPrompts != null) {
+        final index = _myPrompts!.indexWhere((p) => p.id == prompt.id);
+        if (index != -1) {
+          _myPrompts![index] = prompt;
+        } else {
+          // optional: insert if not found
+          _myPrompts!.add(prompt);
+        }
+      } else {
+        _myPrompts = [prompt];
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  //NOTES METHODS
+  Future<void> fetchNotes({required int toolId, }) async {
+    try{
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the notes data
       final notesResponse = await _client.from('profile_tool_notes').select().match(query);
@@ -410,13 +484,13 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> fetchNoteWithId({required int id, required int toolId, required String profileId}) async{
+  Future<void> fetchNoteWithId({required int id, required int toolId, }) async{
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
+      final query = {'id': id, 'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the notes data
       final notesResponse = await _client.from('profile_tool_notes').select().match(query);
@@ -434,7 +508,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addNote({required String note, required int toolId, required String profileId}) async {
+  Future<void> addNote({required String note, required int toolId}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -443,11 +517,11 @@ class AiDiaryProvider with ChangeNotifier{
       await _client.from('profile_tool_notes').insert({
         'note': note,
         'tool_id': toolId,
-        'profile_id': profileId
+        'profile_id': _profileId
       });
 
       _myNotes ??= [];
-      fetchNotes(toolId: toolId, profileId: profileId);
+      fetchNotes(toolId: toolId);
 
       _isLoading = false;
       notifyListeners();
@@ -458,7 +532,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> updateNote({required Note note, required String profileId}) async {
+  Future<void> updateNote({required Note note, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -469,7 +543,7 @@ class AiDiaryProvider with ChangeNotifier{
           .update({'note': note.note})
           .eq('id', note.id)
           .eq('tool_id', note.toolId)
-          .eq('profile_id', profileId);
+          .eq('profile_id', _profileId);
 
       // Update local cache
       if (_myNotes != null) {
@@ -493,7 +567,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> deleteNote({required Note note, required String profileId}) async {
+  Future<void> deleteNote({required Note note, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -503,7 +577,7 @@ class AiDiaryProvider with ChangeNotifier{
           .from('profile_tool_notes')
           .delete()
           .eq('id', note.id)
-          .eq('profile_id', profileId)
+          .eq('profile_id', _profileId)
           .eq('tool_id', note.toolId);
 
       // ✅ Remove from local state
@@ -524,13 +598,13 @@ class AiDiaryProvider with ChangeNotifier{
   }
 
   //VIDEOS METHODS
-  Future<void> fetchVideos({required int toolId, required String profileId}) async {
+  Future<void> fetchVideos({required int toolId, }) async {
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'profile_id': profileId, 'tool_id': toolId};
+      final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the videos data
       final videosResponse = await _client.from('profile_tool_videos').select().match(query);
@@ -548,13 +622,13 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> fetchVideoWithId({required int id, required int toolId, required String profileId}) async{
+  Future<void> fetchVideoWithId({required int id, required int toolId, }) async{
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'id': id, 'profile_id': profileId, 'tool_id': toolId};
+      final query = {'id': id, 'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the video data
       final videosResponse = await _client.from('profile_tool_videos').select().match(query);
@@ -572,7 +646,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addVideo({required String videoLink, required int toolId, required String profileId}) async {
+  Future<void> addVideo({required String videoLink, required int toolId, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -581,11 +655,11 @@ class AiDiaryProvider with ChangeNotifier{
       await _client.from('profile_tool_videos').insert({
         'video_link': videoLink,
         'tool_id': toolId,
-        'profile_id': profileId
+        'profile_id': _profileId
       });
 
       _myVideos ??= [];
-      fetchVideos(toolId: toolId, profileId: profileId);
+      fetchVideos(toolId: toolId);
 
       _isLoading = false;
       notifyListeners();
@@ -596,7 +670,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> updateVideo({required Video video, required String profileId}) async {
+  Future<void> updateVideo({required Video video, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -607,7 +681,7 @@ class AiDiaryProvider with ChangeNotifier{
           .update({'video_link': video.videoLink})
           .eq('id', video.id)
           .eq('tool_id', video.toolId)
-          .eq('profile_id', profileId);
+          .eq('profile_id', _profileId);
 
       // Update local cache
       if (_myVideos != null) {
@@ -631,7 +705,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> deleteVideo({required Video video, required String profileId}) async {
+  Future<void> deleteVideo({required Video video, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -641,7 +715,7 @@ class AiDiaryProvider with ChangeNotifier{
           .from('profile_tool_videos')
           .delete()
           .eq('id', video.id)
-          .eq('profile_id', profileId)
+          .eq('profile_id', _profileId)
           .eq('tool_id', video.toolId);
 
       // ✅ Remove from local state
@@ -662,13 +736,13 @@ class AiDiaryProvider with ChangeNotifier{
   }
 
   //LOG DETAILS METHODS
-  Future<void> fetchLogDetails({required int toolId, required String profileId}) async {
+  Future<void> fetchLogDetails({required int toolId, }) async {
     try{
       _isLoading = true;
       _error = null;
       notifyListeners();
 
-      final query = {'profile_id': profileId, 'tool_id': toolId};
+      final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the log details data
       final logDetailsResponse = await _client.from('profile_tool_log_details').select().match(query);
@@ -687,7 +761,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> addLogDetails({required String email, required String logPasswordHint, required int toolId, required String profileId}) async {
+  Future<void> addLogDetails({required String email, required String logPasswordHint, required int toolId, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -697,10 +771,10 @@ class AiDiaryProvider with ChangeNotifier{
         'log_email': email,
         'log_password_hint': logPasswordHint,
         'tool_id': toolId,
-        'profile_id': profileId
+        'profile_id': _profileId
       });
 
-      fetchLogDetails(toolId: toolId, profileId: profileId);
+      fetchLogDetails(toolId: toolId);
 
       _isLoading = false;
       notifyListeners();
@@ -711,7 +785,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> updateLogDetails({required LogDetails ld, required String profileId}) async {
+  Future<void> updateLogDetails({required LogDetails ld, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -722,7 +796,7 @@ class AiDiaryProvider with ChangeNotifier{
           .update({'log_email': ld.logEmail, 'log_password_hint': ld.logPasswordHint})
           .eq('id', ld.id)
           .eq('tool_id', ld.toolId)
-          .eq('profile_id', profileId);
+          .eq('profile_id', _profileId);
 
       // Update local cache
       if(_logDetails != null) {
@@ -738,7 +812,7 @@ class AiDiaryProvider with ChangeNotifier{
     }
   }
 
-  Future<void> deleteLogDetails({required LogDetails ld, required String profileId}) async {
+  Future<void> deleteLogDetails({required LogDetails ld, }) async {
     try {
       _isLoading = true;
       _error = null;
@@ -748,7 +822,7 @@ class AiDiaryProvider with ChangeNotifier{
           .from('profile_tool_log_details')
           .delete()
           .eq('id', ld.id)
-          .eq('profile_id', profileId)
+          .eq('profile_id', _profileId)
           .eq('tool_id', ld.toolId);
 
       _logDetails = null;

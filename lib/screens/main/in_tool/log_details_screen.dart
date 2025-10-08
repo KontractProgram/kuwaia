@@ -27,7 +27,7 @@ class _LogDetailsScreenState extends State<LogDetailsScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).fetchLogDetails(toolId: widget.tool.id, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).fetchLogDetails(toolId: widget.tool.id);
     });
   }
 
@@ -117,11 +117,7 @@ class _LogDetailsScreenState extends State<LogDetailsScreen> {
                             toolId: logDetails.toolId
                         );
 
-                        Provider.of<AiDiaryProvider>(context, listen: false)
-                            .updateLogDetails(
-                          ld: newLogDetails,
-                          profileId: profileId,
-                        );
+                        Provider.of<AiDiaryProvider>(context, listen: false).updateLogDetails(ld: newLogDetails,);
                       } else {
                         //create
                         Provider.of<AiDiaryProvider>(context, listen: false)
@@ -129,7 +125,6 @@ class _LogDetailsScreenState extends State<LogDetailsScreen> {
                           email: emailController.text,
                           logPasswordHint: passHintController.text,
                           toolId: widget.tool.id,
-                          profileId: profileId,
                         );
                       }
 
@@ -177,10 +172,8 @@ class _LogDetailsScreenState extends State<LogDetailsScreen> {
     );
 
     if (confirmed == true) {
-      final profileId = context.read<AuthProvider>().profile!.id;
-      Provider.of<AiDiaryProvider>(context, listen: false).deleteLogDetails(ld: logDetails, profileId: profileId);
+      Provider.of<AiDiaryProvider>(context, listen: false).deleteLogDetails(ld: logDetails);
     }
-
   }
 
   @override

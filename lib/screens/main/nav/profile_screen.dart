@@ -347,24 +347,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 physics: const NeverScrollableScrollPhysics(),
                 children: [
                   singleTrailCardWidget(
+                      leadingIcon: FontAwesomeIcons.bell,
+                      title: 'Notifications',
+                      onPressed: () {
+
+                      }
+                  ),
+                  singleTrailCardWidget(
                     leadingIcon: FontAwesomeIcons.chartPie,
                     title: 'Invite Friends',
                     onPressed: () {}
                   ),
                   singleTrailCardWidget(
-                    leadingIcon: FontAwesomeIcons.creditCard,
-                    title: 'Change Password',
-                    onPressed: () => _showChangePasswordModal(context: context, authProvider: authProvider, size: size)
-                  ),
-                  singleTrailCardWidget(
-                    leadingIcon: FontAwesomeIcons.download,
-                    title: 'Change Username',
-                    onPressed: () => _showChangeUsernameModal(context: context, authProvider: authProvider, size: size)
-                  ),
-                  singleTrailCardWidget(
                     leadingIcon: FontAwesomeIcons.gear,
                     title: 'Become a Freelancer',
                     onPressed: () {}
+                  ),
+                  singleTrailCardWidget(
+                      leadingIcon: FontAwesomeIcons.creditCard,
+                      title: 'Change Password',
+                      onPressed: () => _showChangePasswordModal(context: context, authProvider: authProvider, size: size)
+                  ),
+                  singleTrailCardWidget(
+                      leadingIcon: FontAwesomeIcons.download,
+                      title: 'Change Username',
+                      onPressed: () => _showChangeUsernameModal(context: context, authProvider: authProvider, size: size)
                   ),
 
                 ],
