@@ -97,7 +97,8 @@ class _ContinueWithEmailScreenState extends State<ContinueWithEmailScreen> {
                       label: 'Email',
                       size: size,
                       validator: (value) => validateEmail(value),
-                      onSaved: (value) => _emailController.text = value ?? ''
+                      onSaved: (value) => _emailController.text = value ?? '',
+                      textInputType: TextInputType.emailAddress
                     ),
                   ),
                 ],

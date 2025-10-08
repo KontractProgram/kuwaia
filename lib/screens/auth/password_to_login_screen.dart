@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kuwaia/system/constants.dart';
 import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/text_fields.dart';
@@ -131,7 +132,7 @@ class _PasswordToLoginScreenState extends State<PasswordToLoginScreen> {
                     children: [
                       TextButton(
                         onPressed: () {
-                          //supabase forgot password function
+                          context.push('/forgot_password');
                         },
                         child: reusableText(
                           text: 'Forgot Password?',

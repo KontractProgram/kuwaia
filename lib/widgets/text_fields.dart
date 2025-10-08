@@ -11,6 +11,7 @@ Widget authTextField({
   required String? Function(String?) validator,
   void Function(String?)? onSaved,
   bool obscureText = false,
+  TextInputType? textInputType
 }) {
   return SizedBox(
     height: size.height*0.06,
@@ -23,16 +24,6 @@ Widget authTextField({
           text: label,
           color: AppColors.bodyTextColor.withAlpha(126),
         ),
-        // prefixIcon: SizedBox(
-        //   width: 40,
-        //   child: Center(
-        //     child: FaIcon(
-        //       icon,
-        //       color: AppColors.bodyTextColor.withAlpha(126),
-        //       size: 20,
-        //     ),
-        //   ),
-        // ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
           borderSide:  BorderSide(color: AppColors.bodyTextColor.withAlpha(126)),
@@ -53,6 +44,7 @@ Widget authTextField({
       cursorColor: AppColors.bodyTextColor.withAlpha(126),
       validator: validator, // ✅ uses the passed-in function
       onSaved: onSaved,
+      keyboardType: textInputType ?? TextInputType.text,
     ),
   );
 }

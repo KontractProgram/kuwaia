@@ -90,3 +90,24 @@ String? validateConfirmPassword(String? cp, String? p) {
     return null;
   }
 }
+
+String? validateOtp(String? value) {
+  if(value == null || value.isEmpty) {
+    return "Please enter the OTP code";
+  }
+  try {
+    int valueInt = int.parse(value);
+
+    if(value.length != 6) {
+      return "OTP code must be 6 characters";
+    }
+  } catch (e) {
+    return 'OTP code contains only numbers';
+  }
+
+  if(value.length != 6) {
+    return "OTP code must be 6 ch";
+  }
+
+  return null;
+}

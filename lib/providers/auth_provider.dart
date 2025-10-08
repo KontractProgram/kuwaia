@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:kuwaia/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,6 +13,11 @@ class AuthProvider with ChangeNotifier {
   Profile? _profile;
   bool _isLoading = true;
   String? _error;
+  String? _emailForReset;
+  String? _otpCode;
+
+
+
 
   User? get user => _user;
   Profile? get profile => _profile;
@@ -397,4 +404,49 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<bool> sendPasswordResetOtp(String email) async{
+    try{
+      _otpCode = _generateOtp();
+      _emailForReset = email;
+
+      await _client.functions.invoke('send_reset_otp', body: {'email': email, 'otp': _otpCode});
+      return true;
+    } catch(e) {
+      print(e.toString());
+      return false;
+    }
+  }
+
+
+  Future<bool> resetPassword(String newPassword) async {
+    try {
+      if (_emailForReset == null) return false;
+
+      final userProfile = await _profileService.getProfileByEmail(_emailForReset!);
+      final userId = userProfile!['id'];
+
+      final response = await _client.auth.admin.updateUserById(
+        userId!,
+        attributes: AdminUserAttributes(password: newPassword),
+      );
+
+      _otpCode = null;
+      _emailForReset = null;
+
+      return response.user != null;
+    } catch (e) {
+      debugPrint('Reset password error: $e');
+      return false;
+    }
+  }
+
+  bool verifyOtp(String code) {
+    if (_otpCode == null) return false;
+    return code.trim() == _otpCode;
+  }
+
+  String _generateOtp() {
+    final random = Random();
+    return (100000 + random.nextInt(900000)).toString(); // 6-digit code
+  }
 }

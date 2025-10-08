@@ -1,4 +1,7 @@
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/screens/auth/forgot_password_screen.dart';
+import 'package:kuwaia/screens/auth/reset_password_screen.dart';
+import 'package:kuwaia/screens/auth/reset_password_verification_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/log_details_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
@@ -38,7 +41,10 @@ enum AppRoute {
   myVideos,
   officialUseCase,
   logDetails,
-  viewNews
+  viewNews,
+  forgotPassword,
+  resetPasswordVerification,
+  resetPassword
 }
 
 final routes = [
@@ -78,6 +84,32 @@ final routes = [
       return UsernameScreen(email: email);
     },
   ),
+
+  GoRoute(
+    path: '/forgot_password',
+    name: AppRoute.forgotPassword.name,
+    builder: (context, state) => const ForgotPasswordScreen(),
+  ),
+
+  GoRoute(
+    path: '/reset_password_verification/:email',
+    name: AppRoute.resetPasswordVerification.name,
+    builder: (context, state) {
+      final email = state.pathParameters['email']!;
+      return ResetPasswordVerificationScreen(email: email);
+    }
+  ),
+
+  GoRoute(
+      path: '/reset_password/:email',
+      name: AppRoute.resetPassword.name,
+      builder: (context, state) {
+        final email = state.pathParameters['email']!;
+        return ResetPasswordScreen(email: email);
+      }
+  ),
+
+
 
   // In-app routes
   GoRoute(
@@ -175,5 +207,7 @@ final routes = [
       final news = extra['news'] as News;
       return ViewNewsScreen(news: news);
     }
-  )
+  ),
+
+
 ];
