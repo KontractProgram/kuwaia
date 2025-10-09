@@ -263,6 +263,81 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  String maskEmail(String email) {
+    // Split into local part and domain
+    final parts = email.split('@');
+    if (parts.length != 2) return email; // Invalid email fallback
+
+    final local = parts[0];
+    final domain = parts[1];
+
+    // Mask local part (keep first 2 chars)
+    final visibleLocal = local.length > 2 ? local.substring(0, 2) : local.substring(0, 1);
+    final maskedLocal = '$visibleLocal***';
+
+    // Mask domain (optional: keep top-level domain visible)
+    final domainParts = domain.split('.');
+    if (domainParts.length < 2) return '$maskedLocal@***';
+
+    final tld = domainParts.last; // e.g., 'com'
+    return '$maskedLocal@***.$tld';
+  }
+
+  void _showVerificationModal({required BuildContext context, required Size size}){
+    final codeController = TextEditingController();
+
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Container(
+          height: size.height * 0.9, // 90% of screen height
+          decoration: BoxDecoration(
+            color: AppColors.primaryBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              reusableText(
+                text: "Enter code sent to your email",
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+              const SizedBox(height: 16),
+              authTextField(
+                  controller: codeController,
+                  label: 'OTP Code',
+                  size: size,
+                  validator: (value) => validateOtp(value),
+                  textInputType: TextInputType.number
+              ),
+              const SizedBox(height: 16),
+              shortActionButton(
+                text: "Verify",
+                size: size,
+                buttonColor: AppColors.primaryAccentColor,
+                textColor: AppColors.bodyTextColor,
+                onPressed: () {
+                  if (codeController.text.isNotEmpty) {
+                    Provider.of<AuthProvider>(context, listen: false).verifyEmailByCode(codeController.text);
+                    context.pop();
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
 
   @override
@@ -273,15 +348,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (authProvider.isLoading) {
           return Center(child: CircularProgressIndicator(color: AppColors.dashaSignatureColor,));
         }
-
-        // if (authProvider.error != null) {
-        //   return Center(
-        //     child: reusableText(
-        //       text: 'Error: ${authProvider.error}',
-        //       color: AppColors.warningColor,
-        //     ),
-        //   );
-        // }
 
         return SingleChildScrollView(
           child: Column(
@@ -322,6 +388,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               SizedBox(height: size.height*0.02),
 
+              if(!authProvider.profile!.verified)
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  margin: EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: AppColors.dashaSignatureColor.withAlpha(26)
+                  ),
+                  child: Column(
+                    children: [
+                      reusableText(text: 'Your email ${maskEmail(authProvider.profile!.email)} is not verified.'),
+                      SizedBox(height: 20),
+                      shortActionButton(
+                        text: 'Confirm Email',
+                        size: size,
+                        buttonColor: AppColors.dashaSignatureColor,
+                        onPressed: () {
+                          authProvider.sendVerificationCode(authProvider.profile!.email);
+                          _showVerificationModal(context:context, size: size);
+                        }
+                      )
+                    ],
+                  ),
+                ),
+
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 decoration: BoxDecoration(
@@ -334,7 +425,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     SizedBox(height: 20),
                     shortActionButton(
                       text: 'Send Request',
-                      size: size
+                      size: size,
                     )
                   ],
                 ),

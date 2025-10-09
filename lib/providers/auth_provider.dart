@@ -1,9 +1,9 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:kuwaia/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
+import '../widgets/toast.dart';
 
 class AuthProvider with ChangeNotifier {
   final SupabaseClient _client = Supabase.instance.client;
@@ -15,6 +15,7 @@ class AuthProvider with ChangeNotifier {
   String? _error;
   String? _emailForReset;
   String? _otpCode;
+  DateTime? _otpExpiry;
 
 
 
@@ -113,7 +114,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   /// Sign in
-  Future<AuthResponse> signIn({required String email, required String password,}) async {
+  Future<AuthResponse> signIn({required String email, required String password}) async {
     try {
       _isLoading = true;
       _error = null;
@@ -407,6 +408,7 @@ class AuthProvider with ChangeNotifier {
   Future<bool> sendPasswordResetOtp(String email) async{
     try{
       _otpCode = _generateOtp();
+      _otpExpiry = DateTime.now().add(const Duration(minutes: 10));
       _emailForReset = email;
 
       print('otp code: $_otpCode');
@@ -432,7 +434,10 @@ class AuthProvider with ChangeNotifier {
       );
 
       _otpCode = null;
+      _otpExpiry = null;
       _emailForReset = null;
+
+      notifyListeners();
 
       return response.user != null;
     } catch (e) {
@@ -443,11 +448,76 @@ class AuthProvider with ChangeNotifier {
 
   bool verifyOtp(String code) {
     if (_otpCode == null) return false;
-    return code.trim() == _otpCode;
+    if (_otpExpiry == null || DateTime.now().isAfter(_otpExpiry!)) {
+      showToast('OTP expired. Please request a new code.');
+      return false;
+    }
+    return code == _otpCode;
   }
+
 
   String _generateOtp() {
     final random = Random();
     return (100000 + random.nextInt(900000)).toString(); // 6-digit code
+  }
+
+  Future<bool> sendVerificationCode(String email) async {
+    try {
+      _otpCode = _generateOtp();
+      _otpExpiry = DateTime.now().add(const Duration(minutes: 10));
+
+      // Optional: log for dev
+      print('Generated OTP for $email: $_otpCode');
+
+      // Trigger Edge Function to send mail
+      final response = await _client.functions.invoke(
+        'send_verification_otp', // you can rename to send_verification_otp if you prefer
+        body: {'email': email, 'otp': _otpCode},
+      );
+
+      if (response.status != 200) {
+        print('Error sending verification code: ${response.data}');
+        showToast('Failed to send email. Try again.');
+        return false;
+      }
+
+      showToast('Verification code sent to $email');
+      return true;
+    } catch (e) {
+      print('sendVerificationCode error: $e');
+      showToast('Something went wrong.');
+      return false;
+    }
+  }
+
+  Future<void> verifyEmailByCode(String code) async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      bool ok = verifyOtp(code);
+
+      if (ok) {
+        await _client
+            .from('profiles')
+            .update({'verified': true})
+            .eq('id', _user!.id);
+
+        await refreshProfile();
+        showToast('Email verified successfully!');
+      } else {
+        showToast('Invalid OTP code.');
+      }
+
+    } catch (e) {
+      print('verifyEmailByCode error: $e');
+      _error = e.toString();
+    } finally {
+      _otpCode = null;
+      _otpExpiry = null;
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

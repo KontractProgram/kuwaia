@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/models/community/freelancer.dart';
 import 'package:kuwaia/models/group.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -314,6 +315,59 @@ Widget savedNoteWidget({
         Divider(),
       ],
     ),
+  );
+}
+
+Widget freelancerCard({
+  required BuildContext context,
+  required Size size,
+  required Freelancer freelancer,
+  VoidCallback? onPressed
+}){
+  return Container(
+    width: size.width*0.9,
+    padding: EdgeInsets.all(4),
+    margin: EdgeInsets.only(top: 10, left: 7, right: 7),
+    decoration: BoxDecoration(
+      color: AppColors.secondaryBackgroundColor,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: ListTile(
+      onTap: onPressed,
+      contentPadding: const EdgeInsets.all(0),
+      leading: CircleAvatar(
+        radius: 20,
+        backgroundColor: AppColors.secondaryBackgroundColor,
+        child: ClipOval(child: Image.network(freelancer.imageUrl, fit: BoxFit.cover,)),
+      ),
+
+      title: reusableText(
+        text: freelancer.name,
+        fontWeight: FontWeight.w600,
+        textAlign: TextAlign.start,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis, // optional
+      ),
+
+      subtitle: reusableText(
+        text: freelancer.skill,
+        fontSize: 14,
+        color: AppColors.bodyTextColor.withAlpha(200),
+        textAlign: TextAlign.start,
+        maxLines: 2
+      ),
+
+      trailing: SizedBox(
+        width: 50,
+        height: 50,
+        child: Column(
+          children: [
+            reusableText(text: 'Rating', color: AppColors.bodyTextColor.withAlpha(120), fontSize: 12),
+            reusableText(text: '${freelancer.rating.toString()}/5')
+          ],
+        ),
+      ),
+    )
   );
 }
 
