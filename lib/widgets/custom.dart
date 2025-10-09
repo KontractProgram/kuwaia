@@ -372,3 +372,120 @@ Widget freelancerCard({
 }
 
 
+class WeightedImageCarousel extends StatefulWidget {
+  final List<String> images;
+  final double height;
+
+  const WeightedImageCarousel({
+    super.key,
+    required this.images,
+    this.height = 250, // Default height of 250
+  });
+
+  @override
+  State<WeightedImageCarousel> createState() => _WeightedImageCarouselState();
+}
+
+class _WeightedImageCarouselState extends State<WeightedImageCarousel> {
+  late final PageController _pageController;
+
+  // Constants for the weighted carousel
+  static const double _viewportFraction = 0.85;
+  static const double _scaleFactor = 0.9;
+
+  @override
+  void initState() {
+    super.initState();
+    // Controller and constants now live here, making the widget self-contained.
+    _pageController = PageController(viewportFraction: _viewportFraction);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.images.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return SizedBox(
+      height: widget.height,
+      child: PageView.builder(
+        controller: _pageController,
+        itemCount: widget.images.length,
+        itemBuilder: (context, index) {
+          return AnimatedBuilder(
+            animation: _pageController,
+            builder: (context, child) {
+              double value = 1.0;
+
+              if (_pageController.hasClients && _pageController.position.hasContentDimensions) {
+                try {
+                  // Calculate the distance of the current page from the center
+                  value = (_pageController.page! - index);
+                } catch (e) {
+                  // Fallback for initial build
+                  value = 0.0;
+                }
+              } else {
+                value = 0.0;
+              }
+
+              // Apply the custom scaling logic
+              value = (1 - (value.abs() * _scaleFactor)).clamp(0.0, 1.0);
+              final double finalScale = 0.85 + (value * 0.15); // Scales from 0.85 to 1.0
+
+              return Center(
+                child: Transform.scale(
+                  scale: finalScale,
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(
+                        widget.images[index],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: widget.height,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: widget.height,
+                            color: Colors.transparent,
+                            child: const Center(child: CircularProgressIndicator()),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            height: widget.height,
+                            color: Colors.red.shade100,
+                            child: const Center(child: Icon(Icons.broken_image, color: Colors.red)),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
