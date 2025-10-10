@@ -4,7 +4,6 @@ import '../models/profile.dart';
 class ProfileService {
   final SupabaseClient _client = Supabase.instance.client;
 
-
   ///profiles table
   //READS
   Future<Profile?> getProfileById(String id) async {
@@ -70,7 +69,6 @@ class ProfileService {
       throw Exception('Error creating profile: $e');
     }
   }
-
 
 
   ///professions table

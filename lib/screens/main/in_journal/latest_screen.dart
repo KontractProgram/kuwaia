@@ -165,7 +165,25 @@ class _LatestCardState extends State<_LatestCard> {
                   children: [
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () =>  launchUrl(Uri.parse(widget.latest.visitLink)),
+                        onPressed: () async {
+                          final uri = Uri.parse(widget.latest.visitLink);
+
+                          // Try to launch in default browser (external app)
+                          if (await canLaunchUrl(uri)) {
+                            final launched = await launchUrl(
+                              uri,
+                              mode: LaunchMode.externalApplication,
+                            );
+
+                            // If launching in external app fails, fallback to normal
+                            if (!launched) {
+                              await launchUrl(uri, mode: LaunchMode.platformDefault);
+                            }
+                          } else {
+                            // Fallback: open with normal behavior
+                            await launchUrl(uri, mode: LaunchMode.platformDefault);
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.secondaryAccentColor,
                           foregroundColor: AppColors.bodyTextColor,

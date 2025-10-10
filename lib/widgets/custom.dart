@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/community/freelancer.dart';
 import 'package:kuwaia/models/group.dart';
+import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/tool.dart';
@@ -14,8 +15,8 @@ Widget toolCardWidget({
   required Tool tool,
   required Group group,
   required bool inDiary,
-  required String logo,
   VoidCallback? onPressed,
+  VoidCallback? onYoutubePressed,
   VoidCallback? onBookMarkPressed,
 }){
   return Container(
@@ -38,11 +39,11 @@ Widget toolCardWidget({
       leading: CircleAvatar(
         radius: 20,
         backgroundColor: AppColors.secondaryBackgroundColor,
-        child: logo.isEmpty ? reusableText(
-            text: tool.id.toString(),
-            fontSize: 16,
-            fontWeight: FontWeight.bold
-        ) : ClipOval(child: Image.asset(logo, width: 50, fit: BoxFit.cover,)),
+        child: ClipOval(
+          child: tool.imageUrl != null && tool.imageUrl!.isNotEmpty
+            ? Image.network(tool.imageUrl!, width: 40, fit: BoxFit.cover,)
+            : Image.asset('assets/tool_logos/AI.png', width: 40, fit: BoxFit.cover,)
+        ),
       ),
 
       title: Row(
@@ -60,7 +61,25 @@ Widget toolCardWidget({
           ),
           const SizedBox(width: 5),
           GestureDetector(
-            onTap: () => launchUrl(Uri.parse(tool.visitLink)),
+            onTap: () async {
+              final uri = Uri.parse(tool.visitLink);
+
+              // Try to launch in default browser (external app)
+              if (await canLaunchUrl(uri)) {
+                final launched = await launchUrl(
+                  uri,
+                  mode: LaunchMode.externalApplication,
+                );
+
+                // If launching in external app fails, fallback to normal
+                if (!launched) {
+                  await launchUrl(uri, mode: LaunchMode.platformDefault);
+                }
+              } else {
+                // Fallback: open with normal behavior
+                await launchUrl(uri, mode: LaunchMode.platformDefault);
+              }
+            },
             child: FaIcon(
               FontAwesomeIcons.arrowUpRightFromSquare,
               color: AppColors.bodyTextColor,
@@ -82,7 +101,7 @@ Widget toolCardWidget({
         children: [
 
           GestureDetector(
-            onTap: () {},
+            onTap: onYoutubePressed,
             child: Image.asset(youtubeLogo, width: 30, fit: BoxFit.cover,),
           ),
 
@@ -371,6 +390,84 @@ Widget freelancerCard({
   );
 }
 
+
+Widget journalPromptWidget({
+  required Prompt prompt,
+  required String owner,
+  required int likes,
+  required bool isLiked,
+  VoidCallback? onLikePressed,
+  VoidCallback? onImport,
+  VoidCallback? onCopy,
+}) {
+  return Container(
+    margin: EdgeInsets.only(top: 16),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        reusableText(
+          text: owner,
+          fontWeight: FontWeight.w600,
+          maxLines: 1,
+          textAlign: TextAlign.start,
+          fontSize: 12,
+          color: AppColors.primaryAccentColor
+        ),
+
+        reusableText(
+            text: prompt.description,
+            fontWeight: FontWeight.w600,
+            maxLines: 1,
+            textAlign: TextAlign.start
+        ),
+
+        Container(
+          margin: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          padding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            color: AppColors.secondaryBackgroundColor,
+          ),
+          child: reusableText(
+              text: prompt.prompt,
+              textAlign: TextAlign.start,
+              fontSize: 12,
+              maxLines: 4
+          ),
+        ),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            IconButton(
+                onPressed: () => onImport?.call(),
+                icon: FaIcon(FontAwesomeIcons.download, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: () => onCopy?.call(),
+                icon: FaIcon(FontAwesomeIcons.copy, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
+            ),
+
+            IconButton(
+                onPressed: () => onLikePressed?.call(),
+                icon: isLiked
+                    ? FaIcon(FontAwesomeIcons.solidHeart, size: 16, color: AppColors.dashaSignatureColor)
+                    : FaIcon(FontAwesomeIcons.heart, size: 16, color: AppColors.bodyTextColor.withAlpha(150)),
+
+            ),
+
+            reusableText(text: likes.toString(), fontSize: 12, color: AppColors.bodyTextColor.withAlpha(150))
+          ],
+        ),
+
+        Divider(color: AppColors.bodyTextColor.withAlpha(53), thickness: 1,),
+      ],
+    ),
+  );
+}
 
 class WeightedImageCarousel extends StatefulWidget {
   final List<String> images;

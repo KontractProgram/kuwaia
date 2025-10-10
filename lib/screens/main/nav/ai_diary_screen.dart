@@ -57,6 +57,14 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
           return tool.name.toLowerCase().contains(query) ||
               tool.visitLink.toLowerCase().contains(query);
         }).toList();
+
+        final favoriteTools = filteredTools
+            .where((tool) => diaryProvider.isToolAFavorite(tool))
+            .toList();
+
+        final nonFavoriteTools = filteredTools
+            .where((tool) => !diaryProvider.isToolAFavorite(tool))
+            .toList();
         
         print('number of filtered tools ${filteredTools.length}');
 
@@ -85,10 +93,47 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                 },
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 20),
+
+              if (favoriteTools.isNotEmpty) ...[
+                reusableText(
+                  text: 'Favorites',
+                  color: AppColors.secondaryAccentColor,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+
+                const SizedBox(height: 10),
+
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: favoriteTools.length,
+                  itemBuilder: (context, index) {
+                    final tool = favoriteTools[index];
+                    final group =
+                    groups.firstWhere((g) => g.id == tool.groupId);
+
+                    return toolCardWidget(
+                      context: context,
+                      tool: tool,
+                      group: group,
+                      inDiary: true,
+                      onPressed: () =>
+                          context.push('/tool_view', extra: {'tool': tool}),
+                      onBookMarkPressed: () {
+                        diaryProvider.deleteToolFromDiary(toolId: tool.id);
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                Divider(thickness: 1, color: AppColors.bodyTextColor.withAlpha(200),),
+                const SizedBox(height: 12,)
+              ],
 
               // 🛠 Tools List
-              filteredTools.isEmpty
+              nonFavoriteTools.isEmpty
                 ? Container(
                 padding: EdgeInsets.only(top: size.height*0.2),
                 child: Lottie.asset(emptyDiary, width: size.width*0.6),
@@ -96,19 +141,22 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                 : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: filteredTools.length,
+                  itemCount: nonFavoriteTools.length,
                   itemBuilder: (context, index) {
-                    final tool = filteredTools[index];
-                    final logo = 'assets/tool_logos/1.png';
+                    final tool = nonFavoriteTools[index];
                     final group = groups.firstWhere((g) => g.id == tool.groupId);
 
                     return toolCardWidget(
                       context: context,
                       tool: tool,
                       group: group,
-                      logo: logo,
                       inDiary: true,
                       onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
+                      onYoutubePressed: () {
+                        if(tool.learningLink.isNotEmpty && tool.learningLink.startsWith('https://youtube.com')) {
+                          context.push('/diary_tool_learning_video', extra: {'videoLink', tool.learningLink});
+                        }
+                      },
                       onBookMarkPressed: () {
                         diaryProvider.deleteToolFromDiary(toolId: tool.id);
                       }

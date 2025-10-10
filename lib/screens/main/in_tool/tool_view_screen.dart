@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/screens/main/in_tool/tool_updates_screen.dart';
 import 'package:kuwaia/widgets/buttons.dart';
+import 'package:provider/provider.dart';
 import '../../../models/tool.dart';
 import '../../../system/constants.dart';
 import '../../../widgets/texts.dart';
@@ -22,6 +25,7 @@ class ToolViewScreen extends StatefulWidget {
 class _ToolViewScreenState extends State<ToolViewScreen> {
   late final PageController _pageController;
   int _currentIndex = 0;
+  late bool isFavorite;
 
   final List<String> _labels = [
     'Prompts',
@@ -36,6 +40,9 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      isFavorite = context.watch<AiDiaryProvider>().isToolAFavorite(widget.tool);
+    });
   }
 
   @override
@@ -101,6 +108,19 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
           maxLines: 1,
           fontWeight: FontWeight.w700,
         ),
+
+        actions: [
+          IconButton(
+            onPressed: (){
+              final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
+              setState(() {
+                isFavorite = !isFavorite;
+                aiDiaryProvider.updateFavoriteStatus(toolId: widget.tool.id, isFavorite: isFavorite);
+              });
+            },
+            icon: isFavorite ? FaIcon(FontAwesomeIcons.solidHeart, color: AppColors.dashaSignatureColor,) : FaIcon(FontAwesomeIcons.heart, color: AppColors.bodyTextColor,)
+          )
+        ],
       ),
       body: SafeArea(
         child: Column(

@@ -55,7 +55,6 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                     itemCount: widget.tools.length,
                     itemBuilder: (context, index) {
                       final tool = widget.tools[index];
-                      final logo = 'assets/tool_logos/1.png';
 
                       final inDiary = context.read<AiDiaryProvider>().isToolInDiary(tool);
                       print('tool ${tool.name} in diary $inDiary');
@@ -65,7 +64,6 @@ class _ToolsInGroupScreenState extends State<ToolsInGroupScreen> {
                         tool: tool,
                         group: widget.group,
                         inDiary: inDiary,
-                        logo: logo,
                         onPressed: () {
                           if(inDiary) {
                             context.push('/tool_view', extra: {'tool': tool});

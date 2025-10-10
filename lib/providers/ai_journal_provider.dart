@@ -5,14 +5,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/community/freelancer.dart';
 import '../models/community/news.dart';
 import '../models/tool.dart';
+import '../services/profile_service.dart';
 
 class AiJournalProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
+  final _profileId = Supabase.instance.client.auth.currentUser!.id;
 
   List<Tool>? _trendingTools;
   List<Latest>? _latestList;
   List<News>? _newsList;
+
   List<Prompt>? _journalPrompts;
+  Map<int, String>? _promptOwnersMap;
+  final Map<int, int> _promptLikesCount = {};
+  final Set<int> _likedPrompts = {};
+
   List<Freelancer>? _freelancers;
   List<String>? _freelancerUrls;
 
@@ -22,12 +29,26 @@ class AiJournalProvider with ChangeNotifier{
   List<Tool>? get trendingTools => _trendingTools;
   List<Latest>? get latestList => _latestList;
   List<News>? get newsList => _newsList;
+
   List<Prompt>? get journalPrompts => _journalPrompts;
+  Map<int, String>? get promptOwnersMap => _promptOwnersMap;
+  int getLikes(int promptId) => _promptLikesCount[promptId] ?? 0;
+  bool userLikesPrompt(int promptId) => _likedPrompts.contains(promptId);
+
   List<Freelancer>? get freelancers => _freelancers;
   List<String>? get freelancerUrls => _freelancerUrls;
 
   bool get isLoading => _isLoading;
   String? get error => _error;
+
+  String getOwnerByPromptId(int promptId) {
+    if (_promptOwnersMap == null || _promptOwnersMap!.isEmpty) {
+      return 'Unknown';
+    }
+    // If the map contains the prompt ID, return the username
+    return _promptOwnersMap![promptId] ?? 'Unknown';
+  }
+
 
   Future<Tool?> fetchToolById(int toolId) async {
     try {
@@ -148,11 +169,90 @@ class AiJournalProvider with ChangeNotifier{
 
       _journalPrompts = journalPromptsResponseList.map((map) => Prompt.fromMap(map)).toList();
 
+      // 🧩 Initialize owners map
+      _promptOwnersMap = {};
+
+      // 🧑‍💻 Fetch all owners (in parallel)
+      final profileService = ProfileService();
+      final futures = _journalPrompts!.map((prompt) async {
+        final ownerId = prompt.ownerId;
+        final profile = await profileService.getProfileById(ownerId);
+        if (profile != null) {
+          _promptOwnersMap![prompt.id] = profile.username;
+        }
+      }).toList();
+
+      // Wait for all profile fetches
+      await Future.wait(futures);
+
       _isLoading = false;
       notifyListeners();
     } catch(e) {
       _error = e.toString();
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> likePrompt({required int promptId}) async {
+    _likedPrompts.add(promptId);
+    _promptLikesCount[promptId] = (_promptLikesCount[promptId] ?? 0) + 1;
+    notifyListeners();
+
+    try {
+      await _client.from('prompts_likes').insert({
+        'profile_id': _profileId,
+        'prompt_id': promptId,
+      });
+    } catch (e) {
+      // revert optimistic update
+      _likedPrompts.remove(promptId);
+      _promptLikesCount[promptId] = (_promptLikesCount[promptId]! - 1).clamp(0, double.infinity).toInt();
+    } finally {notifyListeners();}
+  }
+
+  Future<void> unlikePrompt({required int promptId}) async {
+    _likedPrompts.remove(promptId);
+    _promptLikesCount[promptId] = (_promptLikesCount[promptId]! - 1).clamp(0, double.infinity).toInt();
+    notifyListeners();
+
+    try {
+      await _client
+          .from('prompts_likes')
+          .delete()
+          .match({'profile_id': _profileId, 'prompt_id': promptId});
+    } catch (e) {
+      _error = e.toString();
+      // revert optimistic update
+      _likedPrompts.add(promptId);
+      _promptLikesCount[promptId] = (_promptLikesCount[promptId] ?? 0) + 1;
+      notifyListeners();
+    } finally {notifyListeners();}
+  }
+
+  Future<void> loadPromptLikes(int promptId) async {
+    try {
+      // total likes
+      final response = await _client
+          .from('prompts_likes')
+          .select('prompt_id')
+          .eq('prompt_id', promptId)
+          .count(CountOption.exact);
+
+      _promptLikesCount[promptId] = response.count ?? 0;
+
+      // check if current user liked
+      final liked = await _client
+          .from('prompts_likes')
+          .select('prompt_id')
+          .match({'prompt_id': promptId, 'profile_id': _profileId})
+          .maybeSingle();
+
+      if (liked != null) _likedPrompts.add(promptId);
+
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
       notifyListeners();
     }
   }
