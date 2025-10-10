@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kuwaia/widgets/loading.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -35,7 +36,7 @@ class _LatestScreenState extends State<LatestScreen> {
     return Consumer<AiJournalProvider>(
       builder: (context, aiJournalProvider, _) {
         if (aiJournalProvider.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: latestCardLoadingWidget(size: size),);
         }
 
         if (aiJournalProvider.error != null) {

@@ -1,4 +1,4 @@
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +9,45 @@ import 'package:kuwaia/widgets/texts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/tool.dart';
 import '../system/constants.dart';
+import 'buttons.dart';
 
+Widget singleTrailCardWidget({
+  required IconData leadingIcon,
+  required String title,
+  String? subtitle,
+  VoidCallback? onPressed,
+  }){
+  return Container(
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20),
+      color: AppColors.secondaryBackgroundColor,
+    ),
+    margin: EdgeInsets.only(top: 10),
+    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+    child: ListTile(
+      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+        leading: FaIcon(
+            leadingIcon,
+            color: AppColors.primaryAccentColor,
+            size: 20
+        ),
+        title: reusableText(
+            text: title,
+            textAlign: TextAlign.start,
+            fontWeight: FontWeight.w600,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis
+        ),
+        subtitle: subtitle != null
+          ? reusableText(text: subtitle ?? '', color: AppColors.bodyTextColor.withAlpha(129), fontSize: 12, textAlign: TextAlign.start)
+          : null,
+        trailing: FaIcon(FontAwesomeIcons.chevronRight, color: AppColors.bodyTextColor.withAlpha(150),),
+        onTap: onPressed
+    ),
+  );
+}
+
+/// AI DIARY WIDGET
 Widget toolCardWidget({
   required BuildContext context,
   required Tool tool,
@@ -40,9 +78,9 @@ Widget toolCardWidget({
         radius: 20,
         backgroundColor: AppColors.secondaryBackgroundColor,
         child: ClipOval(
-          child: tool.imageUrl != null && tool.imageUrl!.isNotEmpty
-            ? Image.network(tool.imageUrl!, width: 40, fit: BoxFit.cover,)
-            : Image.asset('assets/tool_logos/AI.png', width: 40, fit: BoxFit.cover,)
+            child: tool.imageUrl != null && tool.imageUrl!.isNotEmpty
+                ? Image.network(tool.imageUrl!, width: 40, fit: BoxFit.cover,)
+                : Image.asset('assets/tool_logos/AI.png', width: 40, fit: BoxFit.cover,)
         ),
       ),
 
@@ -141,25 +179,25 @@ Widget toolCardWidget({
                 if (shouldDelete == true) onBookMarkPressed?.call();
               } else {
                 final addToDiary = await showDialog<bool>(
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      backgroundColor: AppColors.secondaryBackgroundColor,
-                      title: reusableText(text: 'Add to Diary', fontWeight: FontWeight.w600, fontSize: 20),
-                      content: reusableText(text: "Add ${tool.name} to your diary", textAlign: TextAlign.start),
-                      actions: [
-                        TextButton(
-                          child: reusableText(text: "Cancel"),
-                          onPressed: () => context.pop(false)
-                        ),
-                        ElevatedButton(
-                          onPressed: () => context.pop(true),
-                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.confirmColor),
-                          child: reusableText(text: "Confirm", color: AppColors.secondaryBackgroundColor),
-                        )
-                      ],
-                    );
-                  }
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        backgroundColor: AppColors.secondaryBackgroundColor,
+                        title: reusableText(text: 'Add to Diary', fontWeight: FontWeight.w600, fontSize: 20),
+                        content: reusableText(text: "Add ${tool.name} to your diary", textAlign: TextAlign.start),
+                        actions: [
+                          TextButton(
+                              child: reusableText(text: "Cancel"),
+                              onPressed: () => context.pop(false)
+                          ),
+                          ElevatedButton(
+                            onPressed: () => context.pop(true),
+                            style: ElevatedButton.styleFrom(backgroundColor: AppColors.confirmColor),
+                            child: reusableText(text: "Confirm", color: AppColors.secondaryBackgroundColor),
+                          )
+                        ],
+                      );
+                    }
                 );
                 if (addToDiary == true) onBookMarkPressed?.call();
               }
@@ -169,42 +207,6 @@ Widget toolCardWidget({
           SizedBox(width: 10)
         ],
       ),
-    ),
-  );
-}
-
-Widget singleTrailCardWidget({
-  required IconData leadingIcon,
-  required String title,
-  String? subtitle,
-  VoidCallback? onPressed,
-  }){
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      color: AppColors.secondaryBackgroundColor,
-    ),
-    margin: EdgeInsets.only(top: 10),
-    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-    child: ListTile(
-      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-        leading: FaIcon(
-            leadingIcon,
-            color: AppColors.primaryAccentColor,
-            size: 20
-        ),
-        title: reusableText(
-            text: title,
-            textAlign: TextAlign.start,
-            fontWeight: FontWeight.w600,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis
-        ),
-        subtitle: subtitle != null
-          ? reusableText(text: subtitle ?? '', color: AppColors.bodyTextColor.withAlpha(129), fontSize: 12, textAlign: TextAlign.start)
-          : null,
-        trailing: FaIcon(FontAwesomeIcons.chevronRight, color: AppColors.bodyTextColor.withAlpha(150),),
-        onTap: onPressed
     ),
   );
 }
@@ -225,10 +227,10 @@ Widget savedPromptWidget({
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         reusableText(
-          text: description,
-          fontWeight: FontWeight.w600,
-          maxLines: 1,
-          textAlign: TextAlign.start
+            text: description,
+            fontWeight: FontWeight.w600,
+            maxLines: 1,
+            textAlign: TextAlign.start
         ),
 
         Container(
@@ -239,10 +241,10 @@ Widget savedPromptWidget({
             color: AppColors.secondaryBackgroundColor,
           ),
           child: reusableText(
-            text: prompt,
-            textAlign: TextAlign.start,
-            fontSize: 12,
-            maxLines: 4
+              text: prompt,
+              textAlign: TextAlign.start,
+              fontSize: 12,
+              maxLines: 4
           ),
         ),
 
@@ -250,8 +252,8 @@ Widget savedPromptWidget({
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             IconButton(
-              onPressed: () => onShare?.call(),
-              icon: FaIcon(FontAwesomeIcons.shareNodes, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
+                onPressed: () => onShare?.call(),
+                icon: FaIcon(FontAwesomeIcons.shareNodes, size: 16, color: AppColors.bodyTextColor.withAlpha(150))
             ),
 
             IconButton(
@@ -336,6 +338,69 @@ Widget savedNoteWidget({
     ),
   );
 }
+
+///AI TOOL WIDGETS
+
+
+
+///AI JOURNAL WIDGETS
+Widget trendingToolsWidget({
+  required BuildContext context,
+  required Size size,
+  required Tool tool,
+  required Group group,
+  required bool inDiary,
+  int? loadingToolId,
+  VoidCallback? onAddPressed,
+}) {
+  return Container(
+    width: size.width * 0.9,
+    padding: const EdgeInsets.all(4),
+    margin: const EdgeInsets.only(top: 10, left: 7, right: 7),
+    decoration: BoxDecoration(
+      color: AppColors.secondaryBackgroundColor,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: ListTile(
+      title: reusableText(
+        text: tool.name,
+        fontWeight: FontWeight.w600,
+        textAlign: TextAlign.start,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+      ),
+      subtitle: reusableText(
+        text: '${group.name} Tools',
+        fontSize: 14,
+        color: AppColors.bodyTextColor.withAlpha(128),
+        textAlign: TextAlign.start,
+      ),
+      trailing: inDiary
+          ? Container(
+        width: size.width * 0.33,
+        height: size.height * 0.06,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: AppColors.confirmColor.withAlpha(50),
+        ),
+        child: Center(
+          child: reusableText(
+            text: 'In Diary',
+            color: AppColors.confirmColor,
+          ),
+        ),
+      )
+          : (loadingToolId == tool.id
+          ? shortLoadingButton(size: size)
+          : shortActionButton(
+        text: 'Add to Diary',
+        size: size,
+        onPressed: onAddPressed,
+      )),
+    ),
+  );
+}
+
 
 Widget freelancerCard({
   required BuildContext context,
@@ -582,6 +647,120 @@ class _WeightedImageCarouselState extends State<WeightedImageCarousel> {
           );
         },
       ),
+    );
+  }
+}
+
+class PromotionCarousel extends StatefulWidget {
+  final List<Freelancer> promotions;
+  final Size size;
+  final void Function(Freelancer) onTap;
+
+  const PromotionCarousel({
+    super.key,
+    required this.promotions,
+    required this.size,
+    required this.onTap,
+  });
+
+  @override
+  State<PromotionCarousel> createState() => _PromotionCarouselState();
+}
+
+class _PromotionCarouselState extends State<PromotionCarousel> {
+  late final PageController _pageController;
+  int _currentIndex = 0;
+  late final Timer _timer;
+  static const double _viewportFraction = 0.8;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(viewportFraction: _viewportFraction);
+
+    _timer = Timer.periodic(const Duration(seconds: 4), (_) {
+      if (widget.promotions.isEmpty) return;
+      int nextPage = (_currentIndex + 1) % widget.promotions.length;
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: widget.size.height * 0.25,
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: widget.promotions.length,
+            onPageChanged: (index) => setState(() => _currentIndex = index),
+            itemBuilder: (context, index) {
+              final freelancer = widget.promotions[index];
+              return AnimatedBuilder(
+                animation: _pageController,
+                builder: (context, child) {
+                  double value = 1.0;
+                  if (_pageController.position.haveDimensions) {
+                    value = ((_pageController.page ?? _currentIndex).toDouble() - index.toDouble());
+                    value = (1 - (value.abs() * 0.3)).clamp(0.0, 1.0);
+                  }
+                  return Center(
+                    child: Transform.scale(
+                      scale: value,
+                      child: GestureDetector(
+                        onTap: () => widget.onTap(freelancer),
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            color: AppColors.secondaryBackgroundColor,
+                            image: DecorationImage(
+                              image: NetworkImage(freelancer.imageUrl),
+                              fit: BoxFit.cover,
+                            )
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+        ),
+
+        const SizedBox(height: 8),
+
+        // Indicator dots
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: List.generate(widget.promotions.length, (index) {
+            return Container(
+              width: 8,
+              height: 8,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _currentIndex == index
+                    ? AppColors.primaryAccentColor
+                    : AppColors.bodyTextColor.withAlpha(78),
+              ),
+            );
+          }),
+        ),
+      ],
     );
   }
 }

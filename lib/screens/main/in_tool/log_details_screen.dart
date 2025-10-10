@@ -26,7 +26,6 @@ class _LogDetailsScreenState extends State<LogDetailsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final profileId = context.read<AuthProvider>().profile!.id;
       Provider.of<AiDiaryProvider>(context, listen: false).fetchLogDetails(toolId: widget.tool.id);
     });
   }

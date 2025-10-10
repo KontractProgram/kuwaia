@@ -5,6 +5,7 @@ import 'package:kuwaia/services/profile_service.dart';
 import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:kuwaia/widgets/toast.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
 import '../../system/constants.dart';
@@ -120,7 +121,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       );
                     }).toList(),
                   ),
-                ) : Center(child: CircularProgressIndicator(),),
+                ) : Center(
+                  child: Lottie.asset(
+                      threeDotsLoading,
+                      width: size.width*0.7
+                  ),
+                ),
               ),
 
               _isLoading ? longLoadingButton(size: size)

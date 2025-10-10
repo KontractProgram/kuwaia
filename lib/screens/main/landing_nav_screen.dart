@@ -35,6 +35,7 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
 
     return Scaffold(
       extendBodyBehindAppBar: _selectedIndex == 3 ? true : false,
+      extendBody: _selectedIndex == 3 ? true : false,
       appBar: AppBar(
         backgroundColor: _selectedIndex == 3 ? Colors.transparent : AppColors.primaryBackgroundColor,
         title: Center(child: reusableText(

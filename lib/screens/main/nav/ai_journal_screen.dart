@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/screens/main/in_journal/freelancers_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/latest_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/news_screen.dart';
 import 'package:kuwaia/screens/main/in_journal/prompts_screen.dart';
@@ -21,7 +22,8 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
     'Trending',
     'Latest',
     'News',
-    'Prompts'
+    'Prompts',
+    'Freelancers'
   ];
 
   @override
@@ -76,7 +78,8 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
       TrendingScreen(),
       LatestScreen(),
       NewsScreen(),
-      PromptsScreen()
+      PromptsScreen(),
+      FreelancersScreen()
     ];
 
     return Column(
@@ -101,5 +104,4 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
       ],
     );
   }
-  
 }

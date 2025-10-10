@@ -4,6 +4,7 @@ import 'package:kuwaia/providers/auth_provider.dart';
 import 'package:kuwaia/screens/main/landing_nav_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
 import 'package:kuwaia/widgets/buttons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../providers/notification_provider.dart';
 import '../../system/constants.dart';
@@ -35,13 +36,19 @@ class _LandingScreenState extends State<LandingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
           // Case 1: Still bootstrapping or refreshing
           if (authProvider.isLoading) {
-            return Center(child: CircularProgressIndicator(color: AppColors.dashaSignatureColor,));
+            return Center(
+              child: Lottie.asset(
+                threeDotsLoading,
+                width: size.width*0.7
+              ),
+            );
           }
 
           // Case 2: User logged in but profile missing → safe fallback

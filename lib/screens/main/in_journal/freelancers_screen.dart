@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kuwaia/models/community/freelancer.dart';
 import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
+import 'package:kuwaia/widgets/loading.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:provider/provider.dart';
 import '../../../system/constants.dart';
@@ -45,7 +46,18 @@ class _FreelancersScreenState extends State<FreelancersScreen> {
     return Consumer<AiJournalProvider>(
       builder: (context, aiJournalProvider, _) {
         if (aiJournalProvider.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: 3,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return promotionCardLoadingWidget(size: size);
+              }
+
+              return freelancerCardLoading(size: size);
+            }
+          );
         }
 
         if (aiJournalProvider.error != null) {
@@ -64,9 +76,23 @@ class _FreelancersScreenState extends State<FreelancersScreen> {
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: freelancers.length,
+          itemCount: freelancers.length + 1,
           itemBuilder: (context, index) {
-            final freelancer = freelancers[index];
+            if (index == 0) {
+              // First item: promotion carousel
+              return PromotionCarousel(
+                promotions: freelancers.take(3).toList(), // example: first 5 as promotions
+                size: size,
+                onTap: (freelancer) => _showFreelancerGalleryModal(
+                  context: context,
+                  size: size,
+                  freelancer: freelancer,
+                ),
+              );
+            }
+
+            final freelancer = freelancers[index - 1];
+
 
             return freelancerCard(
               context: context,
@@ -80,6 +106,7 @@ class _FreelancersScreenState extends State<FreelancersScreen> {
     );
   }
 }
+
 
 
 class FreelancerGalleryModalContent extends StatefulWidget {

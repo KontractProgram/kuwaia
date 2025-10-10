@@ -8,6 +8,7 @@ import '../../../models/group.dart';
 import '../../../models/tool.dart';
 import '../../../providers/tools_provider.dart';
 import '../../../system/constants.dart';
+import '../../../widgets/loading.dart';
 
 
 class ToolsScreen extends StatefulWidget {
@@ -35,7 +36,7 @@ class _ToolsScreenState extends State<ToolsScreen> {
     return Consumer<ToolsProvider>(
       builder: (context, toolsProvider, _) {
         if (toolsProvider.isLoading) {
-          return Center(child: CircularProgressIndicator(color: AppColors.dashaSignatureColor));
+          return Column(children: List.generate(3, (_) => singleTrailCardLoadingWidget()));
         }
 
         if (toolsProvider.error != null) {

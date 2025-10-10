@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
+import 'package:kuwaia/widgets/loading.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,7 @@ class _PromptsScreenState extends State<PromptsScreen> {
       child: Consumer<AiJournalProvider>(
         builder: (context, aiJournalProvider, _) {
           if (aiJournalProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Column(children: List.generate(3, (_) => journalPromptLoadingWidget()));
           }
 
           if (aiJournalProvider.error != null) {

@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/group.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
+import 'package:kuwaia/widgets/loading.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
     return Consumer<AiDiaryProvider>(
       builder: (context, diaryProvider, _) {
         if (diaryProvider.isLoading) {
-          return Center(child: CircularProgressIndicator(color: AppColors.dashaSignatureColor,));
+          return Column(children: List.generate(3, (_) => toolCardLoadingWidget(size: size)));
         }
 
         if (diaryProvider.error != null) {
@@ -65,7 +66,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
         final nonFavoriteTools = filteredTools
             .where((tool) => !diaryProvider.isToolAFavorite(tool))
             .toList();
-        
+
         print('number of filtered tools ${filteredTools.length}');
 
         return SingleChildScrollView(

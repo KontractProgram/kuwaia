@@ -48,6 +48,7 @@ dependencies:
   intl: ^0.20.2
   overlay_support: ^2.1.0
   connectivity_plus: ^7.0.0
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
