@@ -73,8 +73,14 @@ class _PasswordToRegisterScreenState extends State<PasswordToRegisterScreen> {
             username: widget.username
         );
       } catch(e) {
-        print('register exception $e');
-        showToast('Unable to sign up');
+        if(e.toString().contains('user_already_exists')) {
+          showToast('User already exists');
+        } else if(e.toString().contains('weak_password')) {
+          showToast('Weak password. Try another');
+        } else {
+          showToast('Unable to sign up');
+        }
+
       }
     }
   }

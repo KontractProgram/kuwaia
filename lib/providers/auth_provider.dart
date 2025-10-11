@@ -105,8 +105,14 @@ class AuthProvider with ChangeNotifier {
       return response;
 
     } catch (e) {
-      _error = e.toString();
-      throw Exception('❌ Provider sign up exception: $e');
+      if(e.toString().contains('user_already_exists')) {
+        _error = 'User already exists';
+        throw Exception('user already exists');
+      } else if (e.toString().contains('weak_password')) {
+        _error = 'Weak password';
+        throw Exception('Weak password');
+      }
+      throw Exception('Something went wrong');
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -6,6 +6,7 @@ import '../models/community/freelancer.dart';
 import '../models/community/news.dart';
 import '../models/tool.dart';
 import '../services/profile_service.dart';
+import '../services/supabase_tables.dart';
 
 class AiJournalProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
@@ -56,7 +57,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final toolsResponse = await _client.from('tools').select().eq('id', toolId).maybeSingle();
+      final toolsResponse = await _client.from(SupabaseTables.tools.name).select().eq('id', toolId).maybeSingle();
 
       if(toolsResponse != null) {
         final tool = Tool.fromMap(toolsResponse);
@@ -83,7 +84,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final trendingResponse = await _client.from('trending').select();
+      final trendingResponse = await _client.from(SupabaseTables.trending.name).select();
 
       final trendingList = List<Map<String, dynamic>>.from(trendingResponse);
 
@@ -96,7 +97,7 @@ class AiJournalProvider with ChangeNotifier{
       }
 
       final toolsResponse = await _client
-          .from('tools')
+          .from(SupabaseTables.tools.name)
           .select()
           .inFilter('id', toolIds);
 
@@ -121,7 +122,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final latestResponse = await _client.from('latest').select();
+      final latestResponse = await _client.from(SupabaseTables.latest.name).select();
 
       final latestResponseList = List<Map<String, dynamic>>.from(latestResponse);
 
@@ -142,7 +143,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final newsResponse = await _client.from('news').select();
+      final newsResponse = await _client.from(SupabaseTables.news.name).select();
 
       final newsResponseList = List<Map<String, dynamic>>.from(newsResponse);
 
@@ -163,7 +164,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final journalPromptsResponse = await _client.from('profile_tool_prompts').select().isFilter('in_journal', true);
+      final journalPromptsResponse = await _client.from(SupabaseTables.profile_tool_prompts.name).select().isFilter('in_journal', true);
 
       final journalPromptsResponseList = List<Map<String, dynamic>>.from(journalPromptsResponse);
 
@@ -200,7 +201,7 @@ class AiJournalProvider with ChangeNotifier{
     notifyListeners();
 
     try {
-      await _client.from('prompts_likes').insert({
+      await _client.from(SupabaseTables.prompts_likes.name).insert({
         'profile_id': _profileId,
         'prompt_id': promptId,
       });
@@ -218,7 +219,7 @@ class AiJournalProvider with ChangeNotifier{
 
     try {
       await _client
-          .from('prompts_likes')
+          .from(SupabaseTables.prompts_likes.name)
           .delete()
           .match({'profile_id': _profileId, 'prompt_id': promptId});
     } catch (e) {
@@ -234,7 +235,7 @@ class AiJournalProvider with ChangeNotifier{
     try {
       // total likes
       final response = await _client
-          .from('prompts_likes')
+          .from(SupabaseTables.prompts_likes.name)
           .select('prompt_id')
           .eq('prompt_id', promptId)
           .count(CountOption.exact);
@@ -243,7 +244,7 @@ class AiJournalProvider with ChangeNotifier{
 
       // check if current user liked
       final liked = await _client
-          .from('prompts_likes')
+          .from(SupabaseTables.prompts_likes.name)
           .select('prompt_id')
           .match({'prompt_id': promptId, 'profile_id': _profileId})
           .maybeSingle();
@@ -265,7 +266,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final freelancersResponse = await _client.from('freelancers').select();
+      final freelancersResponse = await _client.from(SupabaseTables.freelancers.name).select();
 
       final freelancersResponseList = List<Map<String, dynamic>>.from(freelancersResponse);
 
@@ -286,7 +287,7 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      final freelancerImageUrlResponse = await _client.from('freelancer_gallery').select().eq('freelancer_id', id);
+      final freelancerImageUrlResponse = await _client.from(SupabaseTables.freelancer_gallery.name).select().eq('freelancer_id', id);
 
       if (freelancerImageUrlResponse.isNotEmpty) {
         _freelancerUrls = freelancerImageUrlResponse

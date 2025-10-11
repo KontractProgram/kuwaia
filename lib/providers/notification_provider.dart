@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/in_tool/prompt.dart';
+import '../services/supabase_tables.dart';
 import '../system/constants.dart';
 
 class PromptNotificationProvider with ChangeNotifier {
@@ -46,9 +47,9 @@ class PromptNotificationProvider with ChangeNotifier {
         print('New notification: ${payload.newRecord}');
 
         final owner = await profileService.getProfileById(promptNotification.senderId);
-        final promptResponse = await _client.from('profile_tool_prompts').select().eq('id', promptNotification.promptId).maybeSingle();
+        final promptResponse = await _client.from(SupabaseTables.profile_tool_prompts.name).select().eq('id', promptNotification.promptId).maybeSingle();
         final prompt = Prompt.fromMap(promptResponse!);
-        final toolResponse = await _client.from('tools').select().eq('id', prompt.toolId).maybeSingle();
+        final toolResponse = await _client.from(SupabaseTables.tools.name).select().eq('id', prompt.toolId).maybeSingle();
         final tool = Tool.fromMap(toolResponse!);
 
 
@@ -73,7 +74,7 @@ class PromptNotificationProvider with ChangeNotifier {
                   builder: (_) => _PromptShareModal(prompt: prompt, owner: owner!, promptNotification: promptNotification, tool: tool,)
               );
 
-              await _client.from('prompt_notifications').update({'read': true}).eq('id', promptNotification.id);
+              await _client.from(SupabaseTables.prompt_notifications.name).update({'read': true}).eq('id', promptNotification.id);
 
             },
             child: reusableText(text: 'VIEW', fontSize: 20, fontWeight: FontWeight.bold)
@@ -162,7 +163,7 @@ class _PromptShareModal extends StatelessWidget {
                     final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
                     await aiDiaryProvider.getJournalPromptToDiary(prompt: prompt);
         
-                    await client.from('prompt_notifications').update({'accepted': true}).eq('id', promptNotification.id);
+                    await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': true}).eq('id', promptNotification.id);
         
         
                     if(context.mounted){
@@ -178,7 +179,7 @@ class _PromptShareModal extends StatelessWidget {
                 ElevatedButton.icon(
                   onPressed: () async {
                     context.pop();
-                    await client.from('notifications').update({'accepted': false}).eq('id', promptNotification.id);
+                    await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': false}).eq('id', promptNotification.id);
                   },
                   icon: Icon(Icons.close),
                   label: Text('Reject'),

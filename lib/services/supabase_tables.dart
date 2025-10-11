@@ -1,0 +1,22 @@
+enum SupabaseTables {
+  freelancer_gallery,
+  freelancers,
+  group_profession_map,
+  latest,
+  news,
+  professions,
+  profile_professions_map,
+  profile_tool_log_details,
+  profile_tool_notes,
+  profile_tool_prompts,
+  profile_tool_videos,
+  profile_tools_map,
+  profiles,
+  prompt_notifications,
+  prompts_likes,
+  shorts,
+  tools,
+  tools_groups,
+  trending
+}
+

@@ -1,3 +1,4 @@
+import 'package:kuwaia/services/supabase_tables.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
 
@@ -9,7 +10,7 @@ class ProfileService {
   Future<Profile?> getProfileById(String id) async {
     try {
       final data = await _client
-          .from('profiles')
+          .from(SupabaseTables.profiles.name)
           .select()
           .eq('id', id)
           .maybeSingle();
@@ -27,7 +28,7 @@ class ProfileService {
 
   Future<Map<String, dynamic>?> getProfileByEmail(String email) async {
     final res = await _client
-        .from('profiles')
+        .from(SupabaseTables.profiles.name)
         .select()
         .eq('email', email)
         .maybeSingle();
@@ -39,7 +40,7 @@ class ProfileService {
 
   Future<Map<String, dynamic>?> getProfileByUsername(String username) async {
     final res = await _client
-        .from('profiles')
+        .from(SupabaseTables.profiles.name)
         .select()
         .eq('username', username)
         .maybeSingle();
@@ -54,7 +55,7 @@ class ProfileService {
   Future<void> createProfile({required String id, required String email, required String username, required bool verified}) async {
 
     try{
-      await _client.from('profiles').insert({
+      await _client.from(SupabaseTables.profiles.name).insert({
         'id': id,
         'email': email,
         'username': username,
@@ -76,7 +77,7 @@ class ProfileService {
   Future<List<Map<String, dynamic>>> fetchProfessions() async {
     try {
       final data = await _client
-          .from('professions')
+          .from(SupabaseTables.professions.name)
           .select();
 
       print('✔ DB READ: fetched ${data.length} professions');
@@ -89,15 +90,5 @@ class ProfileService {
       return [];
     }
   }
-
-
-  ///profile_professions table
-  //WRITES
-  Future<void> createProfileProfessions(List<String> professions) async{
-    try{
-
-    } catch (e) {
-
-    }
-  }
 }
+

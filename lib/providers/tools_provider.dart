@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:kuwaia/services/supabase_tables.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/tool.dart';
@@ -20,7 +21,7 @@ class ToolsProvider with ChangeNotifier {
       _error = null;
       notifyListeners();
 
-      final toolsResponse = await _client.from('tools').select();
+      final toolsResponse = await _client.from(SupabaseTables.tools.name).select();
 
       final toolsList = List<Map<String, dynamic>>.from(toolsResponse);
 

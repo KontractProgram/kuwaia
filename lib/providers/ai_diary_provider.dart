@@ -5,6 +5,7 @@ import '../models/in_tool/Note.dart';
 import '../models/in_tool/Video.dart';
 import '../models/in_tool/prompt.dart';
 import '../models/tool.dart';
+import '../services/supabase_tables.dart';
 
 class AiDiaryProvider with ChangeNotifier{
   final SupabaseClient _client = Supabase.instance.client;
@@ -56,7 +57,7 @@ class AiDiaryProvider with ChangeNotifier{
 
       //fetch which tools are recommended for the user
       final toolsMap = await _client
-          .from('profile_tools_map')
+          .from(SupabaseTables.profile_tools_map.name)
           .select('tool_id, is_favorite')
           .eq('profile_id', _profileId);
 
@@ -71,7 +72,7 @@ class AiDiaryProvider with ChangeNotifier{
       }
 
       //fetch the tools data
-      final toolsResponse = await _client.from('tools').select().inFilter('id', toolIds);
+      final toolsResponse = await _client.from(SupabaseTables.tools.name).select().inFilter('id', toolIds);
 
       final toolsList = List<Map<String, dynamic>>.from(toolsResponse);
 
@@ -93,7 +94,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       // Insert into Supabase
-      await _client.from('profile_tools_map').insert({
+      await _client.from(SupabaseTables.profile_tools_map.name).insert({
         'profile_id': _profileId,
         'tool_id': tool.id,
       });
@@ -124,7 +125,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tools_map')
+          .from(SupabaseTables.profile_tools_map.name)
           .delete()
           .eq('profile_id', _profileId)
           .eq('tool_id', toolId);
@@ -149,7 +150,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tools_map')
+          .from(SupabaseTables.profile_tools_map.name)
           .update({'is_favorite': isFavorite})
           .eq('profile_id', _profileId)
           .eq('tool_id', toolId);
@@ -183,7 +184,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the prompts data
-      final promptsResponse = await _client.from('profile_tool_prompts').select().match(query);
+      final promptsResponse = await _client.from(SupabaseTables.profile_tool_prompts.name).select().match(query);
 
       final promptList = List<Map<String, dynamic>>.from(promptsResponse);
 
@@ -207,7 +208,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'id': id, 'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the prompts data
-      final promptResponse = await _client.from('profile_tool_prompts').select().match(query);
+      final promptResponse = await _client.from(SupabaseTables.profile_tool_prompts.name).select().match(query);
 
       final promptMap = promptResponse[0];
       final prompt = Prompt.fromMap(promptMap);
@@ -228,7 +229,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('profile_tool_prompts').insert({
+      await _client.from(SupabaseTables.profile_tool_prompts.name).insert({
         'description': description,
         'prompt': prompt,
         'tool_id': toolId,
@@ -255,7 +256,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('profile_tool_prompts').insert({
+      await _client.from(SupabaseTables.profile_tool_prompts.name).insert({
         'description': prompt.description,
         'prompt': prompt.prompt,
         'tool_id': prompt.toolId,
@@ -290,7 +291,7 @@ class AiDiaryProvider with ChangeNotifier{
       }
 
       await _client
-        .from('profile_tool_prompts')
+        .from(SupabaseTables.profile_tool_prompts.name)
         .update(query)
         .eq('id', prompt.id)
         .eq('tool_id', prompt.toolId)
@@ -325,7 +326,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_prompts')
+          .from(SupabaseTables.profile_tool_prompts.name)
           .delete()
           .eq('id', prompt.id)
           .eq('profile_id', _profileId)
@@ -355,7 +356,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_prompts')
+          .from(SupabaseTables.profile_tool_prompts.name)
           .update({'in_journal': true})
           .eq('id', prompt.id)
           .eq('tool_id', prompt.toolId)
@@ -393,7 +394,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('notifications').insert({
+      await _client.from(SupabaseTables.prompt_notifications.name).insert({
         'sender_id': senderId,
         'receiver_id': receiverId,
         'type': 'prompt_share',
@@ -420,15 +421,15 @@ class AiDiaryProvider with ChangeNotifier{
 
       //check if user has the tool
       bool hasTool = false;
-      final toolRecordResponse = await _client.from('profile_tools_map').select().match({'profile_id': _profileId, 'tool_id': prompt.toolId}).maybeSingle();
+      final toolRecordResponse = await _client.from(SupabaseTables.profile_tools_map.name).select().match({'profile_id': _profileId, 'tool_id': prompt.toolId}).maybeSingle();
 
       hasTool = toolRecordResponse!['profile_id'] == _profileId && toolRecordResponse['tool_id'] == prompt.toolId;
 
       if(!hasTool) {
-        await _client.from('profile_tools_map').insert({'profile_id': _profileId, 'tool_id': prompt.toolId, 'is_favorite': false});
+        await _client.from(SupabaseTables.profile_tools_map.name).insert({'profile_id': _profileId, 'tool_id': prompt.toolId, 'is_favorite': false});
       }
 
-      await _client.from('profile_tool_prompts').insert({
+      await _client.from(SupabaseTables.profile_tool_prompts.name).insert({
         'description': prompt.description,
         'prompt': prompt.prompt,
         'tool_id': prompt.toolId,
@@ -469,7 +470,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the notes data
-      final notesResponse = await _client.from('profile_tool_notes').select().match(query);
+      final notesResponse = await _client.from(SupabaseTables.profile_tool_notes.name).select().match(query);
 
       final notesList = List<Map<String, dynamic>>.from(notesResponse);
 
@@ -493,7 +494,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'id': id, 'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the notes data
-      final notesResponse = await _client.from('profile_tool_notes').select().match(query);
+      final notesResponse = await _client.from(SupabaseTables.profile_tool_notes.name).select().match(query);
 
       final notesMap = notesResponse[0];
       final note = Note.fromMap(notesMap);
@@ -514,7 +515,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('profile_tool_notes').insert({
+      await _client.from(SupabaseTables.profile_tool_notes.name).insert({
         'note': note,
         'tool_id': toolId,
         'profile_id': _profileId
@@ -539,7 +540,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_notes')
+          .from(SupabaseTables.profile_tool_notes.name)
           .update({'note': note.note})
           .eq('id', note.id)
           .eq('tool_id', note.toolId)
@@ -574,7 +575,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_notes')
+          .from(SupabaseTables.profile_tool_notes.name)
           .delete()
           .eq('id', note.id)
           .eq('profile_id', _profileId)
@@ -607,7 +608,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the videos data
-      final videosResponse = await _client.from('profile_tool_videos').select().match(query);
+      final videosResponse = await _client.from(SupabaseTables.profile_tool_videos.name).select().match(query);
 
       final videosList = List<Map<String, dynamic>>.from(videosResponse);
 
@@ -631,7 +632,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'id': id, 'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the video data
-      final videosResponse = await _client.from('profile_tool_videos').select().match(query);
+      final videosResponse = await _client.from(SupabaseTables.profile_tool_videos.name).select().match(query);
 
       final videosMap = videosResponse[0];
       final video = Video.fromMap(videosMap);
@@ -652,7 +653,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('profile_tool_videos').insert({
+      await _client.from(SupabaseTables.profile_tool_videos.name).insert({
         'video_link': videoLink,
         'tool_id': toolId,
         'profile_id': _profileId
@@ -677,7 +678,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_videos')
+          .from(SupabaseTables.profile_tool_videos.name)
           .update({'video_link': video.videoLink})
           .eq('id', video.id)
           .eq('tool_id', video.toolId)
@@ -712,7 +713,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_videos')
+          .from(SupabaseTables.profile_tool_videos.name)
           .delete()
           .eq('id', video.id)
           .eq('profile_id', _profileId)
@@ -745,7 +746,7 @@ class AiDiaryProvider with ChangeNotifier{
       final query = {'profile_id': _profileId, 'tool_id': toolId};
 
       //fetch the log details data
-      final logDetailsResponse = await _client.from('profile_tool_log_details').select().match(query);
+      final logDetailsResponse = await _client.from(SupabaseTables.profile_tool_log_details.name).select().match(query);
 
       if(logDetailsResponse.isNotEmpty){
         final logDetailsMap = logDetailsResponse[0];
@@ -767,7 +768,7 @@ class AiDiaryProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
-      await _client.from('profile_tool_log_details').insert({
+      await _client.from(SupabaseTables.profile_tool_log_details.name).insert({
         'log_email': email,
         'log_password_hint': logPasswordHint,
         'tool_id': toolId,
@@ -792,7 +793,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_log_details')
+          .from(SupabaseTables.profile_tool_log_details.name)
           .update({'log_email': ld.logEmail, 'log_password_hint': ld.logPasswordHint})
           .eq('id', ld.id)
           .eq('tool_id', ld.toolId)
@@ -819,7 +820,7 @@ class AiDiaryProvider with ChangeNotifier{
       notifyListeners();
 
       await _client
-          .from('profile_tool_log_details')
+          .from(SupabaseTables.profile_tool_log_details.name)
           .delete()
           .eq('id', ld.id)
           .eq('profile_id', _profileId)

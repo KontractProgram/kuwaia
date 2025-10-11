@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kuwaia/services/supabase_tables.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/short.dart';
 
@@ -26,7 +27,7 @@ class ShortsProvider with ChangeNotifier {
       final to = from + _pageSize - 1;
 
       final response = await _client
-          .from('shorts')
+          .from(SupabaseTables.shorts.name)
           .select()
           .order('created_at', ascending: false)
           .range(from, to);
