@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/in_tool/log_details.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/system/constants.dart';
+import 'package:kuwaia/widgets/loading.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:provider/provider.dart';
 import '../../../models/tool.dart';
@@ -183,7 +184,7 @@ class _LogDetailsScreenState extends State<LogDetailsScreen> {
    return Consumer<AiDiaryProvider>(
      builder: (context, aiDiaryProvider, _) {
        if (aiDiaryProvider.isLoading) {
-         return const Center(child: CircularProgressIndicator());
+         return logDetailsLoadingWidget(size: size);
        }
 
        if (aiDiaryProvider.error != null) {

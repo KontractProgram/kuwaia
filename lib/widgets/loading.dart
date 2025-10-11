@@ -106,6 +106,142 @@ Widget singleTrailCardLoadingWidget() {
   );
 }
 
+Widget notesLoadingWidget({required Size size}) {
+  return SingleChildScrollView(
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: List.generate(5, (index) {
+        return Container(
+          margin: const EdgeInsets.only(top: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Note box shimmer
+              Shimmer.fromColors(
+                baseColor: Colors.grey[800]!,
+                highlightColor: Colors.grey[600]!,
+                child: Container(
+                  width: size.width * 0.9,
+                  height: 80,
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(15),
+                    color: AppColors.secondaryBackgroundColor,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              // Icons shimmer row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: List.generate(4, (_) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Shimmer.fromColors(
+                      baseColor: Colors.grey[800]!,
+                      highlightColor: Colors.grey[600]!,
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[800],
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+
+              Divider(color: AppColors.bodyTextColor.withAlpha(53), thickness: 1),
+            ],
+          ),
+        );
+      }),
+    ),
+  );
+}
+
+Widget logDetailsLoadingWidget({required Size size}) {
+  return Shimmer.fromColors(
+    baseColor: AppColors.bodyTextColor.withAlpha(40),
+    highlightColor: AppColors.bodyTextColor.withAlpha(10),
+    child: Container(
+      width: size.width * 0.9,
+      height: 200,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      margin: EdgeInsets.symmetric(
+        horizontal: size.width * 0.05,
+        vertical: size.height * 0.2,
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: AppColors.secondaryBackgroundColor,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Email shimmer
+          Row(
+            children: [
+              Container(width: 50, height: 12, color: AppColors.bodyTextColor.withAlpha(30)),
+              const SizedBox(width: 35),
+              Container(
+                width: size.width * 0.5,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.bodyTextColor.withAlpha(30),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: AppColors.bodyTextColor.withAlpha(30),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 20),
+
+          // Password hint shimmer
+          Row(
+            children: [
+              Container(width: 70, height: 12, color: AppColors.bodyTextColor.withAlpha(30)),
+              const SizedBox(width: 5),
+              Container(
+                width: size.width * 0.5,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColors.bodyTextColor.withAlpha(30),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: AppColors.bodyTextColor.withAlpha(30),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
 Widget trendingToolsLoadingWidget({required Size size}) {
   return Shimmer.fromColors(
     baseColor: AppColors.secondaryBackgroundColor.withAlpha(150),

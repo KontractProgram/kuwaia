@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
+import 'package:kuwaia/widgets/loading.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../../../models/in_tool/Note.dart';
@@ -225,7 +226,7 @@ class _MyNotesScreenState extends State<MyNotesScreen> {
       child: Consumer<AiDiaryProvider>(
         builder: (context, aiDiaryProvider, _) {
           if (aiDiaryProvider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return notesLoadingWidget(size: size);
           }
 
           if (aiDiaryProvider.error != null) {
