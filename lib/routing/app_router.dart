@@ -10,6 +10,7 @@ class AppRouter {
 
   GoRouter get router {
     return GoRouter(
+      navigatorKey: rootNavigatorKey,
       initialLocation: "/",
       refreshListenable: authProvider,
       redirect: (context, state) {
@@ -19,7 +20,10 @@ class AppRouter {
         final inAuthFlow = state.matchedLocation.startsWith('/auth_') ||
                            state.matchedLocation.startsWith('/continue_') ||
                            state.matchedLocation.startsWith('/password_') ||
-                           state.matchedLocation.startsWith('/username');
+                           state.matchedLocation.startsWith('/username') ||
+                           state.matchedLocation.startsWith('/forgot_') ||
+                           state.matchedLocation.startsWith('/reset_');
+
 
         if (!auth.isAuthenticated && !inAuthFlow) return '/auth_options';
 

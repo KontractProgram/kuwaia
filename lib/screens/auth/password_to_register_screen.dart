@@ -54,7 +54,7 @@ class _PasswordToRegisterScreenState extends State<PasswordToRegisterScreen> {
       String? confirmPasswordValidation = validateConfirmPassword(_confirmPasswordController.text, _passwordController.text);
 
       _doesPasswordsMatch = confirmPasswordValidation == null;
-      _isButtonEnabled = passwordValidation == null && _doesPasswordsMatch;
+      _isButtonEnabled = passwordValidation == null && _doesPasswordsMatch && isStrongPassword(_passwordController.text);
     });
   }
 
@@ -73,6 +73,7 @@ class _PasswordToRegisterScreenState extends State<PasswordToRegisterScreen> {
             username: widget.username
         );
       } catch(e) {
+        print('register error ${e.toString()}');
         if(e.toString().contains('user_already_exists')) {
           showToast('User already exists');
         } else if(e.toString().contains('weak_password')) {
@@ -185,6 +186,15 @@ class _PasswordToRegisterScreenState extends State<PasswordToRegisterScreen> {
                             )
                           ],
                         ),
+                        
+                        SizedBox(height: 8,),
+                        
+                        reusableText(
+                          text: 'At least 8 characters, one uppercase, one lowercase, one digit, one special character',
+                          fontSize: 12,
+                          textAlign: TextAlign.start,
+                          color: AppColors.bodyTextColor.withAlpha(150)
+                        )
 
                       ],
                     ),

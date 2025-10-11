@@ -1,8 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kuwaia/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
+import '../routing/routes.dart';
+import '../services/supabase_tables.dart';
 import '../widgets/toast.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -42,8 +45,24 @@ class AuthProvider with ChangeNotifier {
       }
 
       // Listen for future auth state changes
-      _client.auth.onAuthStateChange.listen((event) async {
-        final newUser = event.session?.user;
+      _client.auth.onAuthStateChange.listen((data) async {
+        final event = data.event;
+        final newUser = data.session?.user;
+
+        // 🧠 Handle password recovery
+        if (event == AuthChangeEvent.passwordRecovery) {
+          debugPrint('🔑 Password recovery event detected');
+
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            final context = rootNavigatorKey.currentContext;
+            if (context != null) {
+              context.go('/reset_password'); // 👈 Navigate to reset password screen
+            }
+          });
+          return;
+        }
+
+        // Normal user session updates
         if (newUser?.id != _user?.id) {
           _user = newUser;
 
@@ -105,12 +124,13 @@ class AuthProvider with ChangeNotifier {
       return response;
 
     } catch (e) {
+      print('sign up error ${e.toString()}');
       if(e.toString().contains('user_already_exists')) {
         _error = 'User already exists';
-        throw Exception('user already exists');
+        throw Exception('user_already_exists');
       } else if (e.toString().contains('weak_password')) {
         _error = 'Weak password';
-        throw Exception('Weak password');
+        throw Exception('weak_password');
       }
       throw Exception('Something went wrong');
     } finally {
@@ -193,13 +213,13 @@ class AuthProvider with ChangeNotifier {
         };
       }).toList();
 
-      await _client.from('profile_professions_map').insert(batchProfileProfessions);
+      await _client.from(SupabaseTables.profile_professions_map.name).insert(batchProfileProfessions);
 
       // 2. Fetch all relevant group_ids via group_profession_map
       final professionIds = professions.map((p) => p['id']).toList();
 
       final groupMap = await _client
-          .from('group_profession_map')
+          .from(SupabaseTables.group_profession_map.name)
           .select('group_id, profession_id')
           .inFilter('profession_id', professionIds);
 
@@ -207,7 +227,7 @@ class AuthProvider with ChangeNotifier {
 
       // 3. Fetch all tools in these groups
       final tools = await _client
-          .from('tools')
+          .from(SupabaseTables.tools.name)
           .select('id, name, group_id')
           .inFilter('group_id', groupIds);
 
@@ -282,11 +302,11 @@ class AuthProvider with ChangeNotifier {
         };
       }).toList();
 
-      await _client.from('profile_tools_map').insert(batchProfileTools);
+      await _client.from(SupabaseTables.profile_tools_map.name).insert(batchProfileTools);
 
       // 4. Mark profile as onboarded
       final res = await _client
-          .from('profiles')
+          .from(SupabaseTables.profiles.name)
           .update({'onboarded': true})
           .eq('id', _user!.id)
           .select();
@@ -328,7 +348,7 @@ class AuthProvider with ChangeNotifier {
 
       // Step 2: Check if the username already exists
       final existing = await _client
-          .from('profiles')
+          .from(SupabaseTables.profiles.name)
           .select('id')
           .eq('username', newUsername)
           .maybeSingle();
@@ -339,7 +359,7 @@ class AuthProvider with ChangeNotifier {
 
       // Step 3: Proceed with username update
       await _client
-          .from('profiles')
+          .from(SupabaseTables.profiles.name)
           .update({'username': newUsername})
           .eq('id', _user!.id);
 
@@ -410,38 +430,28 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
-  Future<bool> sendPasswordResetOtp(String email) async{
+  
+  
+  Future<void> sendResetPasswordLinkToEmail(String email) async {
     try{
-      _otpCode = _generateOtp();
-      _otpExpiry = DateTime.now().add(const Duration(minutes: 10));
-      _emailForReset = email;
-
-      print('otp code: $_otpCode');
-
-      await _client.functions.invoke('send_reset_otp', body: {'email': email, 'otp': _otpCode});
-      return true;
+      await _client.auth.resetPasswordForEmail(email, redirectTo: 'myapp://password-reset-callback/',);
     } catch(e) {
-      print(e.toString());
-      return false;
+      throw Exception('Something went wrong');
     }
   }
 
   Future<bool> resetPassword(String newPassword) async {
     try {
-      if (_emailForReset == null) return false;
+      final user = _client.auth.currentUser;
+      if (user == null) {
+        debugPrint('No user currently authenticated for password reset.');
+        return false;
+      }
 
-      final userProfile = await _profileService.getProfileByEmail(_emailForReset!);
-      final userId = userProfile!['id'];
-
-      final response = await _client.auth.admin.updateUserById(
-        userId!,
-        attributes: AdminUserAttributes(password: newPassword),
+      // Update the user's password
+      final response = await _client.auth.updateUser(
+        UserAttributes(password: newPassword),
       );
-
-      _otpCode = null;
-      _otpExpiry = null;
-      _emailForReset = null;
 
       notifyListeners();
 
@@ -461,11 +471,21 @@ class AuthProvider with ChangeNotifier {
     return code == _otpCode;
   }
 
-
   String _generateOtp() {
     final random = Random();
     return (100000 + random.nextInt(900000)).toString(); // 6-digit code
   }
+
+
+
+
+
+
+
+
+
+
+
 
   Future<bool> sendVerificationCode(String email) async {
     try {
@@ -506,7 +526,7 @@ class AuthProvider with ChangeNotifier {
 
       if (ok) {
         await _client
-            .from('profiles')
+            .from(SupabaseTables.profiles.name)
             .update({'verified': true})
             .eq('id', _user!.id);
 

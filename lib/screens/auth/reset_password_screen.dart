@@ -10,11 +10,9 @@ import '../../providers/auth_provider.dart';
 import '../../widgets/toast.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  final String email;
 
   const ResetPasswordScreen({
     super.key,
-    required this.email
   });
 
   @override
@@ -53,22 +51,38 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       String? confirmPasswordValidation = validateConfirmPassword(_confirmPasswordController.text, _passwordController.text);
 
       _doesPasswordsMatch = confirmPasswordValidation == null;
-      _isButtonEnabled = passwordValidation == null && _doesPasswordsMatch;
+      _isButtonEnabled = passwordValidation == null && _doesPasswordsMatch && isStrongPassword(_passwordController.text);
     });
   }
 
+
   Future<void> _resetPassword() async{
-    if(_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
+    FocusScope.of(context).unfocus();
 
-      String password = _passwordController.text;
+    if (_isButtonEnabled) {
+      setState(() {
+        _isLoading = true;
+      });
+      if(_formKey.currentState!.validate()) {
+        _formKey.currentState!.save();
+        String password = _passwordController.text;
+        try {
+          final authProvider = Provider.of<AuthProvider>(context, listen: false);
+          final passwordReset = await authProvider.resetPassword(password);
 
-      try {
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        await authProvider.resetPassword(password);
-      } catch(e) {
-        print('register exception $e');
-        showToast('Unable to sign up');
+          if(passwordReset) {
+            if(context.mounted){
+              context.go('/continue_with_email');
+            }
+          }
+          Future.delayed(Duration(seconds: 3));
+          setState(() {
+            _isLoading = false;
+          });
+        } catch(e) {
+          print('register exception $e');
+          showToast('Unable to sign up');
+        }
       }
     }
   }
@@ -177,6 +191,15 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                         ],
                       ),
                     ),
+
+                    SizedBox(height: 8),
+
+                    reusableText(
+                        text: 'At least 8 characters, one uppercase, one lowercase, one digit, one special character',
+                        fontSize: 12,
+                        textAlign: TextAlign.start,
+                        color: AppColors.bodyTextColor.withAlpha(150)
+                    )
                   ],
                 ),
 
@@ -186,29 +209,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     text: 'Confirm Reset',
                     size: size,
                     buttonColor: _isButtonEnabled ? AppColors.primaryAccentColor : AppColors.bodyTextColor.withAlpha(39),
-
-                    onPressed: () async {
-                      FocusScope.of(context).unfocus();
-                      if(_isButtonEnabled) {
-                        setState(() {
-                          _isLoading = true;
-                        });
-
-                        // supabase function to reset password
-                        await _resetPassword();
-
-                        await Future.delayed(const Duration(seconds: 5));
-
-                        // take action based on response from supabase
-                        if(context.mounted){
-                          setState(() {
-                            _isLoading = false;
-                          });
-
-                          context.go('/password_to_login/${widget.email}',);
-                        }
-                      }
-                    }
+                    onPressed: _resetPassword,
                 )
               ],
             ),

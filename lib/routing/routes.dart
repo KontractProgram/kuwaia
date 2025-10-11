@@ -1,7 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/screens/auth/forgot_password_screen.dart';
 import 'package:kuwaia/screens/auth/reset_password_screen.dart';
-import 'package:kuwaia/screens/auth/reset_password_verification_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/log_details_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
@@ -23,6 +23,7 @@ import 'package:kuwaia/screens/others/loading_screen.dart';
 import '../screens/main/in_journal/view_news_screen.dart';
 import '../screens/main/in_tool/my_notes_screen.dart';
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 enum AppRoute {
   authOptions,
@@ -92,21 +93,9 @@ final routes = [
   ),
 
   GoRoute(
-    path: '/reset_password_verification/:email',
-    name: AppRoute.resetPasswordVerification.name,
-    builder: (context, state) {
-      final email = state.pathParameters['email']!;
-      return ResetPasswordVerificationScreen(email: email);
-    }
-  ),
-
-  GoRoute(
       path: '/reset_password/:email',
       name: AppRoute.resetPassword.name,
-      builder: (context, state) {
-        final email = state.pathParameters['email']!;
-        return ResetPasswordScreen(email: email);
-      }
+      builder: (context, state) => const ResetPasswordScreen()
   ),
 
 

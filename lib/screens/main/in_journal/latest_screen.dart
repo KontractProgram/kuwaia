@@ -201,7 +201,7 @@ class _LatestCardState extends State<_LatestCard> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
-                          color: AppColors.confirmColor.withOpacity(0.2),
+                          color: AppColors.confirmColor.withAlpha(52),
                         ),
                         child: Center(
                           child: reusableText(

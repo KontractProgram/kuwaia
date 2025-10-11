@@ -18,6 +18,7 @@ const authBg = "assets/images/auth_bg.jpg";
 const logoTrans = "assets/images/logo_trans.png";
 const googleLogo = "assets/images/google.png";
 const youtubeLogo = "assets/images/youtube_logo.png";
+const aiLogo = "assets/tool_logos/AI.png";
 
 //fonts
 const montserratRegular = "assets/fonts/Montserrat-Regular.ttf";
@@ -70,8 +71,8 @@ String? validateUsername(String? value) {
 String? validatePassword(String? value) {
   if (value == null || value.isEmpty) {
     return "Please enter your password";
-  } else if (value.length < 6) {
-    return "Password must be at least 6 characters";
+  } else if (value.length < 8) {
+    return "Password must be at least 8 characters";
   } else if (value.contains(' ')) {
     return "Password cannot contain spaces";
   } else {
@@ -110,4 +111,13 @@ String? validateOtp(String? value) {
   }
 
   return null;
+}
+
+
+bool isStrongPassword(String password) {
+  // At least 8 characters, one uppercase, one lowercase, one digit, one special character
+  final regex = RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+  );
+  return regex.hasMatch(password);
 }

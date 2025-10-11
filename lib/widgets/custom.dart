@@ -80,7 +80,7 @@ Widget toolCardWidget({
         child: ClipOval(
             child: tool.imageUrl != null && tool.imageUrl!.isNotEmpty
                 ? Image.network(tool.imageUrl!, width: 40, fit: BoxFit.cover,)
-                : Image.asset('assets/tool_logos/AI.png', width: 40, fit: BoxFit.cover,)
+                : Image.asset(aiLogo, width: 40, fit: BoxFit.cover,)
         ),
       ),
 
@@ -609,7 +609,7 @@ class _WeightedImageCarouselState extends State<WeightedImageCarousel> {
                     decoration: BoxDecoration(
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
+                          color: Colors.black.withAlpha(52),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),

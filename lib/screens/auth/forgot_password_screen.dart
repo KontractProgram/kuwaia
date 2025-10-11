@@ -122,10 +122,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           } else {
                             //send code to email
                             String email = _emailController.text;
-                            await Provider.of<AuthProvider>(context, listen: false).sendPasswordResetOtp(email);
+                            await Provider.of<AuthProvider>(context, listen: false).sendResetPasswordLinkToEmail(email);
                             //push to code screen
                             if(context.mounted){
-                              context.push('/reset_password_verification/$email');
+                              showToast('Click the link sent to your mail');
                             }
                           }
                         }
