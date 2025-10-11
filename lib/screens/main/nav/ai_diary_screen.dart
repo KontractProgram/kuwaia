@@ -5,6 +5,7 @@ import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/loading.dart';
 import 'package:kuwaia/widgets/texts.dart';
+import 'package:kuwaia/widgets/toast.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 
@@ -71,6 +72,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
 
         return SingleChildScrollView(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 🔍 Search box
               TextField(
@@ -99,9 +101,10 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
               if (favoriteTools.isNotEmpty) ...[
                 reusableText(
                   text: 'Favorites',
-                  color: AppColors.secondaryAccentColor,
-                  fontSize: 18,
+                  color: AppColors.headingTextColor,
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.start
                 ),
 
                 const SizedBox(height: 10),
@@ -137,7 +140,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
               nonFavoriteTools.isEmpty
                 ? Container(
                 padding: EdgeInsets.only(top: size.height*0.2),
-                child: Lottie.asset(emptyDiary, width: size.width*0.6),
+                child: Center(child: Lottie.asset(emptyDiary, width: size.width*0.6)),
                 )
                 : ListView.builder(
                   shrinkWrap: true,
@@ -154,8 +157,10 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                       inDiary: true,
                       onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
                       onYoutubePressed: () {
-                        if(tool.learningLink.isNotEmpty && tool.learningLink.startsWith('https://youtube.com')) {
+                        if(tool.learningLink.isNotEmpty && tool.learningLink.startsWith('https://youtube')) {
                           context.push('/diary_tool_learning_video', extra: {'videoLink', tool.learningLink});
+                        } else {
+                          showToast('No Video available yet');
                         }
                       },
                       onBookMarkPressed: () {

@@ -59,10 +59,7 @@ class _NewsScreenState extends State<NewsScreen> {
           itemCount: newsList.length,
           itemBuilder: (context, index) {
             final news = newsList[index];
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: _newsCard(context: context, news: news, size: size),
-            );
+            return _newsCard(context: context, news: news, size: size);
           },
         );
       },
@@ -135,9 +132,7 @@ Widget _newsCard({required BuildContext context, required News news, required Si
                 fontSize: 12,
                 textAlign: TextAlign.start
               ),
-
-              const SizedBox(height: 12),
-
+              SizedBox(height: 8,),
               Center(
                 child: shortActionButton(
                   text: 'Read More',
@@ -146,8 +141,7 @@ Widget _newsCard({required BuildContext context, required News news, required Si
                   onPressed: () => context.push('/view_news', extra: {'news': news}),
                 )
               ),
-
-              const SizedBox(height: 20,)
+              SizedBox(height: 8,),
 
             ],
           ),

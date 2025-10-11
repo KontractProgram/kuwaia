@@ -1,10 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:kuwaia/services/profile_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile.dart';
-import '../routing/routes.dart';
 import '../services/supabase_tables.dart';
 import '../widgets/toast.dart';
 
@@ -16,12 +14,8 @@ class AuthProvider with ChangeNotifier {
   Profile? _profile;
   bool _isLoading = true;
   String? _error;
-  String? _emailForReset;
   String? _otpCode;
   DateTime? _otpExpiry;
-
-
-
 
   User? get user => _user;
   Profile? get profile => _profile;
@@ -46,21 +40,7 @@ class AuthProvider with ChangeNotifier {
 
       // Listen for future auth state changes
       _client.auth.onAuthStateChange.listen((data) async {
-        final event = data.event;
         final newUser = data.session?.user;
-
-        // 🧠 Handle password recovery
-        if (event == AuthChangeEvent.passwordRecovery) {
-          debugPrint('🔑 Password recovery event detected');
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final context = rootNavigatorKey.currentContext;
-            if (context != null) {
-              context.go('/reset_password'); // 👈 Navigate to reset password screen
-            }
-          });
-          return;
-        }
 
         // Normal user session updates
         if (newUser?.id != _user?.id) {
@@ -440,21 +420,13 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> resetPassword(String newPassword) async {
+  Future<bool> resetPassword({required String newPassword}) async {
     try {
-      final user = _client.auth.currentUser;
-      if (user == null) {
-        debugPrint('No user currently authenticated for password reset.');
-        return false;
-      }
-
-      // Update the user's password
       final response = await _client.auth.updateUser(
         UserAttributes(password: newPassword),
       );
 
       notifyListeners();
-
       return response.user != null;
     } catch (e) {
       debugPrint('Reset password error: $e');

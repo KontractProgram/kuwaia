@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/screens/auth/forgot_password_screen.dart';
 import 'package:kuwaia/screens/auth/reset_password_screen.dart';
+import 'package:kuwaia/screens/main/in_tool/diary_tool_learning_video_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/log_details_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_prompts_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
@@ -45,7 +46,8 @@ enum AppRoute {
   viewNews,
   forgotPassword,
   resetPasswordVerification,
-  resetPassword
+  resetPassword,
+  diaryToolLearningVideo
 }
 
 final routes = [
@@ -93,9 +95,12 @@ final routes = [
   ),
 
   GoRoute(
-      path: '/reset_password/:email',
+      path: '/reset_password',
       name: AppRoute.resetPassword.name,
-      builder: (context, state) => const ResetPasswordScreen()
+    builder: (context, state) {
+      final token = state.uri.queryParameters['token'] ?? '';
+      return ResetPasswordScreen(token: token);
+    },
   ),
 
 
@@ -196,6 +201,16 @@ final routes = [
       final news = extra['news'] as News;
       return ViewNewsScreen(news: news);
     }
+  ),
+
+  GoRoute(
+      path: '/diary_tool_learning_video',
+      name: AppRoute.diaryToolLearningVideo.name,
+      builder: (context, state) {
+        final extra = state.extra as Map<String, dynamic>;
+        final videoLink = extra['videoLink'] as String;
+        return DiaryToolLearningVideoScreen(videoLink: videoLink);
+      }
   ),
 
 

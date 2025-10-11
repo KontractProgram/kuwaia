@@ -120,8 +120,8 @@ Widget toolCardWidget({
             },
             child: FaIcon(
               FontAwesomeIcons.arrowUpRightFromSquare,
-              color: AppColors.bodyTextColor,
-              size: 16,
+              color: AppColors.secondaryAccentColor,
+              size: 20,
             ),
           ),
         ],
@@ -139,7 +139,7 @@ Widget toolCardWidget({
         children: [
 
           GestureDetector(
-            onTap: onYoutubePressed,
+            onTap: () => onYoutubePressed?.call(),
             child: Image.asset(youtubeLogo, width: 30, fit: BoxFit.cover,),
           ),
 

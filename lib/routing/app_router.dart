@@ -25,6 +25,15 @@ class AppRouter {
                            state.matchedLocation.startsWith('/reset_');
 
 
+        // Detect deep link query parameter for recovery
+        final isRecoveryLink = state.uri.queryParameters['type'] == 'recovery' &&
+            state.uri.queryParameters.containsKey('token');
+
+        if (isRecoveryLink) {
+          final token = state.uri.queryParameters['token']!;
+          return '/reset_password/?token=$token';
+        }
+
         if (!auth.isAuthenticated && !inAuthFlow) return '/auth_options';
 
         if(auth.isAuthenticated && state.matchedLocation == '/') return '/landing';

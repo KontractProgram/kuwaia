@@ -10,9 +10,9 @@ import '../../providers/auth_provider.dart';
 import '../../widgets/toast.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-
+  final String token;
   const ResetPasswordScreen({
-    super.key,
+    super.key, required this.token,
   });
 
   @override
@@ -68,7 +68,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         String password = _passwordController.text;
         try {
           final authProvider = Provider.of<AuthProvider>(context, listen: false);
-          final passwordReset = await authProvider.resetPassword(password);
+          final passwordReset = await authProvider.resetPassword(newPassword: password);
 
           if(passwordReset) {
             if(context.mounted){

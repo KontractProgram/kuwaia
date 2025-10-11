@@ -25,7 +25,7 @@ class ToolViewScreen extends StatefulWidget {
 class _ToolViewScreenState extends State<ToolViewScreen> {
   late final PageController _pageController;
   int _currentIndex = 0;
-  late bool isFavorite;
+  bool? isFavorite;
 
   final List<String> _labels = [
     'Prompts',
@@ -40,9 +40,8 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      isFavorite = context.watch<AiDiaryProvider>().isToolAFavorite(widget.tool);
-    });
+    final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
+    isFavorite = aiDiaryProvider.isToolAFavorite(widget.tool);
   }
 
   @override
@@ -110,16 +109,16 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
         ),
 
         actions: [
-          IconButton(
+          isFavorite != null ? IconButton(
             onPressed: (){
               final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
               setState(() {
-                isFavorite = !isFavorite;
-                aiDiaryProvider.updateFavoriteStatus(toolId: widget.tool.id, isFavorite: isFavorite);
+                isFavorite = !isFavorite!;
+                aiDiaryProvider.updateFavoriteStatus(toolId: widget.tool.id, isFavorite: isFavorite!);
               });
             },
-            icon: isFavorite ? FaIcon(FontAwesomeIcons.solidHeart, color: AppColors.dashaSignatureColor,) : FaIcon(FontAwesomeIcons.heart, color: AppColors.bodyTextColor,)
-          )
+            icon: isFavorite! ? FaIcon(FontAwesomeIcons.solidHeart, color: AppColors.dashaSignatureColor,) : FaIcon(FontAwesomeIcons.heart, color: AppColors.bodyTextColor,)
+          ) : SizedBox.shrink(),
         ],
       ),
       body: SafeArea(
