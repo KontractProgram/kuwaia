@@ -121,8 +121,73 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
     );
   }
 
-  void _showSharePromptModal({required BuildContext context, required Size size, required AiDiaryProvider aiDiaryProvider, required Prompt prompt}) {
+  void _showShareToFriendModal({required BuildContext context, required Size size, required int promptId}) {
+    final controller = TextEditingController();
 
+    showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Container(
+          height: size.height * 0.9, // 90% of screen height
+          decoration: BoxDecoration(
+            color: AppColors.primaryBackgroundColor,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              reusableText(
+                text: "Share To A Friend",
+                fontWeight: FontWeight.w700,
+                fontSize: 16,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: controller,
+                maxLength: 150,
+                decoration: InputDecoration(
+                  labelText: "Username",
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                  ),
+                ),
+                style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              longActionButton(
+                text: "Share",
+                size: size,
+                buttonColor: AppColors.primaryAccentColor,
+                textColor: AppColors.bodyTextColor,
+                onPressed: () {
+                  if (controller.text.isNotEmpty && validateUsername(controller.text) == null) {
+                    Provider.of<AiDiaryProvider>(context, listen: false)
+                        .sharePromptToAFriend(senderId: 'senderid', receiverId: 'receiverid', promptId: promptId);
+                    context.pop();
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showSharePromptModal({required BuildContext context, required Size size, required AiDiaryProvider aiDiaryProvider, required Prompt prompt}) {
     showModalBottomSheet(
       backgroundColor: Colors.transparent,
       context: context,
@@ -155,9 +220,7 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                 textColor: AppColors.bodyTextColor,
                 onPressed: () async {
                   context.pop();
-                  final profileId = Provider.of<AuthProvider>(context, listen: false).profile!.id;
-                  final promptSent = await aiDiaryProvider.sharePromptToAFriend(senderId: profileId, receiverId: profileId, promptId: 4);
-                  showToast(promptSent ? "Prompt sent successfully ": "Prompt sending failed");
+                  _showShareToFriendModal(context: context, size: size, promptId: prompt.id);
                 },
               ),
               const SizedBox(height: 8),

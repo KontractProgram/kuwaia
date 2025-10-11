@@ -15,7 +15,7 @@ class Freelancer{
       id: map['id'] as int,
       name: map['name'] as String,
       skill: map['skill'] as String,
-      imageUrl: map['imageUrl'] as String,
+      imageUrl: map['image_url'] as String,
       rating: map['rating'] as double,
       email: map['email'] as String,
       aboutMe: map['about_me'] as String,

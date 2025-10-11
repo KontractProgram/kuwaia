@@ -17,6 +17,7 @@ enum SupabaseTables {
   shorts,
   tools,
   tools_groups,
-  trending
+  trending,
+  tool_notifications
 }
 

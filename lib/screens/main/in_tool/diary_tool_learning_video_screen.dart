@@ -7,19 +7,18 @@ class DiaryToolLearningVideoScreen extends StatefulWidget {
   const DiaryToolLearningVideoScreen({super.key, required this.videoLink});
 
   @override
-  State<DiaryToolLearningVideoScreen> createState() => _SDiaryToolLearningVideoScreenState();
+  State<DiaryToolLearningVideoScreen> createState() => _DiaryToolLearningVideoScreenState();
 }
 
-class _SDiaryToolLearningVideoScreenState extends State<DiaryToolLearningVideoScreen> {
-  late String _videoId;
+class _DiaryToolLearningVideoScreenState extends State<DiaryToolLearningVideoScreen> {
+  late final String? _videoId;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _videoId = YoutubePlayer.convertUrlToId(widget.videoLink)!;
-    });
-
+    _videoId = YoutubePlayer.convertUrlToId(widget.videoLink);
   }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -33,8 +32,13 @@ class _SDiaryToolLearningVideoScreenState extends State<DiaryToolLearningVideoSc
           width: size.width,
           height: size.height,
           color: Colors.black,
-          child: _videoId.isEmpty
-            ? Center(child: CircularProgressIndicator(),)
+          child: _videoId == null
+            ? const Center(
+              child: Text(
+                'Invalid or unsupported YouTube link',
+                style: TextStyle(color: Colors.white),
+              ),
+            )
             : YoutubePlayer(
             controller: YoutubePlayerController(
               initialVideoId: _videoId,

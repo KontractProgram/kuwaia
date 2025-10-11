@@ -123,8 +123,15 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                       tool: tool,
                       group: group,
                       inDiary: true,
-                      onPressed: () =>
-                          context.push('/tool_view', extra: {'tool': tool}),
+                      onYoutubePressed: () {
+                        print('tool learning link ${tool.learningLink}');
+                        if(tool.learningLink.isNotEmpty) {
+                          context.push('/diary_tool_learning_video', extra: {'videoLink': tool.learningLink});
+                        } else {
+                          showToast('No Video available yet');
+                        }
+                      },
+                      onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
                       onBookMarkPressed: () {
                         diaryProvider.deleteToolFromDiary(toolId: tool.id);
                       },
@@ -157,6 +164,7 @@ class _AiDiaryScreenState extends State<AiDiaryScreen> {
                       inDiary: true,
                       onPressed: () => context.push('/tool_view', extra: {'tool': tool}),
                       onYoutubePressed: () {
+                        print('tool learning link ${tool.learningLink}');
                         if(tool.learningLink.isNotEmpty && tool.learningLink.startsWith('https://youtube')) {
                           context.push('/diary_tool_learning_video', extra: {'videoLink', tool.learningLink});
                         } else {

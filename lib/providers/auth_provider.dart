@@ -449,16 +449,6 @@ class AuthProvider with ChangeNotifier {
   }
 
 
-
-
-
-
-
-
-
-
-
-
   Future<bool> sendVerificationCode(String email) async {
     try {
       _otpCode = _generateOtp();
@@ -469,7 +459,7 @@ class AuthProvider with ChangeNotifier {
 
       // Trigger Edge Function to send mail
       final response = await _client.functions.invoke(
-        'send_verification_otp', // you can rename to send_verification_otp if you prefer
+        'send_verification_otp',
         body: {'email': email, 'otp': _otpCode},
       );
 

@@ -25,7 +25,8 @@ class _LandingScreenState extends State<LandingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final notificationProvider = Provider.of<PromptNotificationProvider>(context, listen: false);
-      notificationProvider.subscribe(context);
+      notificationProvider.subscribePromptShare(context);
+      notificationProvider.subscribeToolShare(context);
 
       // If no user → send to auth options
       if (!authProvider.isAuthenticated) {

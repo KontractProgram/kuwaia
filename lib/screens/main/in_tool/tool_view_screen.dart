@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
-import 'package:kuwaia/screens/main/in_tool/tool_updates_screen.dart';
 import 'package:kuwaia/widgets/buttons.dart';
 import 'package:provider/provider.dart';
 import '../../../models/tool.dart';
@@ -33,7 +32,6 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
     'Videos',
     'Use Case',
     'Log Details',
-    'Updates',
   ];
 
   @override
@@ -93,7 +91,6 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
       MyVideosScreen(tool: widget.tool),
       OfficialUseCaseScreen(tool: widget.tool), // shown for "Info"
       LogDetailsScreen(tool: widget.tool),
-      ToolUpdatesScreen(tool: widget.tool),
     ];
 
     return Scaffold(

@@ -388,30 +388,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
               SizedBox(height: size.height*0.02),
 
-              if(!authProvider.profile!.verified)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  margin: EdgeInsets.only(bottom: 20),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: AppColors.dashaSignatureColor.withAlpha(26)
-                  ),
-                  child: Column(
-                    children: [
-                      reusableText(text: 'Your email ${maskEmail(authProvider.profile!.email)} is not verified.'),
-                      SizedBox(height: 20),
-                      shortActionButton(
-                        text: 'Confirm Email',
-                        size: size,
-                        buttonColor: AppColors.dashaSignatureColor,
-                        onPressed: () {
-                          authProvider.sendVerificationCode(authProvider.profile!.email);
-                          _showVerificationModal(context:context, size: size);
-                        }
-                      )
-                    ],
-                  ),
-                ),
+              // if(!authProvider.profile!.verified)
+              //   Container(
+              //     padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              //     margin: EdgeInsets.only(bottom: 20),
+              //     decoration: BoxDecoration(
+              //         borderRadius: BorderRadius.circular(20),
+              //         color: AppColors.dashaSignatureColor.withAlpha(26)
+              //     ),
+              //     child: Column(
+              //       children: [
+              //         reusableText(text: 'Your email ${maskEmail(authProvider.profile!.email)} is not verified.'),
+              //         SizedBox(height: 20),
+              //         shortActionButton(
+              //           text: 'Confirm Email',
+              //           size: size,
+              //           buttonColor: AppColors.dashaSignatureColor,
+              //           onPressed: () async {
+              //             _showVerificationModal(context:context, size: size);
+              //             await authProvider.sendVerificationCode(authProvider.profile!.email);
+              //           }
+              //         )
+              //       ],
+              //     ),
+              //   ),
 
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -445,25 +445,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       }
                   ),
                   singleTrailCardWidget(
-                    leadingIcon: FontAwesomeIcons.chartPie,
+                    leadingIcon: FontAwesomeIcons.userGroup,
                     title: 'Invite Friends',
-                    onPressed: () {}
+                    onPressed: () {
+
+                    }
                   ),
                   singleTrailCardWidget(
-                    leadingIcon: FontAwesomeIcons.gear,
+                    leadingIcon: FontAwesomeIcons.briefcase,
                     title: 'Become a Freelancer',
                     onPressed: () {}
                   ),
                   singleTrailCardWidget(
-                      leadingIcon: FontAwesomeIcons.creditCard,
+                      leadingIcon: FontAwesomeIcons.lock,
                       title: 'Change Password',
                       onPressed: () => _showChangePasswordModal(context: context, authProvider: authProvider, size: size)
                   ),
-                  singleTrailCardWidget(
-                      leadingIcon: FontAwesomeIcons.download,
-                      title: 'Change Username',
-                      onPressed: () => _showChangeUsernameModal(context: context, authProvider: authProvider, size: size)
-                  ),
+                  // singleTrailCardWidget(
+                  //     leadingIcon: FontAwesomeIcons.download,
+                  //     title: 'Change Username',
+                  //     onPressed: () => _showChangeUsernameModal(context: context, authProvider: authProvider, size: size)
+                  // ),
 
                 ],
               ),

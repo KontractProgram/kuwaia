@@ -33,7 +33,7 @@ class _PromptsScreenState extends State<PromptsScreen> {
       child: Consumer<AiJournalProvider>(
         builder: (context, aiJournalProvider, _) {
           if (aiJournalProvider.isLoading) {
-            return Column(children: List.generate(3, (_) => journalPromptLoadingWidget()));
+            return journalPromptLoadingWidget();
           }
 
           if (aiJournalProvider.error != null) {

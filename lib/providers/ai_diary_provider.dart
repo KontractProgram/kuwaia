@@ -397,15 +397,15 @@ class AiDiaryProvider with ChangeNotifier{
       await _client.from(SupabaseTables.prompt_notifications.name).insert({
         'sender_id': senderId,
         'receiver_id': receiverId,
-        'type': 'prompt_share',
         'message': 'A new prompt was shared with you',
-        'data': {'prompt_id': promptId},
+        'prompt_id': promptId,
       });
 
       _isLoading = false;
       notifyListeners();
       return true;
     }  catch (e) {
+      print(e.toString());
       _error = e.toString();
       _isLoading = false;
       notifyListeners();

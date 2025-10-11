@@ -207,7 +207,7 @@ final routes = [
       path: '/diary_tool_learning_video',
       name: AppRoute.diaryToolLearningVideo.name,
       builder: (context, state) {
-        final extra = state.extra as Map<String, dynamic>;
+        final extra = state.extra as Map<String, String>;
         final videoLink = extra['videoLink'] as String;
         return DiaryToolLearningVideoScreen(videoLink: videoLink);
       }

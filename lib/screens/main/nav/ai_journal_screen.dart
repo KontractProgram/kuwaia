@@ -75,11 +75,11 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
+      NewsScreen(),
       TrendingScreen(),
       LatestScreen(),
-      NewsScreen(),
       PromptsScreen(),
-      FreelancersScreen()
+      FreelancersScreen(),
     ];
 
     return Column(
