@@ -82,7 +82,7 @@ class KuwaiaApp extends StatelessWidget {
             ),
           ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: AppColors.primaryBackgroundColor,
+          backgroundColor: Colors.transparent, //AppColors.primaryBackgroundColor,
           showSelectedLabels: false,
           showUnselectedLabels: false
         )

@@ -12,7 +12,7 @@ import '../system/constants.dart';
 import 'buttons.dart';
 
 Widget singleTrailCardWidget({
-  required IconData leadingIcon,
+  required String leadingIcon,
   required String title,
   String? subtitle,
   VoidCallback? onPressed,
@@ -26,10 +26,10 @@ Widget singleTrailCardWidget({
     padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
     child: ListTile(
       contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-        leading: FaIcon(
-            leadingIcon,
-            color: AppColors.primaryAccentColor,
-            size: 20
+        leading: Image.asset(
+          "assets/kuwaia_icons/$leadingIcon.png",
+          width: 30,
+          fit: BoxFit.cover,
         ),
         title: reusableText(
             text: title,

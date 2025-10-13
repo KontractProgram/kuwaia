@@ -52,70 +52,80 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
           height: size.height,
           padding: EdgeInsets.symmetric(
             horizontal: _selectedIndex == 3 ? 0 : size.width*0.05,
-            vertical: _selectedIndex == 3 ? 0 : size.height*0.02
+            vertical: 0//_selectedIndex == 3 ? 0 : size.height*0.02
           ),
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: AppColors.primaryBackgroundColor,
+        backgroundColor: Colors.transparent,//AppColors.primaryBackgroundColor,
         fixedColor: AppColors.bodyTextColor.withAlpha(150),
         currentIndex: _selectedIndex,
         onTap: (int index){setState(() {_selectedIndex = index;});},
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: glowingIcon(
-              icon: FontAwesomeIcons.bookOpenReader,
-              isActive: false,
+            icon: Image.asset(
+              "assets/kuwaia_icons/main/aidiaryicon.png",
+              width: 25,
+              fit: BoxFit.cover,
             ),
-            activeIcon: glowingIcon(
-              icon: FontAwesomeIcons.bookOpenReader,
-              isActive: true,
+            activeIcon: Image.asset(
+              "assets/kuwaia_icons/main/aidiaryicon.png",
+              width: 30,
+              fit: BoxFit.cover,
             ),
             label: 'AI diary'
           ),
           BottomNavigationBarItem(
-              icon: glowingIcon(
-                icon: FontAwesomeIcons.wrench,
-                isActive: false,
+              icon: Image.asset(
+                "assets/kuwaia_icons/main/aitoolsicon.png",
+                width: 25,
+                fit: BoxFit.cover,
               ),
-              activeIcon: glowingIcon(
-                icon: FontAwesomeIcons.wrench,
-                isActive: true,
+              activeIcon: Image.asset(
+                "assets/kuwaia_icons/main/aitoolsicon.png",
+                width: 30,
+                fit: BoxFit.cover,
               ),
               label: 'Tools'
           ),
           BottomNavigationBarItem(
-              icon: glowingIcon(
-                icon: FontAwesomeIcons.globe,
-                isActive: false,
+              icon: Image.asset(
+                "assets/kuwaia_icons/main/aijournalicon.png",
+                width: 25,
+                fit: BoxFit.cover,
               ),
-              activeIcon: glowingIcon(
-                icon: FontAwesomeIcons.globe,
-                isActive: true,
+              activeIcon: Image.asset(
+                "assets/kuwaia_icons/main/aijournalicon.png",
+                width: 30,
+                fit: BoxFit.cover,
               ),
               label: 'AI Journal'
           ),
           BottomNavigationBarItem(
-            icon: glowingIcon(
-              icon: FontAwesomeIcons.circlePlay,
-              isActive: false,
-            ),
-            activeIcon: glowingIcon(
-              icon: FontAwesomeIcons.circlePlay,
-              isActive: true,
-            ),
-            label: 'Shorts'
+              icon: Image.asset(
+                "assets/kuwaia_icons/main/shorts.png",
+                width: 25,
+                fit: BoxFit.cover,
+              ),
+              activeIcon: Image.asset(
+                "assets/kuwaia_icons/main/shorts.png",
+                width: 30,
+                fit: BoxFit.cover,
+              ),
+            label: 'Updates'
           ),
           BottomNavigationBarItem(
-              icon: glowingIcon(
-                icon: FontAwesomeIcons.user,
-                isActive: false,
+              icon: Image.asset(
+                "assets/kuwaia_icons/main/profileicon.png",
+                width: 25,
+                fit: BoxFit.cover,
               ),
-              activeIcon: glowingIcon(
-                icon: FontAwesomeIcons.user,
-                isActive: true,
+              activeIcon: Image.asset(
+                "assets/kuwaia_icons/main/profileicon.png",
+                width: 30,
+                fit: BoxFit.cover,
               ),
               label: 'Profile'
           ),

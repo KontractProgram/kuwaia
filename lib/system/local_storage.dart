@@ -9,4 +9,18 @@ class LocalStorage {
     }
     return isFirstTime;
   }
+
+  static Future<void> saveSharedUser(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> sharedUsers = prefs.getStringList('sharedUsers') ?? [];
+    if (!sharedUsers.contains(username)) {
+      sharedUsers.add(username);
+      await prefs.setStringList('sharedUsers', sharedUsers);
+    }
+  }
+
+  static Future<List<String>> getSharedUsers() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getStringList('sharedUsers') ?? [];
+  }
 }

@@ -19,9 +19,9 @@ class _AiJournalScreenState extends State<AiJournalScreen> {
   int _currentIndex = 0;
 
   final List<String> _labels = [
+    'News',
     'Trending',
     'Latest',
-    'News',
     'Prompts',
     'Freelancers'
   ];

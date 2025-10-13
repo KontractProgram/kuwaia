@@ -7,6 +7,7 @@ import 'package:kuwaia/models/notifications/prompt_notification.dart';
 import 'package:kuwaia/models/tool.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
 import 'package:kuwaia/services/profile_service.dart';
+import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/texts.dart';
 import 'package:kuwaia/widgets/toast.dart';
 import 'package:overlay_support/overlay_support.dart';
@@ -82,7 +83,6 @@ class PromptNotificationProvider with ChangeNotifier {
             child: reusableText(text: 'VIEW', fontSize: 20, fontWeight: FontWeight.bold)
           )
         );
-
       },
     ).subscribe();
 
@@ -148,7 +148,7 @@ class PromptNotificationProvider with ChangeNotifier {
       },
     ).subscribe();
 
-    print('subscribed for prompt share notifications');
+    print('subscribed for tool share notifications');
   }
 
   /// Add a notification manually (optional)
@@ -183,13 +183,19 @@ class _PromptShareModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = Supabase.instance.client;
+    final size = MediaQuery.of(context).size;
 
-    return Padding(
+    return Container(
+      height: size.height*0.9,
+      decoration: BoxDecoration(
+        color: AppColors.primaryBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        top: 20,
-        left: 20,
-        right: 20,
+        left: 16,
+        right: 16,
+        top: 24,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -203,7 +209,7 @@ class _PromptShareModal extends StatelessWidget {
               ],
             ),
 
-            reusableText(text: 'Shared Prompt to you from ${owner.username}', fontSize: 20, fontWeight: FontWeight.bold),
+            reusableText(text: 'Shared Prompt to you from ${owner.username}', fontSize: 20, fontWeight: FontWeight.bold, textAlign: TextAlign.start),
         
             const SizedBox(height: 10),
 
@@ -215,14 +221,14 @@ class _PromptShareModal extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            reusableText(text: 'This prompt is built for ${tool.name}. If you do not have this tool, it will be automatically added to your diary', maxLines: 5, fontSize: 14),
+            reusableText(text: 'This prompt is built for ${tool.name}. If you do not have this tool, it will be automatically added to your diary', maxLines: 5, fontSize: 14, color: AppColors.dashaSignatureColor),
 
             SizedBox(height: 10,),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
+                shortActionButton(
                   onPressed: () async {
                     final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
                     await aiDiaryProvider.getJournalPromptToDiary(prompt: prompt);
@@ -237,18 +243,18 @@ class _PromptShareModal extends StatelessWidget {
                     showToast('Prompt added to ${tool.name} in diary');
 
                   },
-                  icon: Icon(Icons.check),
-                  label: reusableText(text: 'Accept'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  size: size,
+                  text: 'Accept',
+                  buttonColor: AppColors.dashaSignatureColor
                 ),
-                ElevatedButton.icon(
+                shortActionButton(
                   onPressed: () async {
                     context.pop();
                     await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': false}).eq('id', promptNotification.id);
                   },
-                  icon: Icon(Icons.close),
-                  label: Text('Reject'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                  size: size,
+                  text: 'Reject',
+                  buttonColor: Colors.transparent,
                 ),
               ],
             ),
@@ -272,13 +278,19 @@ class _ToolShareModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final client = Supabase.instance.client;
+    final size = MediaQuery.of(context).size;
 
-    return Padding(
+    return Container(
+      height: size.height*0.9,
+      decoration: BoxDecoration(
+        color: AppColors.primaryBackgroundColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        top: 20,
-        left: 20,
-        right: 20,
+        left: 16,
+        right: 16,
+        top: 24,
       ),
       child: SingleChildScrollView(
         child: Column(
@@ -305,36 +317,37 @@ class _ToolShareModal extends StatelessWidget {
             const SizedBox(height: 20),
 
 
-
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () async {
-                    final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                    await aiDiaryProvider.addToolToDiary(tool: tool);
+                shortActionButton(
+                    onPressed: () async {
+                      final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
+                      await aiDiaryProvider.addToolToDiary(tool: tool);
 
-                    await client.from(SupabaseTables.tool_notifications.name).update({'accepted': true}).eq('id', toolNotification.id);
+                      await client.from(SupabaseTables.tool_notifications.name).update({'accepted': true}).eq('id', toolNotification.id);
 
 
-                    if(context.mounted){
-                      context.pop();
-                    }
+                      if(context.mounted){
+                        context.pop();
+                      }
 
-                    showToast('${tool.name} added to diary');
+                      showToast('${tool.name} added to diary');
 
-                  },
-                  label: reusableText(text: 'Accept', fontWeight: FontWeight.w500),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.dashaSignatureColor),
+                    },
+                    size: size,
+                    text: 'Accept',
+                    buttonColor: AppColors.dashaSignatureColor
                 ),
-                ElevatedButton.icon(
+
+                shortActionButton(
                   onPressed: () async {
                     context.pop();
                     await client.from(SupabaseTables.tool_notifications.name).update({'accepted': false}).eq('id', toolNotification.id);
                   },
-                  icon: Icon(Icons.close),
-                  label: reusableText(text: 'Reject', fontWeight: FontWeight.w500),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent),
+                  size: size,
+                  text: 'Reject',
+                  buttonColor: Colors.transparent,
                 ),
               ],
             ),
