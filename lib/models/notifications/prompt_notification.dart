@@ -1,21 +1,19 @@
-class PromptNotification {
-  final int id;
-  final String message;
+import 'package:kuwaia/models/notifications/app_notification.dart';
+
+class PromptNotification extends AppNotification{
   final String senderId;
   final String receiverId;
   final int promptId;
-  final DateTime createdAt;
-  bool? read;
   bool? accepted;
 
   PromptNotification({
-    required this.id,
-    required this.message,
+    required super.id,
+    required super.message,
     required this.senderId,
     required this.receiverId,
     required this.promptId,
-    required this.createdAt,
-    this.read,
+    required super.createdAt,
+    super.read,
     this.accepted
   });
 
@@ -27,7 +25,7 @@ class PromptNotification {
       receiverId: map['receiver_id'] as String,
       createdAt: DateTime.parse(map['created_at']),
       promptId: map['prompt_id'] as int,
-      read: map['read'] as bool?,
+      read: map['read'] as bool,
       accepted: map['accepted'] as bool?
     );
   }

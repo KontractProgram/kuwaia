@@ -375,7 +375,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ]
                 ),
-                child: Center(child: FaIcon(FontAwesomeIcons.user, color: AppColors.headingTextColor, size: 50)),
+                child: Center(child:Image.asset("assets/kuwaia_icons/main/profileicon.png", width: 50)),
               ),
 
               SizedBox(height: 20,),
@@ -440,9 +440,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   singleTrailCardWidget(
                       leadingIcon: 'main/notificationicon',
                       title: 'Notifications',
-                      onPressed: () {
-
-                      }
+                      onPressed: () => context.push('/notifications')
                   ),
                   singleTrailCardWidget(
                     leadingIcon: 'main/inviteicon',

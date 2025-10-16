@@ -1,21 +1,19 @@
-class ToolNotification{
-  final int id;
-  final String message;
+import 'package:kuwaia/models/notifications/app_notification.dart';
+
+class ToolNotification extends AppNotification{
   final String senderId;
   final String receiverId;
   final int toolId;
-  final DateTime createdAt;
-  bool? read;
   bool? accepted;
 
   ToolNotification({
-    required this.id,
-    required this.message,
+    required super.id,
+    required super.message,
     required this.senderId,
     required this.receiverId,
     required this.toolId,
-    required this.createdAt,
-    this.read,
+    required super.createdAt,
+    super.read,
     this.accepted
 });
 
@@ -27,7 +25,7 @@ class ToolNotification{
         receiverId: map['receiver_id'] as String,
         createdAt: DateTime.parse(map['created_at']),
         toolId: map['tool_id'] as int,
-        read: map['read'] as bool?,
+        read: map['read'] as bool,
         accepted: map['accepted'] as bool?
     );
   }

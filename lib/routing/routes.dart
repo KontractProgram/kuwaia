@@ -9,6 +9,7 @@ import 'package:kuwaia/screens/main/in_tool/my_videos_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/official_use_case_screen.dart';
 import 'package:kuwaia/screens/main/in_tool/tool_view_screen.dart';
 import 'package:kuwaia/screens/main/landing_nav_screen.dart';
+import 'package:kuwaia/screens/main/notifications/notifications_screen.dart';
 import 'package:kuwaia/screens/main/tools_in_group_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
 import '../models/community/news.dart';
@@ -47,7 +48,8 @@ enum AppRoute {
   forgotPassword,
   resetPasswordVerification,
   resetPassword,
-  diaryToolLearningVideo
+  diaryToolLearningVideo,
+  notifications,
 }
 
 final routes = [
@@ -212,6 +214,13 @@ final routes = [
         return DiaryToolLearningVideoScreen(videoLink: videoLink);
       }
   ),
+
+  GoRoute(
+    path: '/notifications',
+    name: AppRoute.notifications.name,
+    builder: (context, state) => const NotificationsScreen(),
+  ),
+
 
 
 ];

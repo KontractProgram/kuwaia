@@ -80,6 +80,10 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
 
   }
 
+  void _showShareToolToFriendModal({required BuildContext context, required Size size, required Tool tool}) {
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -116,6 +120,11 @@ class _ToolViewScreenState extends State<ToolViewScreen> {
             },
             icon: isFavorite! ? FaIcon(FontAwesomeIcons.solidHeart, color: AppColors.dashaSignatureColor,) : FaIcon(FontAwesomeIcons.heart, color: AppColors.bodyTextColor,)
           ) : SizedBox.shrink(),
+
+          IconButton(
+            onPressed: () => _showShareToolToFriendModal(context: context, size: size, tool: widget.tool),
+            icon: FaIcon(FontAwesomeIcons.share, color: AppColors.bodyTextColor,)
+          )
         ],
       ),
       body: SafeArea(

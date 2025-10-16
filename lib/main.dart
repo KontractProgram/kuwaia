@@ -34,7 +34,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => AiDiaryProvider()),
           ChangeNotifierProvider(create: (_) => ToolsProvider()),
           ChangeNotifierProvider(create: (_) => ShortsProvider()),
-          ChangeNotifierProvider(create: (_) => PromptNotificationProvider()),
+          ChangeNotifierProvider(create: (_) => NotificationProvider()),
           ChangeNotifierProvider(create: (_) => AiJournalProvider()),
 
         ],

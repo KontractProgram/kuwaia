@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/models/notifications/app_notification.dart';
 import 'package:kuwaia/models/notifications/tool_notification.dart';
 import 'package:kuwaia/models/profile.dart';
 import 'package:kuwaia/models/notifications/prompt_notification.dart';
@@ -15,16 +16,107 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/group.dart';
 import '../models/in_tool/prompt.dart';
+import '../screens/others/notification_modals.dart';
 import '../services/supabase_tables.dart';
 import '../system/constants.dart';
 
-class PromptNotificationProvider with ChangeNotifier {
+class NotificationProvider with ChangeNotifier {
   final SupabaseClient _client = Supabase.instance.client;
 
-  final List<PromptNotification> _promptNotifications = [];
-  final List<ToolNotification> _toolNotifications = [];
+  List<PromptNotification> _promptNotifications = [];
+  List<ToolNotification> _toolNotifications = [];
+  List<AppNotification> _allNotifications = [];
+  bool _isLoading = true;
+  String? _error;
 
-  List<PromptNotification> get promptNotifications => _promptNotifications;
+
+  List<PromptNotification>? get promptNotifications => _promptNotifications;
+  List<ToolNotification>? get toolNotification => _toolNotifications;
+  List<AppNotification>? get allNotifications => _allNotifications;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  List<AppNotification> getSortedNotifications() {
+    final sorted = List<AppNotification>.from(_allNotifications);
+    sorted.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return sorted;
+  }
+
+  void _sortNotifications() {
+    _allNotifications.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<void> fetchAllNotifications() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final id = _client.auth.currentUser!.id;
+
+      final promptNotificationResponse = await _client
+                                          .from(SupabaseTables.prompt_notifications.name)
+                                          .select()
+                                          .eq('receiver_id', id);
+
+      _promptNotifications = promptNotificationResponse.isNotEmpty
+          ? List<Map<String, dynamic>>.from(promptNotificationResponse)
+          .map((map) => PromptNotification.fromMap(map))
+          .toList()
+          : <PromptNotification>[];
+
+      final toolNotificationResponse = await _client
+          .from(SupabaseTables.tool_notifications.name)
+          .select()
+          .eq('receiver_id', id);
+
+      _toolNotifications = toolNotificationResponse.isNotEmpty
+          ? List<Map<String, dynamic>>.from(toolNotificationResponse)
+          .map((map) => ToolNotification.fromMap(map))
+          .toList()
+          : <ToolNotification>[];
+
+      _allNotifications = [
+        ..._promptNotifications,
+        ..._toolNotifications,
+      ];
+
+      _sortNotifications();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _isLoading = false;
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
+  Future<void> readNotification(AppNotification notification) async {
+    try {
+      String table;
+      if (notification is PromptNotification) {
+        table = SupabaseTables.prompt_notifications.name;
+      } else if (notification is ToolNotification) {
+        table = SupabaseTables.tool_notifications.name;
+      } else {
+        throw Exception('Unknown notification type');
+      }
+
+      await _client
+          .from(table)
+          .update({'read': true})
+          .eq('id', notification.id);
+
+      notification.read = true;
+
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
+
 
   /// Subscribe to realtime promptNotifications for the current user
   void subscribePromptShare(BuildContext context) {
@@ -44,6 +136,7 @@ class PromptNotificationProvider with ChangeNotifier {
         final profileService = ProfileService();
         final promptNotification = PromptNotification.fromMap(payload.newRecord);
         _promptNotifications.insert(0, promptNotification);
+        _allNotifications.insert(0, promptNotification);
         notifyListeners();
 
         // Optional: show in-app toast or snack bar
@@ -66,6 +159,8 @@ class PromptNotificationProvider with ChangeNotifier {
           trailing: TextButton(
             onPressed: () async {
               entry?.dismiss();
+              print(promptNotification.id);
+              print(promptNotification.senderId);
 
               showModalBottomSheet(
                   context: context,
@@ -74,7 +169,7 @@ class PromptNotificationProvider with ChangeNotifier {
                   shape: const RoundedRectangleBorder(
                     borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                   ),
-                  builder: (_) => _PromptShareModal(prompt: prompt, owner: owner!, promptNotification: promptNotification, tool: tool,)
+                  builder: (_) => PromptShareModal(prompt: prompt, owner: owner!, promptNotification: promptNotification, tool: tool,)
               );
 
               await _client.from(SupabaseTables.prompt_notifications.name).update({'read': true}).eq('id', promptNotification.id);
@@ -105,6 +200,7 @@ class PromptNotificationProvider with ChangeNotifier {
       callback: (payload) async {
         final toolNotification = ToolNotification.fromMap(payload.newRecord);
         _toolNotifications.insert(0, toolNotification);
+        _allNotifications.insert(0, toolNotification);
         notifyListeners();
 
         // Optional: show in-app toast or snack bar
@@ -135,7 +231,7 @@ class PromptNotificationProvider with ChangeNotifier {
                       shape: const RoundedRectangleBorder(
                         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                       ),
-                      builder: (_) => _ToolShareModal(toolNotification: toolNotification, group: group,  tool: tool, sender: sender!)
+                      builder: (_) => ToolShareModal(toolNotification: toolNotification, group: group,  tool: tool, sender: sender!)
                   );
 
                   await _client.from(SupabaseTables.tool_notifications.name).update({'read': true}).eq('id', tool.id);
@@ -168,195 +264,4 @@ class PromptNotificationProvider with ChangeNotifier {
     _promptNotifications.clear();
     notifyListeners();
   }
-}
-
-
-
-class _PromptShareModal extends StatelessWidget {
-  final Prompt prompt;
-  final PromptNotification promptNotification;
-  final Profile owner;
-  final Tool tool;
-
-  const _PromptShareModal({required this.prompt, required this.owner, required this.promptNotification, required this.tool});
-
-  @override
-  Widget build(BuildContext context) {
-    final client = Supabase.instance.client;
-    final size = MediaQuery.of(context).size;
-
-    return Container(
-      height: size.height*0.9,
-      decoration: BoxDecoration(
-        color: AppColors.primaryBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 24,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: (){context.pop();}, child: reusableText(text: 'SKIP', fontWeight: FontWeight.w500))
-              ],
-            ),
-
-            reusableText(text: 'Shared Prompt to you from ${owner.username}', fontSize: 20, fontWeight: FontWeight.bold, textAlign: TextAlign.start),
-        
-            const SizedBox(height: 10),
-
-            reusableText(text: prompt.description, fontWeight: FontWeight.w600),
-
-            const SizedBox(height: 8),
-
-            reusableText(text: prompt.prompt, maxLines: 100),
-
-            const SizedBox(height: 20),
-
-            reusableText(text: 'This prompt is built for ${tool.name}. If you do not have this tool, it will be automatically added to your diary', maxLines: 5, fontSize: 14, color: AppColors.dashaSignatureColor),
-
-            SizedBox(height: 10,),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                shortActionButton(
-                  onPressed: () async {
-                    final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                    await aiDiaryProvider.getJournalPromptToDiary(prompt: prompt);
-        
-                    await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': true}).eq('id', promptNotification.id);
-        
-        
-                    if(context.mounted){
-                      context.pop();
-                    }
-        
-                    showToast('Prompt added to ${tool.name} in diary');
-
-                  },
-                  size: size,
-                  text: 'Accept',
-                  buttonColor: AppColors.dashaSignatureColor
-                ),
-                shortActionButton(
-                  onPressed: () async {
-                    context.pop();
-                    await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': false}).eq('id', promptNotification.id);
-                  },
-                  size: size,
-                  text: 'Reject',
-                  buttonColor: Colors.transparent,
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-
-class _ToolShareModal extends StatelessWidget {
-  final ToolNotification toolNotification;
-  final Tool tool;
-  final Group group;
-  final Profile sender;
-
-  const _ToolShareModal({required this.toolNotification, required this.group, required this.tool, required this.sender});
-
-  @override
-  Widget build(BuildContext context) {
-    final client = Supabase.instance.client;
-    final size = MediaQuery.of(context).size;
-
-    return Container(
-      height: size.height*0.9,
-      decoration: BoxDecoration(
-        color: AppColors.primaryBackgroundColor,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 24,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: (){context.pop();}, child: reusableText(text: 'SKIP', fontWeight: FontWeight.w500))
-              ],
-            ),
-
-            reusableText(text: 'Shared Tool to you from ${sender.username}', fontSize: 20, fontWeight: FontWeight.bold),
-
-            const SizedBox(height: 10),
-
-            reusableText(text: tool.name, fontWeight: FontWeight.w600),
-
-            const SizedBox(height: 4),
-
-            reusableText(text: group.name),
-
-            const SizedBox(height: 20),
-
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                shortActionButton(
-                    onPressed: () async {
-                      final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                      await aiDiaryProvider.addToolToDiary(tool: tool);
-
-                      await client.from(SupabaseTables.tool_notifications.name).update({'accepted': true}).eq('id', toolNotification.id);
-
-
-                      if(context.mounted){
-                        context.pop();
-                      }
-
-                      showToast('${tool.name} added to diary');
-
-                    },
-                    size: size,
-                    text: 'Accept',
-                    buttonColor: AppColors.dashaSignatureColor
-                ),
-
-                shortActionButton(
-                  onPressed: () async {
-                    context.pop();
-                    await client.from(SupabaseTables.tool_notifications.name).update({'accepted': false}).eq('id', toolNotification.id);
-                  },
-                  size: size,
-                  text: 'Reject',
-                  buttonColor: Colors.transparent,
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-          ],
-        ),
-      ),
-    );
-  }
-
-
 }

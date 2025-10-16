@@ -199,9 +199,9 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                         itemBuilder: (context, index) {
                           final username = filteredUsernames[index];
                           return ListTile(
-                            title: Text(
-                              username,
-                              style: TextStyle(color: AppColors.bodyTextColor),
+                            title: reusableText(
+                              text: username,
+                              fontSize: 14,
                             ),
                             onTap: () {
                               controller.text = username;
@@ -213,14 +213,14 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                   else
                     Padding(
                       padding: const EdgeInsets.only(top: 8),
-                      child: Text(
-                        'No saved usernames yet',
-                        style: TextStyle(
-                          color: AppColors.bodyTextColor.withAlpha(120),
-                          fontStyle: FontStyle.italic,
-                        ),
+                      child: reusableText(
+                        text: 'No saved usernames yet',
+                        fontSize: 12,
+                        color: AppColors.bodyTextColor.withAlpha(150)
                       ),
                     ),
+
+                  SizedBox(height: 10,),
 
                   longActionButton(
                     text: "Share",
@@ -235,14 +235,17 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
                         if(receiverResponse != null) {
                           final receiver = Profile.fromMap(receiverResponse);
 
-                          //Can't share prompt to self
-                          //put logic here
-                          final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                          aiDiaryProvider.sharePromptToAFriend(senderId: senderId, receiverId: receiver.id, promptId: promptId);
-                          if(context.mounted){
-                            context.pop();
+                          if(senderId != receiver.id){
+                            final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
+                            aiDiaryProvider.sharePromptToAFriend(senderId: senderId, receiverId: receiver.id, promptId: promptId);
+                            if(context.mounted){
+                              context.pop();
+                            }
+                            showToast('Prompt has been shared to $username');
+                          } else {
+                            showToast("Can't share prompt to self");
                           }
-                          showToast('Prompt has been shared to $username');
+
                         } else {
                           showToast('Username does not exist');
                         }
