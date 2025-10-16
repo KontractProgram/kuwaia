@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:kuwaia/models/profile.dart';
 import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/text_fields.dart';
 import 'package:kuwaia/widgets/toast.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/auth_provider.dart';
+import '../../../services/profile_service.dart';
 import '../../../system/constants.dart';
 import '../../../widgets/texts.dart';
 
@@ -283,6 +285,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return '$maskedLocal@***.$tld';
   }
 
+  Future<bool?> _isEmailValid(String email) async {
+      try {
+        final ProfileService profileService = ProfileService();
+        final res = await profileService.getProfileByEmail(email);
+        if(res != null){
+          final profile = Profile.fromMap(res);
+          if(profile.email == email){
+            showToast('User already exists');
+            return false;
+          } else {
+            return true;
+          }
+        } else {
+          return true;
+        }
+      } catch(e) {
+        showToast('Could not check user existence. Please try again.');
+        return null;
+      }
+
+  }
+
+
   void _showVerificationModal({required BuildContext context, required Size size}){
     final codeController = TextEditingController();
 
@@ -336,6 +361,100 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         );
       },
+    );
+  }
+
+  void _showInviteFriendModal({required BuildContext context, required Size size}){
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        final controller = TextEditingController();
+        bool isButtonEnabled = false;
+        bool isLoading = false;
+
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+
+            controller.addListener(() {
+              setState(() {
+                isButtonEnabled = validateEmail(controller.text) == null;
+              });
+            });
+
+            return Container(
+              height: size.height*0.9,
+              decoration: BoxDecoration(
+                color: AppColors.primaryBackgroundColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  reusableText(
+                    text: "Invite a Friend",
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                  const SizedBox(height: 15),
+
+                  authTextField(
+                    controller: controller,
+                    obscureText: false,
+                    label: 'Email',
+                    size: size,
+                    validator: (value) => validateEmail(value),
+                    onSaved: (value) => controller.text = value ?? '',
+                  ),
+
+                  SizedBox(height: 20,),
+
+                  isLoading ? longLoadingButton(size: size)
+                      : longActionButton(
+                      text: 'Send Invite',
+                      size: size,
+                      buttonColor: isButtonEnabled ? AppColors.primaryAccentColor : AppColors.bodyTextColor.withAlpha(39),
+
+                      onPressed: () async {
+                        if (!isButtonEnabled) return;
+
+                        FocusScope.of(context).unfocus();
+
+                        setState(() => isLoading = true);
+
+                        final isValid = await _isEmailValid(controller.text.trim());
+
+                        if (context.mounted) {
+                          setState(() => isLoading = false);
+                        }
+
+                        if (isValid != null && isValid == true) {
+                          await authProvider.sendInvite(controller.text.trim());
+                          showToast('Invite sent successfully');
+                          if (context.mounted) context.pop();
+                        }
+                      }
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      }
     );
   }
 
@@ -412,24 +531,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               //       ],
               //     ),
               //   ),
-
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: AppColors.secondaryBackgroundColor
-                ),
-                child: Column(
-                  children: [
-                    reusableText(text: 'Do you want to be recommended as an AI freelancer to our users?'),
-                    SizedBox(height: 20),
-                    shortActionButton(
-                      text: 'Send Request',
-                      size: size,
-                    )
-                  ],
-                ),
-              ),
+              // Container(
+              //   padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+              //   decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(20),
+              //       color: AppColors.secondaryBackgroundColor
+              //   ),
+              //   child: Column(
+              //     children: [
+              //       reusableText(text: 'Do you want to be recommended as an AI freelancer to our users?'),
+              //       SizedBox(height: 20),
+              //       shortActionButton(
+              //         text: 'Send Request',
+              //         size: size,
+              //       )
+              //     ],
+              //   ),
+              // ),
 
               SizedBox(height: 20,),
 
@@ -445,20 +563,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   singleTrailCardWidget(
                     leadingIcon: 'main/inviteicon',
                     title: 'Invite Friends',
-                    onPressed: () {
-
-                    }
+                    onPressed: () => _showInviteFriendModal(context: context, size: size)
                   ),
                   singleTrailCardWidget(
                     leadingIcon: 'main/freelancericon',
                     title: 'Become a Freelancer',
-                    onPressed: () {}
+                    onPressed: () {
+                      showModalBottomSheet(
+                        backgroundColor: AppColors.secondaryBackgroundColor,
+                        context: context,
+                        isScrollControlled: true,
+                        builder: (_) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.secondaryBackgroundColor,
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                            ),
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                              left: 16,
+                              right: 16,
+                              top: 24,
+                            ),
+                            child: Column(
+                              children: [
+                                reusableText(
+                                  text: 'Press the button below to become a freelancer, you will receive a mail in a few hours',
+                                  maxLines: 5,
+                                  fontSize: 14
+                                ),
+                                SizedBox(height: 5,),
+                                longActionButton(
+                                  text: 'Confirm Request',
+                                  size: size,
+                                  buttonColor: AppColors.dashaSignatureColor,
+                                  onPressed: () {
+                                    context.pop();
+                                  }
+                                )
+                              ],
+                            ),
+                          );
+                        }
+                      );
+                    }
                   ),
                   singleTrailCardWidget(
                       leadingIcon: 'main/changepasswordicon',
                       title: 'Change Password',
                       onPressed: () => _showChangePasswordModal(context: context, authProvider: authProvider, size: size)
                   ),
+
                   // singleTrailCardWidget(
                   //     leadingIcon: FontAwesomeIcons.download,
                   //     title: 'Change Username',

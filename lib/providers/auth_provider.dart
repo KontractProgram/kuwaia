@@ -358,7 +358,6 @@ class AuthProvider with ChangeNotifier {
         _error = 'unknown-error';
         throw Exception('unknown-error');
       }
-      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -506,6 +505,31 @@ class AuthProvider with ChangeNotifier {
       _otpExpiry = null;
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+
+  Future<void> sendInvite(String email) async {
+    try{
+      final response = await _client.functions.invoke(
+        'send-invite-email',
+        body: {
+          'recipientEmail': email
+        },
+      );
+
+      if (response.status != 200) {
+        // Throw an error if the backend function failed
+        final errorBody = response.data;
+        throw Exception('Invite failed to send: ${errorBody['message'] ?? 'Server error'}');
+      }
+
+      // Success
+      print('Invite Edge Function executed successfully.');
+
+    } catch(e) {
+      print('Error invoking send invite function: $e');
+      throw Exception('Failed to send the invitation. Please try again.');
     }
   }
 }
