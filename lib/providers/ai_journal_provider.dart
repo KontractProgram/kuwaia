@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kuwaia/models/community/latest.dart';
+import 'package:kuwaia/models/community/promotion.dart';
 import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/community/freelancer.dart';
@@ -23,6 +24,7 @@ class AiJournalProvider with ChangeNotifier{
 
   List<Freelancer>? _freelancers;
   List<String>? _freelancerUrls;
+  List<Promotion>? _promotions;
 
   bool _isLoading = true;
   String? _error;
@@ -38,6 +40,7 @@ class AiJournalProvider with ChangeNotifier{
 
   List<Freelancer>? get freelancers => _freelancers;
   List<String>? get freelancerUrls => _freelancerUrls;
+  List<Promotion>? get promotions => _promotions;
 
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -266,11 +269,19 @@ class AiJournalProvider with ChangeNotifier{
       _error = null;
       notifyListeners();
 
+      //fetch freelancers
       final freelancersResponse = await _client.from(SupabaseTables.freelancers.name).select();
 
       final freelancersResponseList = List<Map<String, dynamic>>.from(freelancersResponse);
 
       _freelancers = freelancersResponseList.map((map) => Freelancer.fromMap(map)).toList();
+
+      //fetch promotions
+      final promotionsResponse = await _client.from(SupabaseTables.freelancer_promotions.name).select();
+
+      final promotionsResponseList = List<Map<String, dynamic>>.from(promotionsResponse);
+
+      _promotions = promotionsResponseList.map((map) => Promotion.fromMap(map)).toList();
 
       _isLoading = false;
       notifyListeners();
@@ -305,5 +316,36 @@ class AiJournalProvider with ChangeNotifier{
       notifyListeners();
     }
   }
+
+  Future<void> fetchFreelancerPromotions() async {
+    try {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+
+      final promotionsResponse = await _client.from(SupabaseTables.freelancer_promotions.name).select();
+
+      final promotionsResponseList = List<Map<String, dynamic>>.from(promotionsResponse);
+
+      _promotions = promotionsResponseList.map((map) => Promotion.fromMap(map)).toList();
+
+      _isLoading = false;
+      notifyListeners();
+    } catch(e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> sendFreelancerRequest(String email) async {
+    try {
+      await _client.from(SupabaseTables.freelancer_request.name).insert({'email', email});
+    } catch(e) {
+     return;
+    }
+  }
+
+
 
 }

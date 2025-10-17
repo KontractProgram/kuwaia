@@ -68,45 +68,65 @@ class _FreelancersScreenState extends State<FreelancersScreen> {
         }
 
         final freelancers = aiJournalProvider.freelancers ?? [];
+        final promotions = aiJournalProvider.promotions ?? [];
+        int count = freelancers.length;
+        if(promotions.isNotEmpty) {
+          count += 1;
+        }
 
         if(freelancers.isEmpty) {
-          return Center(child: reusableText(text: "No freelancers yet"),);
+          return Center(
+            child: Column(
+              children: [
+                Image.asset('assets/kuwaia_icons/main/freelancericon.png', width: size.width*0.6,),
+                reusableText(text: 'No freelancers available yet', fontSize: 20, fontWeight: FontWeight.bold)
+              ],
+            ),
+          );
         }
 
         return ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: freelancers.length + 1,
+          itemCount: count,
           itemBuilder: (context, index) {
-            if (index == 0) {
-              // First item: promotion carousel
-              return PromotionCarousel(
-                promotions: freelancers.take(3).toList(), // example: first 5 as promotions
-                size: size,
-                onTap: (freelancer) => _showFreelancerGalleryModal(
+            if(count > freelancers.length) {
+              if (index == 0) {
+                // First item: promotion carousel
+                return PromotionCarousel(
+                  promotions: freelancers.take(3).toList(), // example: first 5 as promotions
+                  size: size,
+                  onTap: (freelancer) => _showFreelancerGalleryModal(
+                    context: context,
+                    size: size,
+                    freelancer: freelancer,
+                  ),
+                );
+              }
+
+              final freelancer = freelancers[index - 1];
+
+              return freelancerCard(
                   context: context,
                   size: size,
                   freelancer: freelancer,
-                ),
+                  onPressed: () => _showFreelancerGalleryModal(context: context, size: size, freelancer: freelancer)
               );
             }
-
-            final freelancer = freelancers[index - 1];
-
-
-            return freelancerCard(
-              context: context,
-              size: size,
-              freelancer: freelancer,
-              onPressed: () => _showFreelancerGalleryModal(context: context, size: size, freelancer: freelancer)
-            );
+            else {
+              return freelancerCard(
+                  context: context,
+                  size: size,
+                  freelancer: freelancers[index],
+                  onPressed: () => _showFreelancerGalleryModal(context: context, size: size, freelancer: freelancers[index])
+              );
+            }
           },
         );
       },
     );
   }
 }
-
 
 
 class FreelancerGalleryModalContent extends StatefulWidget {

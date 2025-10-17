@@ -1,5 +1,7 @@
 enum SupabaseTables {
   freelancer_gallery,
+  freelancer_promotions,
+  freelancer_request,
   freelancers,
   group_profession_map,
   latest,
@@ -18,6 +20,6 @@ enum SupabaseTables {
   tools,
   tools_groups,
   trending,
-  tool_notifications
+  tool_notifications,
 }
 
