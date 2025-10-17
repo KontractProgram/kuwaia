@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:kuwaia/widgets/buttons.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,8 +25,9 @@ class VersionProvider with ChangeNotifier {
   void _launchStoreUrl(BuildContext context) async {
     // FIX 1: Correctly use Theme.of(context).platform for store URL resolution.
     // FIX 2: Check if the URLs are available (not null or empty).
+
     if (_iOSAppStoreUrl != null && _androidPlayStoreUrl != null) {
-      String url = (Theme.of(context).platform == TargetPlatform.iOS)
+      String url = (defaultTargetPlatform == TargetPlatform.iOS)
           ? _iOSAppStoreUrl!
           : _androidPlayStoreUrl!;
 
@@ -47,54 +50,55 @@ class VersionProvider with ChangeNotifier {
         background: AppColors.secondaryAccentColor,
         autoDismiss: false, // Not auto dismissable
         slideDismissDirection: DismissDirection.horizontal, // Can be swiped away
-        trailing: TextButton(
-          onPressed: () {
-            // Dismiss the notification overlay
-            OverlaySupportEntry.of(context)?.dismiss();
-            // Pass the context of the notification to the helper
-            _launchStoreUrl(context);
-          },
-          child: reusableText(
-            text: 'UPDATE',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: AppColors.primaryBackgroundColor,
-          ),
+
+        // FIX: Use Builder to get the context inside the Overlay
+        trailing: Builder(
+            builder: (innerContext) { // innerContext is the context of the TextButton inside the Overlay
+              return TextButton(
+                onPressed: () {
+                  // 1. Dismiss using the innerContext (the one inside the notification)
+                  OverlaySupportEntry.of(innerContext)?.dismiss();
+                  // 2. Launch URL using the original context (for Theme/Platform check)
+                  _launchStoreUrl(context);
+                },
+                child: reusableText(
+                  text: 'UPDATE',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.bodyTextColor,
+                ),
+              );
+            }
         )
     );
   }
 
-  // Hard Update Screen (Blocking, must update)
-  void _showMustUseUpdateScreen(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Cannot be swiped away or tapped outside
-      builder: (BuildContext dialogContext) {
-        return WillPopScope( // Prevents back button dismissal on Android
-          onWillPop: () async => false,
-          child: AlertDialog(
-            title: reusableText(text: 'Required Update', fontWeight: FontWeight.bold),
-            content: reusableText(
-                text: 'This version of the app is no longer supported. Please update to continue using the service.',
-                textAlign: TextAlign.start
-            ),
-            actions: <Widget>[
-              TextButton(
+  void _showMustUseUpdateScreen(BuildContext context){
+    showSimpleNotification(
+        reusableText(text: 'This version is already outdated, some features may not work well. Please update this now ASAP', textAlign: TextAlign.start, maxLines: 4, fontSize: 14),
+        leading: const FaIcon(FontAwesomeIcons.circleUp),
+        background: AppColors.warningColor,
+        autoDismiss: false, // Not auto dismissable
+        slideDismiss: false,
+        // FIX: Use Builder to get the context inside the Overlay
+        trailing: Builder(
+            builder: (innerContext) { // innerContext is the context of the TextButton inside the Overlay
+              return TextButton(
                 onPressed: () {
-                  // User must update. Take them to the store.
-                  // Pass the context of the dialog to the helper
-                  _launchStoreUrl(dialogContext);
+                  // 1. Dismiss using the innerContext (the one inside the notification)
+                  OverlaySupportEntry.of(innerContext)?.dismiss();
+                  // 2. Launch URL using the original context (for Theme/Platform check)
+                  _launchStoreUrl(context);
                 },
                 child: reusableText(
-                  text: 'UPDATE NOW',
+                  text: 'UPDATE',
+                  fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: AppColors.secondaryAccentColor,
+                  color: AppColors.bodyTextColor,
                 ),
-              ),
-            ],
-          ),
-        );
-      },
+              );
+            }
+        )
     );
   }
 
@@ -110,7 +114,7 @@ class VersionProvider with ChangeNotifier {
         return;
       }
 
-      _releaseDateTime = DateTime.parse(response['release_time']);
+      _releaseDateTime = DateTime.parse(response['release_date']);
       _mustUseDateTime = DateTime.parse(response['must_use_date']);
 
       // NEW: Fetch store URLs from the record
@@ -123,6 +127,8 @@ class VersionProvider with ChangeNotifier {
       debugPrint('Android URL: $_androidPlayStoreUrl');
 
       final now = DateTime.now();
+
+      notifyListeners();
 
       // 2. Check mustUse Date (Highest Priority)
       if (_mustUseDateTime != null && now.isAfter(_mustUseDateTime!)) {

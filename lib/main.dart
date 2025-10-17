@@ -37,6 +37,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => UpdatesProvider()),
           ChangeNotifierProvider(create: (_) => NotificationProvider()),
           ChangeNotifierProvider(create: (_) => AiJournalProvider()),
+          ChangeNotifierProvider(create: (_) => VersionProvider()),
 
         ],
         child: const KuwaiaApp(),

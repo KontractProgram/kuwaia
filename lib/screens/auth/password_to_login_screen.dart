@@ -55,7 +55,13 @@ class _PasswordToLoginScreenState extends State<PasswordToLoginScreen> {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
         await authProvider.signIn(email: widget.email, password: password);
-      } catch(e) {showToast('Unable to sign in');}
+      } catch(e) {
+        if (e.toString().contains('invalid-credentials')) {
+          showToast('Invalid credentials. Please try again.');
+        } else {
+          showToast('System busy, please try again later');
+        }
+      }
     }
   }
 

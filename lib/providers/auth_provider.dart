@@ -142,8 +142,14 @@ class AuthProvider with ChangeNotifier {
 
       return response;
     } catch (e) {
-      _error = e.toString();
-      throw Exception('❌ Provider sign in exception: $e');
+      if (e.toString().contains('Invalid login credentials') ||
+          e.toString().contains('invalid_credentials')) {
+        _error = 'invalid-credentials';
+        throw Exception('invalid-credentials');
+      } else {
+        _error = 'unknown-error';
+        throw Exception('unknown-error');
+      }
     } finally {
       _isLoading = false;
       notifyListeners();

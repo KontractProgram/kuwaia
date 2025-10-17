@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:kuwaia/system/constants.dart';
 import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/texts.dart';
+import 'package:kuwaia/widgets/toast.dart';
 
 import '../../routing/app_router.dart';
 
@@ -78,6 +79,9 @@ class AuthOptionsScreen extends StatelessWidget {
 
               continueWithGoogleButton(
                   size: size,
+                  onPressed: () {
+                    showToast('Google sign in unavailable');
+                  }
                   //integrate function for google sign in/up
               ),
 
