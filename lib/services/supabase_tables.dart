@@ -21,5 +21,6 @@ enum SupabaseTables {
   tools_groups,
   trending,
   tool_notifications,
+  versions
 }
 
