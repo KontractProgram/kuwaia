@@ -15,13 +15,35 @@ import '../../widgets/buttons.dart';
 import '../../widgets/texts.dart';
 import '../../widgets/toast.dart';
 
-class PromptShareModal extends StatelessWidget {
+// The class definition changes from StatelessWidget to StatefulWidget
+class PromptShareModal extends StatefulWidget {
   final Prompt prompt;
   final PromptNotification promptNotification;
   final Profile owner;
   final Tool tool;
 
-  const PromptShareModal({super.key, required this.prompt, required this.owner, required this.promptNotification, required this.tool});
+  const PromptShareModal({
+    super.key,
+    required this.prompt,
+    required this.owner,
+    required this.promptNotification,
+    required this.tool
+  });
+
+  @override
+  State<PromptShareModal> createState() => _PromptShareModalState();
+}
+
+class _PromptShareModalState extends State<PromptShareModal> {
+  // 1. Local state variable to track the acceptance status
+  // Initialize it with the existing status from the notification object.
+  bool? _acceptedStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _acceptedStatus = widget.promptNotification.accepted;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +51,8 @@ class PromptShareModal extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return Container(
-      height: size.height*0.9,
+      // ... (rest of the container setup is the same)
+      height: size.height * 0.9,
       decoration: BoxDecoration(
         color: AppColors.primaryBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -48,54 +71,71 @@ class PromptShareModal extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: (){context.pop();}, child: reusableText(text: 'SKIP', fontWeight: FontWeight.w500))
+                TextButton(onPressed: () { context.pop(); }, child: reusableText(text: 'SKIP', fontWeight: FontWeight.w500))
               ],
             ),
 
-            reusableText(text: 'Shared Prompt to you from ${owner.username}', fontSize: 20, fontWeight: FontWeight.bold, textAlign: TextAlign.start),
+            reusableText(text: 'Shared Prompt to you from ${widget.owner.username}', fontSize: 20, fontWeight: FontWeight.bold, textAlign: TextAlign.start),
 
             const SizedBox(height: 10),
 
-            reusableText(text: prompt.description, fontWeight: FontWeight.w600),
+            reusableText(text: widget.prompt.description, fontWeight: FontWeight.w600),
 
             const SizedBox(height: 8),
 
-            reusableText(text: prompt.prompt, maxLines: 100),
+            reusableText(text: widget.prompt.prompt, maxLines: 100),
 
             const SizedBox(height: 10),
 
-            if(promptNotification.accepted == null)
-              reusableText(text: 'This prompt is built for ${tool.name}. If you do not have this tool, it will be automatically added to your diary', maxLines: 5, fontSize: 14, color: AppColors.dashaSignatureColor),
+            // Use the local state variable _acceptedStatus
+            if (_acceptedStatus == null)
+              reusableText(text: 'This prompt is built for ${widget.tool.name}. If you do not have this tool, it will be automatically added to your diary', maxLines: 5, fontSize: 14, color: AppColors.dashaSignatureColor),
 
-            SizedBox(height: 10,),
+            SizedBox(height: 10),
 
-            promptNotification.accepted == null
-              ? Row(
+            // Use the local state variable _acceptedStatus
+            _acceptedStatus == null
+                ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Accept Button Logic
                 shortActionButton(
                     onPressed: () async {
                       final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                      await aiDiaryProvider.getJournalPromptToDiary(prompt: prompt);
+                      await aiDiaryProvider.getJournalPromptToDiary(prompt: widget.prompt);
 
-                      await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': true}).eq('id', promptNotification.id);
+                      // Update the database
+                      await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': true}).eq('id', widget.promptNotification.id);
 
+                      // 2. Update the local state and trigger a rebuild
+                      setState(() {
+                        _acceptedStatus = true;
+                      });
 
-                      if(context.mounted){
-                        context.pop();
-                      }
+                      showToast('Prompt added to ${widget.tool.name} in diary');
 
-                      showToast('Prompt added to ${tool.name} in diary');
-
+                      // We pop after the setState to show the status, otherwise it closes immediately
+                      // If you want it to close immediately, move context.pop() here and remove setState.
+                      // Since you want to show the 'Prompt added' state, we'll keep the pop() commented or move it out.
+                      // context.pop();
                     },
                     size: size,
                     text: 'Accept',
                     buttonColor: AppColors.dashaSignatureColor
                 ),
+                // Reject Button Logic
                 shortActionButton(
                   onPressed: () async {
-                    context.pop();
-                    await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': false}).eq('id', promptNotification.id);
+                    // Update the database
+                    await client.from(SupabaseTables.prompt_notifications.name).update({'accepted': false}).eq('id', widget.promptNotification.id);
+
+                    // 3. Update the local state and trigger a rebuild
+                    setState(() {
+                      _acceptedStatus = false;
+                    });
+
+                    // We pop after the setState for the same reason
+                    // context.pop();
                   },
                   size: size,
                   text: 'Reject',
@@ -103,20 +143,24 @@ class PromptShareModal extends StatelessWidget {
                 ),
               ],
             )
-              : Container(
-                width: size.width*0.85,
-                height: 50,
-                decoration: BoxDecoration(
+            // Display Accepted/Rejected Container
+                : Container(
+              width: size.width * 0.85,
+              height: 50,
+              decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: promptNotification.accepted == true ? AppColors.confirmColor.withAlpha(26) : AppColors.warningColor.withAlpha(26)
-                ),
-                child: Center(
-                  child: reusableText(
-                    text: promptNotification.accepted == true ? 'Prompt added' : 'Prompt rejected',
+                  // Use the local state variable _acceptedStatus
+                  color: _acceptedStatus == true ? AppColors.confirmColor.withAlpha(26) : AppColors.warningColor.withAlpha(26)
+              ),
+              child: Center(
+                child: reusableText(
+                  // Use the local state variable _acceptedStatus
+                    text: _acceptedStatus == true ? 'Prompt added' : 'Prompt rejected',
                     fontWeight: FontWeight.w600,
-                    color: promptNotification.accepted == true ? AppColors.confirmColor : AppColors.warningColor),
+                    color: _acceptedStatus == true ? AppColors.confirmColor : AppColors.warningColor
                 ),
               ),
+            ),
             const SizedBox(height: 10),
           ],
         ),
@@ -126,13 +170,34 @@ class PromptShareModal extends StatelessWidget {
 }
 
 
-class ToolShareModal extends StatelessWidget {
+class ToolShareModal extends StatefulWidget {
   final ToolNotification toolNotification;
   final Tool tool;
   final Group group;
   final Profile sender;
 
-  const ToolShareModal({super.key, required this.toolNotification, required this.group, required this.tool, required this.sender});
+  const ToolShareModal({
+    super.key,
+    required this.toolNotification,
+    required this.group,
+    required this.tool,
+    required this.sender
+  });
+
+  @override
+  State<ToolShareModal> createState() => _ToolShareModalState();
+}
+
+class _ToolShareModalState extends State<ToolShareModal> {
+  // Local state variable to track the acceptance status
+  bool? _acceptedStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with the current status from the notification object
+    _acceptedStatus = widget.toolNotification.accepted;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +205,7 @@ class ToolShareModal extends StatelessWidget {
     final size = MediaQuery.of(context).size;
 
     return Container(
-      height: size.height*0.9,
+      height: size.height * 0.9,
       decoration: BoxDecoration(
         color: AppColors.primaryBackgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -159,51 +224,72 @@ class ToolShareModal extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                TextButton(onPressed: (){context.pop();}, child: reusableText(text: 'SKIP', fontWeight: FontWeight.w500))
+                TextButton(onPressed: () { context.pop(); }, child: reusableText(text: 'SKIP', fontWeight: FontWeight.w500))
               ],
             ),
 
-            reusableText(text: 'Shared Tool to you from ${sender.username}', fontSize: 20, fontWeight: FontWeight.bold),
+            // Use widget.sender
+            reusableText(text: 'Shared Tool to you from ${widget.sender.username}', fontSize: 20, fontWeight: FontWeight.bold),
 
             const SizedBox(height: 10),
 
-            reusableText(text: tool.name, fontWeight: FontWeight.w600),
+            // Use widget.tool
+            reusableText(text: widget.tool.name, fontWeight: FontWeight.w600),
 
             const SizedBox(height: 4),
 
-            reusableText(text: group.name),
+            // Use widget.group
+            reusableText(text: widget.group.name),
 
             const SizedBox(height: 20),
 
-
-            toolNotification.accepted == null
-              ? Row(
+            // Use the local state variable _acceptedStatus
+            _acceptedStatus == null
+                ? Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Accept Button Logic
                 shortActionButton(
                     onPressed: () async {
                       final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                      await aiDiaryProvider.addToolToDiary(tool: tool);
+                      // Use widget.tool
+                      await aiDiaryProvider.addToolToDiary(tool: widget.tool);
 
-                      await client.from(SupabaseTables.tool_notifications.name).update({'accepted': true}).eq('id', toolNotification.id);
+                      // Update the database
+                      await client.from(SupabaseTables.tool_notifications.name)
+                      // Use widget.toolNotification
+                          .update({'accepted': true}).eq('id', widget.toolNotification.id);
 
+                      // 1. Update the local state and trigger a rebuild
+                      setState(() {
+                        _acceptedStatus = true;
+                      });
 
-                      if(context.mounted){
-                        context.pop();
-                      }
+                      // Use widget.tool
+                      showToast('${widget.tool.name} added to diary');
 
-                      showToast('${tool.name} added to diary');
-
+                      // context.pop() is removed here so the user sees the confirmation container
                     },
                     size: size,
                     text: 'Accept',
                     buttonColor: AppColors.dashaSignatureColor
                 ),
 
+                // Reject Button Logic
                 shortActionButton(
                   onPressed: () async {
-                    context.pop();
-                    await client.from(SupabaseTables.tool_notifications.name).update({'accepted': false}).eq('id', toolNotification.id);
+                    // Update the database
+                    await client.from(SupabaseTables.tool_notifications.name)
+                    // Use widget.toolNotification
+                        .update({'accepted': false}).eq('id', widget.toolNotification.id);
+
+                    // 2. Update the local state and trigger a rebuild
+                    setState(() {
+                      _acceptedStatus = false;
+                    });
+
+                    // context.pop() is removed here so the user sees the rejection container
+                    // If you want it to close immediately on reject, put context.pop() here.
                   },
                   size: size,
                   text: 'Reject',
@@ -211,27 +297,28 @@ class ToolShareModal extends StatelessWidget {
                 ),
               ],
             )
-              : Container(
-              width: size.width*0.85,
+            // Display Accepted/Rejected Container
+                : Container(
+              width: size.width * 0.85,
               height: 50,
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: toolNotification.accepted == true ? AppColors.confirmColor.withAlpha(26) : AppColors.warningColor.withAlpha(26)
+                  // Use the local state variable _acceptedStatus
+                  color: _acceptedStatus == true ? AppColors.confirmColor.withAlpha(26) : AppColors.warningColor.withAlpha(26)
               ),
               child: Center(
                 child: reusableText(
-                    text: toolNotification.accepted == true ? 'Prompt added' : 'Prompt rejected',
+                  // Use the local state variable _acceptedStatus
+                    text: _acceptedStatus == true ? 'Tool added' : 'Tool rejected', // Corrected text from 'Prompt' to 'Tool'
                     fontWeight: FontWeight.w600,
-                    color: toolNotification.accepted == true ? AppColors.confirmColor : AppColors.warningColor),
+                    color: _acceptedStatus == true ? AppColors.confirmColor : AppColors.warningColor
+                ),
               ),
             ),
-
             const SizedBox(height: 10),
           ],
         ),
       ),
     );
   }
-
-
 }

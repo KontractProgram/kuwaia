@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/profile.dart';
+import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/widgets/buttons.dart';
 import 'package:kuwaia/widgets/custom.dart';
 import 'package:kuwaia/widgets/text_fields.dart';
@@ -494,7 +495,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ]
                 ),
-                child: Center(child:Image.asset("assets/kuwaia_icons/main/profileicon.png", width: 50)),
+                child: Center(child:Image.asset("assets/kuwaia_icons/main/profileicon.png", width: size.width*0.35)),
               ),
 
               SizedBox(height: 20,),
@@ -586,6 +587,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               top: 24,
                             ),
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 reusableText(
                                   text: 'Press the button below to become a freelancer, you will receive a mail in a few hours',
@@ -597,8 +599,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   text: 'Confirm Request',
                                   size: size,
                                   buttonColor: AppColors.dashaSignatureColor,
-                                  onPressed: () {
+                                  onPressed: () async {
                                     context.pop();
+                                    try{
+                                      final aiJournalProvider = Provider.of<AiJournalProvider>(context, listen: false);
+                                      final sentRequest = await aiJournalProvider.sendFreelancerRequest(authProvider.profile!.email);
+                                      if(sentRequest) {
+                                        showToast('Request sent successfully');
+                                      } else {
+                                        showToast('Server busy, try again later');
+                                      }
+
+                                    } catch (e) {
+                                      showToast('Server busy, try again later');
+                                    }
                                   }
                                 )
                               ],

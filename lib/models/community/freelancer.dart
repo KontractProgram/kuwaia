@@ -16,9 +16,19 @@ class Freelancer{
       name: map['name'] as String,
       skill: map['skill'] as String,
       imageUrl: map['image_url'] as String,
-      rating: map['rating'] as double,
+      rating: (map['rating'] as num).toDouble(),
       email: map['email'] as String,
       aboutMe: map['about_me'] as String,
     );
   }
+
+  factory Freelancer.empty() => Freelancer(
+    id: 0,
+    name: '',
+    skill: '',
+    imageUrl: '',
+    rating: 0.0,
+    email: '',
+    aboutMe: '',
+  );
 }

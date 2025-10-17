@@ -338,14 +338,16 @@ class AiJournalProvider with ChangeNotifier{
     }
   }
 
-  Future<void> sendFreelancerRequest(String email) async {
+  Future<bool> sendFreelancerRequest(String email) async {
     try {
-      await _client.from(SupabaseTables.freelancer_request.name).insert({'email', email});
+      print(email);
+      await _client.from(SupabaseTables.freelancer_requests.name).insert({'email': email});
+      return true;
     } catch(e) {
-     return;
+      print('request error ${e.toString()}');
+     return false;
     }
   }
-
 
 
 }

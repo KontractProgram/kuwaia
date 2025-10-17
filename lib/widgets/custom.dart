@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/community/freelancer.dart';
+import 'package:kuwaia/models/community/promotion.dart';
 import 'package:kuwaia/models/group.dart';
 import 'package:kuwaia/models/in_tool/prompt.dart';
 import 'package:kuwaia/widgets/texts.dart';
@@ -401,59 +402,138 @@ Widget trendingToolsWidget({
   );
 }
 
-
 Widget freelancerCard({
   required BuildContext context,
   required Size size,
   required Freelancer freelancer,
-  VoidCallback? onPressed
-}){
-  return Container(
-    width: size.width*0.9,
-    padding: EdgeInsets.all(4),
-    margin: EdgeInsets.only(top: 10, left: 7, right: 7),
-    decoration: BoxDecoration(
-      color: AppColors.secondaryBackgroundColor,
-      borderRadius: BorderRadius.circular(20),
+  VoidCallback? onPressed,
+}) {
+  return InkWell(
+    onTap: onPressed,
+    borderRadius: BorderRadius.circular(20),
+    child: Container(
+      width: size.width * 0.9,
+      margin: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.secondaryBackgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          // Leading Image (touching top and bottom)
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              bottomLeft: Radius.circular(20),
+            ),
+            child: Image.network(
+              freelancer.imageUrl,
+              width: 70,
+              height: 80,
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          const SizedBox(width: 10),
+
+          // Name and skill
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                reusableText(
+                  text: freelancer.name,
+                  fontWeight: FontWeight.w600,
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                reusableText(
+                  text: freelancer.skill,
+                  fontSize: 14,
+                  color: AppColors.bodyTextColor.withAlpha(200),
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(width: 8),
+
+          // Rating
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              reusableText(
+                text: 'Rating',
+                color: AppColors.bodyTextColor.withAlpha(120),
+                fontSize: 12,
+              ),
+              reusableText(text: '${freelancer.rating.toString()}/5'),
+            ],
+          ),
+
+          const SizedBox(width: 10),
+        ],
+      ),
     ),
-    child: ListTile(
-      onTap: onPressed,
-      contentPadding: const EdgeInsets.all(0),
-      leading: CircleAvatar(
-        radius: 20,
-        backgroundColor: AppColors.secondaryBackgroundColor,
-        child: ClipOval(child: Image.network(freelancer.imageUrl, fit: BoxFit.cover,)),
-      ),
-
-      title: reusableText(
-        text: freelancer.name,
-        fontWeight: FontWeight.w600,
-        textAlign: TextAlign.start,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis, // optional
-      ),
-
-      subtitle: reusableText(
-        text: freelancer.skill,
-        fontSize: 14,
-        color: AppColors.bodyTextColor.withAlpha(200),
-        textAlign: TextAlign.start,
-        maxLines: 2
-      ),
-
-      trailing: SizedBox(
-        width: 50,
-        height: 50,
-        child: Column(
-          children: [
-            reusableText(text: 'Rating', color: AppColors.bodyTextColor.withAlpha(120), fontSize: 12),
-            reusableText(text: '${freelancer.rating.toString()}/5')
-          ],
-        ),
-      ),
-    )
   );
 }
+
+
+// Widget freelancerCard({
+//   required BuildContext context,
+//   required Size size,
+//   required Freelancer freelancer,
+//   VoidCallback? onPressed
+// }){
+//   return Container(
+//     width: size.width*0.9,
+//     padding: EdgeInsets.only(right: 4, top: 0, bottom: 0, left: 0),
+//     margin: EdgeInsets.only(top: 10, left: 7, right: 7),
+//     decoration: BoxDecoration(
+//       color: AppColors.secondaryBackgroundColor,
+//       borderRadius: BorderRadius.circular(20),
+//     ),
+//     child: ListTile(
+//       onTap: onPressed,
+//       contentPadding: const EdgeInsets.all(0),
+//       leading: Container(
+//         width: 50,
+//         decoration: BoxDecoration(borderRadius: BorderRadius.only(topLeft: Radius.circular(20), bottomLeft: Radius.circular(20)), color: AppColors.secondaryBackgroundColor,),
+//         child: Image.network(freelancer.imageUrl, fit: BoxFit.cover),
+//       ),
+//
+//       title: reusableText(
+//         text: freelancer.name,
+//         fontWeight: FontWeight.w600,
+//         textAlign: TextAlign.start,
+//         maxLines: 1,
+//         overflow: TextOverflow.ellipsis, // optional
+//       ),
+//
+//       subtitle: reusableText(
+//         text: freelancer.skill,
+//         fontSize: 14,
+//         color: AppColors.bodyTextColor.withAlpha(200),
+//         textAlign: TextAlign.start,
+//         maxLines: 1
+//       ),
+//
+//       trailing: SizedBox(
+//         width: 50,
+//         height: 50,
+//         child: Column(
+//           children: [
+//             reusableText(text: 'Rating', color: AppColors.bodyTextColor.withAlpha(120), fontSize: 12),
+//             reusableText(text: '${freelancer.rating.toString()}/5')
+//           ],
+//         ),
+//       ),
+//     )
+//   );
+// }
 
 
 Widget journalPromptWidget({
@@ -652,9 +732,9 @@ class _WeightedImageCarouselState extends State<WeightedImageCarousel> {
 }
 
 class PromotionCarousel extends StatefulWidget {
-  final List<Freelancer> promotions;
+  final List<Promotion> promotions;
   final Size size;
-  final void Function(Freelancer) onTap;
+  final void Function(Promotion) onTap;
 
   const PromotionCarousel({
     super.key,
@@ -707,7 +787,7 @@ class _PromotionCarouselState extends State<PromotionCarousel> {
             itemCount: widget.promotions.length,
             onPageChanged: (index) => setState(() => _currentIndex = index),
             itemBuilder: (context, index) {
-              final freelancer = widget.promotions[index];
+              final promotion = widget.promotions[index];
               return AnimatedBuilder(
                 animation: _pageController,
                 builder: (context, child) {
@@ -720,14 +800,14 @@ class _PromotionCarouselState extends State<PromotionCarousel> {
                     child: Transform.scale(
                       scale: value,
                       child: GestureDetector(
-                        onTap: () => widget.onTap(freelancer),
+                        onTap: () => widget.onTap(promotion),
                         child: Container(
                           margin: const EdgeInsets.symmetric(horizontal: 8),
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             color: AppColors.secondaryBackgroundColor,
                             image: DecorationImage(
-                              image: NetworkImage(freelancer.imageUrl),
+                              image: NetworkImage(promotion.imageUrl),
                               fit: BoxFit.cover,
                             )
                           ),

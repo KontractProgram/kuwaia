@@ -16,11 +16,24 @@ class LocalStorage {
     if (!sharedUsers.contains(username)) {
       sharedUsers.add(username);
       await prefs.setStringList('sharedUsers', sharedUsers);
+    } else {
+      sharedUsers.remove(username);
+      sharedUsers.insert(0, username);
+      await prefs.setStringList('sharedUsers', sharedUsers);
     }
   }
 
   static Future<List<String>> getSharedUsers() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getStringList('sharedUsers') ?? [];
+  }
+
+  static Future<void> deleteUsername(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> sharedUsers = prefs.getStringList('sharedUsers')!;
+    if(sharedUsers.contains(username)) {
+      sharedUsers.remove(username);
+      await prefs.setStringList('sharedUsers', sharedUsers);
+    }
   }
 }

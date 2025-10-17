@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
+import 'package:kuwaia/providers/updates_provider.dart';
 import 'package:kuwaia/screens/main/landing_nav_screen.dart';
 import 'package:kuwaia/screens/onboarding/onboarding_screen.dart';
 import 'package:kuwaia/widgets/buttons.dart';
@@ -25,9 +26,11 @@ class _LandingScreenState extends State<LandingScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+      final updatesProvider = Provider.of<UpdatesProvider>(context, listen: false);
       notificationProvider.subscribePromptShare(context);
       notificationProvider.subscribeToolShare(context);
       notificationProvider.fetchAllNotifications();
+      updatesProvider.fetchUpdates(loadMore: false);
 
       // If no user → send to auth options
       if (!authProvider.isAuthenticated) {

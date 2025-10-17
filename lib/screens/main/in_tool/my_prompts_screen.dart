@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:kuwaia/models/profile.dart';
 import 'package:kuwaia/providers/ai_diary_provider.dart';
@@ -124,7 +125,12 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
     );
   }
 
-  void _showShareToFriendModal({required BuildContext context, required Size size, required int promptId, required String senderId}) {
+  void _showShareToFriendModal({
+    required BuildContext context,
+    required Size size,
+    required int promptId,
+    required String senderId
+  }) {
     final controller = TextEditingController();
     List<String> allUsernames = [];
     List<String> filteredUsernames = [];
@@ -135,131 +141,325 @@ class _MyPromptsScreenState extends State<MyPromptsScreen> {
       isScrollControlled: true,
       builder: (_) {
         return StatefulBuilder(
-          builder: (context, setState) {
-            Future(() async {
-              if (allUsernames.isEmpty) {
-                final saved = await LocalStorage.getSharedUsers();
+            builder: (context, setState) {
+
+              // Synchronous function to filter the list and update the filteredUsernames state
+              void filterUsernames(String query) {
                 setState(() {
-                  allUsernames = saved;
-                  filteredUsernames = saved;
+                  filteredUsernames = allUsernames
+                      .where((u) => u.toLowerCase().contains(query.toLowerCase()))
+                      .toList();
                 });
               }
-            });
 
-            void filterUsernames(String query) {
-              setState(() {
-                filteredUsernames = allUsernames
-                    .where((u) => u.toLowerCase().contains(query.toLowerCase()))
-                    .toList();
+              // Initial load of saved users (runs once)
+              Future(() async {
+                if (allUsernames.isEmpty) {
+                  final saved = await LocalStorage.getSharedUsers();
+                  setState(() {
+                    allUsernames = saved;
+                    filteredUsernames = saved;
+                  });
+                }
               });
-            }
 
-            return Container(
-              height: size.height * 0.9, // 90% of screen height
-              decoration: BoxDecoration(
-                color: AppColors.primaryBackgroundColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-                left: 16,
-                right: 16,
-                top: 24,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  reusableText(
-                    text: "Share To A Friend",
-                    fontWeight: FontWeight.w700,
-                    fontSize: 16,
-                  ),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: controller,
-                    onChanged: filterUsernames,
-                    decoration: InputDecoration(
-                      labelText: "Username",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
-                      ),
+              return Container(
+                height: size.height * 0.9, // 90% of screen height
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBackgroundColor,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                  left: 16,
+                  right: 16,
+                  top: 24,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    reusableText(
+                      text: "Share To A Friend",
+                      fontWeight: FontWeight.w700,
+                      fontSize: 16,
                     ),
-                    style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
-                  ),
-                  const SizedBox(height: 16),
-                  if (filteredUsernames.isNotEmpty)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: filteredUsernames.length,
-                        itemBuilder: (context, index) {
-                          final username = filteredUsernames[index];
-                          return ListTile(
-                            title: reusableText(
-                              text: username,
-                              fontSize: 14,
-                            ),
-                            onTap: () {
-                              controller.text = username;
-                            },
-                          );
-                        },
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: controller,
+                      onChanged: filterUsernames,
+                      decoration: InputDecoration(
+                        labelText: "Username",
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(15),
+                            borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+                        ),
                       ),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: reusableText(
-                        text: 'No saved usernames yet',
-                        fontSize: 12,
-                        color: AppColors.bodyTextColor.withAlpha(150)
-                      ),
+                      style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
                     ),
+                    const SizedBox(height: 16),
+                    if (filteredUsernames.isNotEmpty)
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: filteredUsernames.length,
+                          itemBuilder: (context, index) {
+                            final username = filteredUsernames[index];
+                            return ListTile(
+                              leading: FaIcon(FontAwesomeIcons.clockRotateLeft, color: AppColors.bodyTextColor.withAlpha(150), size: 16,),
+                              title: reusableText(
+                                  text: username,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  textAlign: TextAlign.start
+                              ),
+                              onTap: () {
+                                controller.text = username;
+                                // Optionally trigger filter here if you want selection to hide the list
+                                // filterUsernames(username);
+                              },
+                              trailing: IconButton(
+                                onPressed: () async {
+                                  // --- FIX APPLIED HERE (Delete Button) ---
+                                  await LocalStorage.deleteUsername(username);
 
-                  SizedBox(height: 10,),
+                                  // 1. Execute async work (get new list) outside setState
+                                  final newAllUsernames = await LocalStorage.getSharedUsers();
 
-                  longActionButton(
-                    text: "Share",
-                    size: size,
-                    buttonColor: AppColors.primaryAccentColor,
-                    textColor: AppColors.bodyTextColor,
-                    onPressed: () async {
-                      if (controller.text.isNotEmpty && validateUsername(controller.text) == null) {
-                        final username = controller.text;
-                        final profileService = ProfileService();
-                        final receiverResponse = await profileService.getProfileByUsername(username);
-                        if(receiverResponse != null) {
-                          final receiver = Profile.fromMap(receiverResponse);
+                                  // 2. Synchronously update state
+                                  setState(() {
+                                    allUsernames = newAllUsernames;
+                                    // 3. Re-filter based on the current text
+                                    filterUsernames(controller.text);
+                                  });
+                                },
+                                icon: FaIcon(FontAwesomeIcons.x, color: AppColors.bodyTextColor.withAlpha(150), size: 16),
+                              ),
+                            );
+                          },
+                        ),
+                      )
+                    else
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: reusableText(
+                            text: 'No saved usernames yet',
+                            fontSize: 12,
+                            color: AppColors.bodyTextColor.withAlpha(150)
+                        ),
+                      ),
 
-                          if(senderId != receiver.id){
-                            final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
-                            aiDiaryProvider.sharePromptToAFriend(senderId: senderId, receiverId: receiver.id, promptId: promptId);
-                            if(context.mounted){
-                              context.pop();
+                    const SizedBox(height: 10),
+
+                    longActionButton(
+                      text: "Share",
+                      size: size,
+                      buttonColor: AppColors.primaryAccentColor,
+                      textColor: AppColors.bodyTextColor,
+                      onPressed: () async {
+                        if (controller.text.isNotEmpty && validateUsername(controller.text) == null) {
+                          final username = controller.text;
+                          final profileService = ProfileService();
+                          final receiverResponse = await profileService.getProfileByUsername(username);
+
+                          if(receiverResponse != null) {
+                            final receiver = Profile.fromMap(receiverResponse);
+
+                            if(senderId != receiver.id){
+                              final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
+                              aiDiaryProvider.sharePromptToAFriend(senderId: senderId, receiverId: receiver.id, promptId: promptId);
+
+                              // Save user to LocalStorage
+                              await LocalStorage.saveSharedUser(username);
+
+                              // --- FIX APPLIED HERE (Share Button) ---
+                              // 1. Execute async work (get new list) outside setState
+                              final newAllUsernames = await LocalStorage.getSharedUsers();
+
+                              // 2. Synchronously update state
+                              setState(() {
+                                allUsernames = newAllUsernames;
+                                filterUsernames(controller.text);
+                              });
+                              // --- END FIX ---
+
+                              if(context.mounted){
+                                context.pop();
+                              }
+                              showToast('Prompt has been shared to $username');
+
                             }
-                            showToast('Prompt has been shared to $username');
-                          } else {
-                            showToast("Can't share prompt to self");
+                            else {
+                              showToast("Can't share prompt to self");
+                            }
                           }
-
-                        } else {
-                          showToast('Username does not exist');
+                          else {
+                            showToast('Username does not exist');
+                          }
                         }
-                      }
-                    },
-                  ),
-                ],
-              ),
-            );
-          }
+                      },
+                    ),
+                  ],
+                ),
+              );
+            }
         );
       },
     );
   }
+
+  // void _showShareToFriendModal({required BuildContext context, required Size size, required int promptId, required String senderId}) {
+  //   final controller = TextEditingController();
+  //   List<String> allUsernames = [];
+  //   List<String> filteredUsernames = [];
+  //
+  //   showModalBottomSheet(
+  //     backgroundColor: Colors.transparent,
+  //     context: context,
+  //     isScrollControlled: true,
+  //     builder: (_) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           Future(() async {
+  //             if (allUsernames.isEmpty) {
+  //               final saved = await LocalStorage.getSharedUsers();
+  //               setState(() {
+  //                 allUsernames = saved;
+  //                 filteredUsernames = saved;
+  //               });
+  //             }
+  //           });
+  //
+  //           void filterUsernames(String query) {
+  //             setState(() {
+  //               filteredUsernames = allUsernames
+  //                   .where((u) => u.toLowerCase().contains(query.toLowerCase()))
+  //                   .toList();
+  //             });
+  //           }
+  //
+  //           return Container(
+  //             height: size.height * 0.9, // 90% of screen height
+  //             decoration: BoxDecoration(
+  //               color: AppColors.primaryBackgroundColor,
+  //               borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+  //             ),
+  //             padding: EdgeInsets.only(
+  //               bottom: MediaQuery.of(context).viewInsets.bottom,
+  //               left: 16,
+  //               right: 16,
+  //               top: 24,
+  //             ),
+  //             child: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 reusableText(
+  //                   text: "Share To A Friend",
+  //                   fontWeight: FontWeight.w700,
+  //                   fontSize: 16,
+  //                 ),
+  //                 const SizedBox(height: 16),
+  //                 TextField(
+  //                   controller: controller,
+  //                   onChanged: filterUsernames,
+  //                   decoration: InputDecoration(
+  //                     labelText: "Username",
+  //                     border: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(15),
+  //                         borderSide: BorderSide(color: AppColors.bodyTextColor.withAlpha(150), width: 2)
+  //                     ),
+  //                     focusedBorder: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(15),
+  //                         borderSide: BorderSide(color: AppColors.secondaryAccentColor, width: 2)
+  //                     ),
+  //                   ),
+  //                   style: TextStyle(fontFamily: montserratRegular, color: AppColors.bodyTextColor, fontSize: 16),
+  //                 ),
+  //                 const SizedBox(height: 16),
+  //                 if (filteredUsernames.isNotEmpty)
+  //                   Expanded(
+  //                     child: ListView.builder(
+  //                       itemCount: filteredUsernames.length,
+  //                       itemBuilder: (context, index) {
+  //                         final username = filteredUsernames[index];
+  //                         return ListTile(
+  //                           leading: FaIcon(FontAwesomeIcons.clockRotateLeft, color: AppColors.bodyTextColor.withAlpha(150), size: 16,),
+  //                           title: reusableText(
+  //                             text: username,
+  //                             fontSize: 14,
+  //                             fontWeight: FontWeight.w500,
+  //                             textAlign: TextAlign.start
+  //                           ),
+  //                           onTap: () {
+  //                             controller.text = username;
+  //                           },
+  //                           trailing: IconButton(
+  //                             onPressed: () async {
+  //                               await LocalStorage.deleteUsername(username);
+  //                               allUsernames = await LocalStorage.getSharedUsers();
+  //                               filterUsernames;
+  //                             },
+  //                             icon: FaIcon(FontAwesomeIcons.x, color: AppColors.bodyTextColor.withAlpha(150), size: 16),
+  //                           ),
+  //                         );
+  //                       },
+  //                     ),
+  //                   )
+  //                 else
+  //                   Padding(
+  //                     padding: const EdgeInsets.only(top: 8),
+  //                     child: reusableText(
+  //                       text: 'No saved usernames yet',
+  //                       fontSize: 12,
+  //                       color: AppColors.bodyTextColor.withAlpha(150)
+  //                     ),
+  //                   ),
+  //
+  //                 SizedBox(height: 10),
+  //
+  //                 longActionButton(
+  //                   text: "Share",
+  //                   size: size,
+  //                   buttonColor: AppColors.primaryAccentColor,
+  //                   textColor: AppColors.bodyTextColor,
+  //                   onPressed: () async {
+  //                     if (controller.text.isNotEmpty && validateUsername(controller.text) == null) {
+  //                       final username = controller.text;
+  //                       final profileService = ProfileService();
+  //                       final receiverResponse = await profileService.getProfileByUsername(username);
+  //                       if(receiverResponse != null) {
+  //                         final receiver = Profile.fromMap(receiverResponse);
+  //
+  //                         if(senderId != receiver.id){
+  //                           final aiDiaryProvider = Provider.of<AiDiaryProvider>(context, listen: false);
+  //                           aiDiaryProvider.sharePromptToAFriend(senderId: senderId, receiverId: receiver.id, promptId: promptId);
+  //                           if(context.mounted){
+  //                             context.pop();
+  //                           }
+  //                           showToast('Prompt has been shared to $username');
+  //                           await LocalStorage.saveSharedUser(username);
+  //
+  //                         }
+  //                         else {
+  //                           showToast("Can't share prompt to self");
+  //                         }
+  //                       }
+  //                       else {
+  //                         showToast('Username does not exist');
+  //                       }
+  //                     }
+  //                   },
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         }
+  //       );
+  //     },
+  //   );
+  // }
 
   void _showSharePromptModal({required BuildContext context, required Size size, required AiDiaryProvider aiDiaryProvider, required Prompt prompt}) {
     showModalBottomSheet(

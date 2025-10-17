@@ -128,7 +128,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
                       if (notification.read == false)
                         Positioned(
-                          top: 8,
+                          top: 12,
                           right: 12,
                           child: Container(
                             width: 10,

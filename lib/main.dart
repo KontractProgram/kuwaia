@@ -5,7 +5,7 @@ import 'package:kuwaia/providers/ai_journal_provider.dart';
 import 'package:kuwaia/providers/auth_provider.dart';
 import 'package:kuwaia/providers/connectivity_provider.dart';
 import 'package:kuwaia/providers/notification_provider.dart';
-import 'package:kuwaia/providers/shorts_provider.dart';
+import 'package:kuwaia/providers/updates_provider.dart';
 import 'package:kuwaia/providers/tools_provider.dart';
 import 'package:kuwaia/screens/others/no_internet_screen.dart';
 import 'package:kuwaia/system/constants.dart';
@@ -33,7 +33,7 @@ void main() async {
           ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => AiDiaryProvider()),
           ChangeNotifierProvider(create: (_) => ToolsProvider()),
-          ChangeNotifierProvider(create: (_) => ShortsProvider()),
+          ChangeNotifierProvider(create: (_) => UpdatesProvider()),
           ChangeNotifierProvider(create: (_) => NotificationProvider()),
           ChangeNotifierProvider(create: (_) => AiJournalProvider()),
 

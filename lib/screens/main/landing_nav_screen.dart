@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:kuwaia/screens/main/nav/ai_diary_screen.dart';
 import 'package:kuwaia/screens/main/nav/ai_journal_screen.dart';
 import 'package:kuwaia/screens/main/nav/profile_screen.dart';
-import 'package:kuwaia/screens/main/nav/shorts_screen.dart';
+import 'package:kuwaia/screens/main/nav/updates_screen.dart';
 import 'package:kuwaia/screens/main/nav/tools_screen.dart';
 import 'package:kuwaia/system/constants.dart';
 import 'package:kuwaia/widgets/others.dart';
@@ -23,11 +23,11 @@ class _LandingNavScreenState extends State<LandingNavScreen> {
     AiDiaryScreen(),
     ToolsScreen(),
     AiJournalScreen(),
-    ShortsScreen(),
+    UpdatesScreen(),
     ProfileScreen()
   ];
 
-  static final List<String> _appBarTitles = ['AI Diary', 'Tools', 'AI Journal', 'Shorts', 'Profile'];
+  static final List<String> _appBarTitles = ['AI Diary', 'Tools', 'AI Journal', 'Updates', 'Profile'];
 
   @override
   Widget build(BuildContext context) {
